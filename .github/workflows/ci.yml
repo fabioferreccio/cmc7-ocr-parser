@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'milestone/**']
+  pull_request:
+    branches: [main, 'milestone/**']
+
+jobs:
+  test:
+    name: Test & Quality Gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+
+      # Regra 1.5 — linting
+      - name: Lint
+        run: npm run lint
+
+      # Regra 1.5 — formatting
+      - name: Format check
+        run: npm run format:check
+
+      # Regra 1.1 — TypeScript strict
+      - name: Type check
+        run: npm run build:check
+
+      # Regra 3.1 — Vitest
+      - name: Tests with coverage
+        run: npm run coverage
+
+      # Regra 5.2 — License compliance
+      - name: License check
+        run: npm run check:licenses
+
+  build:
+    name: Build & Bundle Size
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      # Regra 6.1 — bundle size hard limits
+      - name: Bundle size check
+        run: node scripts/check-bundle-size.js
+
+  commitlint:
+    name: Commit Message
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      # Regra 8.1 — Conventional Commits
+      - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to HEAD

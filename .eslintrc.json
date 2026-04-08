@@ -1,0 +1,61 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier"
+  ],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-non-null-assertion": "warn",
+    "@typescript-eslint/explicit-function-return-type": [
+      "error",
+      { "allowExpressions": true, "allowTypedFunctionExpressions": true }
+    ],
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-console": "error",
+    "no-debugger": "error",
+    "no-restricted-globals": [
+      "error",
+      { "name": "fetch", "message": "fetch() proibido em src/ (docs/05-regras.md §4.1). Use assetsBaseUrl para carregar arquivos estáticos." },
+      { "name": "XMLHttpRequest", "message": "XHR proibido em src/ (docs/05-regras.md §4.1)." }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "NewExpression[callee.name='WebSocket']",
+        "message": "WebSocket proibido em src/ (docs/05-regras.md §4.1)."
+      },
+      {
+        "selector": "CallExpression[callee.object.name='navigator'][callee.property.name='sendBeacon']",
+        "message": "sendBeacon() proibido (docs/05-regras.md §4.1)."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*.test.ts", "src/test-helpers/**"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "warn",
+        "no-restricted-globals": "off",
+        "no-restricted-syntax": "off"
+      }
+    },
+    {
+      "files": ["*.config.ts", "scripts/**"],
+      "rules": {
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "no-restricted-globals": "off"
+      }
+    }
+  ]
+}

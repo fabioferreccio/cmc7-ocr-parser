@@ -1,0 +1,22 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
+
+# Assets gerados (não versionados — gerados em build/CI)
+dist/wasm/
+dist/models/
+
+# Ferramentas de treinamento (não fazem parte da lib)
+tools/__pycache__/
+tools/*.pyc
+tools/datasets/
+
+# POC temporários
+poc/images/
+poc/results/
+
+# Relatórios de audit gerados
+audit/deps/*.json

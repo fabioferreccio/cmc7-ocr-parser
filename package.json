@@ -1,0 +1,108 @@
+{
+  "name": "cmc7-ocr-parser",
+  "version": "0.0.1",
+  "description": "TypeScript library for reading Brazilian CMC-7 check lines via camera, fully client-side",
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.cts",
+        "default": "./dist/cjs/index.cjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/esm/react.d.ts",
+        "default": "./dist/esm/react.js"
+      }
+    },
+    "./vue": {
+      "import": {
+        "types": "./dist/esm/vue.d.ts",
+        "default": "./dist/esm/vue.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "build:check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .ts,.tsx --max-warnings 0",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"docs/**/*.md\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "check:bundle": "node scripts/check-bundle-size.js",
+    "check:licenses": "license-checker --production --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0'",
+    "prepare": "husky",
+    "release:dry": "npm publish --dry-run"
+  },
+  "keywords": [
+    "cmc7",
+    "micr",
+    "ocr",
+    "cheque",
+    "check",
+    "brazil",
+    "febraban",
+    "typescript",
+    "wasm",
+    "camera"
+  ],
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vitest/coverage-v8": "^1.4.0",
+    "@vitest/ui": "^1.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.0.0",
+    "jsdom": "^24.0.0",
+    "license-checker": "^25.0.1",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.4.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "vue": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true },
+    "vue": { "optional": true }
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "eslint --max-warnings 0",
+      "prettier --write"
+    ],
+    "docs/**/*.md": [
+      "prettier --write"
+    ]
+  }
+}
