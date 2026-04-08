@@ -15,6 +15,7 @@ tools/*.pyc
 tools/datasets/
 
 # POC temporários
+!poc/images/input_file_0.png
 poc/images/
 poc/results/
 

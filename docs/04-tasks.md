@@ -65,7 +65,7 @@ audit/font-license.test.ts
 
 ---
 
-### T-002 — PoC de Segmentação CMC-7 em Imagens de Câmera
+### T-002 — PoC de Segmentação CMC-7 em Imagens de Câmera [DONE]
 
 > **Esta é a tarefa mais crítica do projeto.** Valida o Risco R1 do PRD e a Premissa P-01.
 

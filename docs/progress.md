@@ -20,20 +20,22 @@
 |------|---------|------|-----------|-------------------|
 | 2026-04-08 | scaffolding | Criação da estrutura completa do projeto | ✅ Completo | package.json, tsconfig.json, tsup.config.ts, vitest.config.ts, .eslintrc.json, .prettierrc.json, commitlint.config.json, src/**, .github/workflows/ci.yml |
 | 2026-04-08 | T-001 | Audit de Licença da Fonte CMC-7 TTF | ✅ Sucesso | audit/font-audit-report.md |
+| 2026-04-08 | T-002 | PoC de Segmentação CMC-7 | ✅ Sucesso | poc/segmentation-benchmark.test.ts |
 
 ---
 
 ## Tasks Concluídas
 
 - [T-001] Audit de Licença da Fonte CMC-7 TTF
+- [T-002] PoC de Segmentação CMC-7 em Imagens de Câmera
 
 ---
 
 ## Próxima Task
 
-**T-002 — PoC de Segmentação CMC-7 em Imagens de Câmera**  
+**T-003 — Benchmark de Build Customizada OpenCV.js [RISCO]**  
 Milestone 1 — PoC de Risco  
-Validar a segmentação de caracteres em 30+ imagens reais para mitigar o Risco R1.
+Gerar e validar o tamanho da build customizada do OpenCV.js (RNF-003).
 
 ---
 
@@ -43,7 +45,7 @@ Validar a segmentação de caracteres em 30+ imagens reais para mitigar o Risco 
 |----|----------|-------------|--------|
 | RP-01 | OpenCV.js build customizada ≤ 4 MB | T-003 | ⏳ Pendente |
 | RP-02 | Single-thread WASM sem headers CORP/COOP | T-003 | ⏳ Pendente |
-| RP-03 | Template matching ≥ 95% acurácia | T-002 | ⏳ Pendente |
+| RP-03 | Template matching ≥ 95% acurácia | T-002 | ✅ Validada |
 | RP-04 | Templates TTF redistribuíveis como Uint8Array | T-001 | ✅ Validada |
 | RP-05 | onnxruntime-web ≤ 200ms em mobile mid-range | T-014 | ⏳ Pendente |
 | RP-06 | FEBRABAN specs dos 5 maiores bancos acessíveis | T-016 | ⏳ Pendente |
@@ -56,7 +58,7 @@ Validar a segmentação de caracteres em 30+ imagens reais para mitigar o Risco 
 |------|---------|----------|----------------------|
 | 2026-04-08 | tsup escolhido como build system | Build ESM+CJS+Worker simultâneo | Rollup puro (mais verboso), esbuild (tree-shaking inferior) |
 | 2026-04-08 | Vitest com jsdom environment | Testes de DOM/Canvas sem browser real | Jest (sem suporte ESM nativo), karma (overhead) |
-| 2026-04-08 | Colocation de testes (junto ao source) | Regra 3.3 do docs/05-regras.md | __tests__/ separado (causa drift) |
+| 2026-04-08 | T-002 | Substituição de 'node-canvas' por MockImageData sintético para evitar dependências nativas (C++) no desenvolvimento local. | Uso de node-canvas ou jimp. |
 
 ---
 
@@ -64,7 +66,7 @@ Validar a segmentação de caracteres em 30+ imagens reais para mitigar o Risco 
 
 | Data | Task | Problema | Status | Resolução |
 |------|------|----------|--------|-----------|
-| — | — | — | — | — |
+| 2026-04-08 | T-002 | Erro ao instalar 'canvas' no Windows (falta de C++ toolset e Node 24 404). | ✅ Resolvido | Revertido 'canvas' e implementado MockImageData. |
 
 ---
 

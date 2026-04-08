@@ -86,7 +86,8 @@
     "prettier": "^3.2.0",
     "tsup": "^8.0.0",
     "typescript": "^5.4.0",
-    "vitest": "^1.4.0"
+    "vitest": "^1.4.0",
+    "jimp": "^0.22.12"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
