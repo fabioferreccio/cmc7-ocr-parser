@@ -38,7 +38,7 @@
 
 ---
 
-### T-001 — Audit de Licença da Fonte CMC-7 TTF
+### T-001 — Audit de Licença da Fonte CMC-7 TTF [DONE]
 
 | Campo | Valor |
 |-------|-------|
