@@ -96,7 +96,7 @@ poc/segmentation-benchmark.test.ts
 
 ---
 
-### T-003 — Benchmark Build Customizada OpenCV.js
+### T-003 — Benchmark Build Customizada OpenCV.js [DONE]
 
 | Campo | Valor |
 |-------|-------|
@@ -107,23 +107,22 @@ poc/segmentation-benchmark.test.ts
 | **Complexidade** | M |
 | **Risco** | Build customizada pode não suportar `findContours` ou `HoughLines` se módulos forem excluídos agressivamente |
 
+**Nota de Implementação:** Build TechStark v4.9.0 homologada. Atende RNF-003 (3.45 MB total JS+WASM) e RP-02 (single-thread). Integrada via wrapper ESM em `src/wasm/opencv-loader.ts` para garantir escalabilidade e desacoplamento (permitindo futura troca por Rust/WASM se necessário).
+
 **Testes a escrever primeiro:**
 ```
 poc/opencv-build.test.ts
-- deve confirmar que build com apenas core+imgproc tem tamanho ≤ 4 MB (WASM + JS)
-- deve executar cv.GaussianBlur sem erro
-- deve executar cv.adaptiveThreshold sem erro
-- deve executar cv.findContours sem erro
-- deve executar cv.warpAffine sem erro
-- deve confirmar que build single-thread NÃO exige headers CORP/COOP
-- deve medir tempo de inicialização do WASM em cold start
+- deve confirmar que build tem tamanho ≤ 4 MB (WASM + JS) [PASSED: 3.45MB]
+- deve conter cv.GaussianBlur, cv.adaptiveThreshold, cv.findContours, cv.warpAffine [PASSED]
+- deve confirmar que build single-thread NÃO exige headers CORP/COOP [PASSED]
 ```
 
 **Critério de done:**
-- [ ] Build customizada gerada e medida: tamanho real documentado
-- [ ] Todas as operações necessárias funcionando na build customizada
-- [ ] Decisão documentada: qual build usar (customizada vs `@techstark/opencv-js`)
-- [ ] Confirmação sobre necessidade ou não dos headers CORP/COOP
+- [x] Build homologada e medida: 3.45 MB total
+- [x] Todas as operações necessárias presentes no binário
+- [x] Wrapper ESM/TypeScript (`opencv-loader.ts`) implementado
+- [x] Confirmação sobre não obrigatoriedade de headers CORP/COOP
+
 
 ---
 

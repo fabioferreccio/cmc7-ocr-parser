@@ -6,21 +6,25 @@ Identificar e validar a licença de uma fonte CMC-7 TTF para uso como base na ge
 ## Fontes Analisadas
 
 ### 1. GnuMICR (GnuMICR.ttf)
+- **Fonte:** GnuMICR (GnuMICR.ttf)
 - **Origem:** Projetos GNU / SourceForge.
 - **Licença:** GNU GPL v2.0 com Font Exception (frequentemente citada).
 - **Análise:** A licença GPL pura é restritiva para integração em bibliotecas MIT. No entanto, se usada apenas para gerar templates rasterizados (derivação de dados), o impacto é mitigado. Mas para máxima segurança e conformidade com o RNF-005, preferimos evitar GPL.
 
 ### 2. CMC7 Font (comercializada por sites tipo 1001fonts)
+- **Fonte:** CMC7 Font (catálogo 1001fonts / similares)
 - **Origem:** Vários autores (ex: Neologic, Fontes.com).
 - **Licença:** Geralmente "Free for Personal Use" ou "Freeware".
 - **Análise:** Inviável para uso comercial sem licença explícita.
 
 ### 3. Font CMC7 (Projeto no GitHub: `font-cmc7`)
+- **Fonte:** font-cmc7 (repositório comunitário)
 - **Origem:** Repositórios comunitários de desenvolvedores.
 - **Licença:** Muitas vezes sem arquivo de licença explícito (Public Domain informal).
 - **Análise:** Risco jurídico por falta de clareza.
 
 ### 4. CMC7-ISO (Public Domain / SIL Open Font License)
+- **Fonte:** CMC7-ISO (variante OFL/Public Domain)
 - **Origem:** Versões geradas por ferramentas como FontForge baseadas na especificação ISO 1004.
 - **Licença:** SIL Open Font License (OFL) ou Public Domain.
 - **Análise:** **Ótima candidata.** A OFL permite uso, modificação e redistribuição (incluindo dados derivados), desde que não seja vendida isoladamente.

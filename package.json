@@ -43,6 +43,8 @@
   ],
   "sideEffects": false,
   "scripts": {
+    "opencv:prepare": "node scripts/prepare-opencv-assets.js",
+    "pretest": "npm run opencv:prepare",
     "build": "tsup",
     "build:check": "tsc --noEmit",
     "test": "vitest run",
@@ -94,8 +96,12 @@
     "vue": ">=3.0.0"
   },
   "peerDependenciesMeta": {
-    "react": { "optional": true },
-    "vue": { "optional": true }
+    "react": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
   },
   "lint-staged": {
     "src/**/*.ts": [

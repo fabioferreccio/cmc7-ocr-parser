@@ -1,6 +1,7 @@
 node_modules/
 dist/
 coverage/
+.idea/
 *.tsbuildinfo
 .DS_Store
 Thumbs.db
@@ -19,5 +20,4 @@ tools/datasets/
 poc/images/
 poc/results/
 
-# Relatórios de audit gerados
-audit/deps/*.json
+# Fim do arquivo

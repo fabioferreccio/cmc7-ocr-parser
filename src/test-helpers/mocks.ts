@@ -71,11 +71,11 @@ export function mockEnvironment(overrides: Partial<EnvironmentInfo> = {}): void 
   });
 }
 
-// ─── OpenCV.js mock ──────────────────────────────────────────────────────────
+// ─── OpenCV.js mock ──────────────────────────────────────────
 
 /**
  * Mock of the OpenCV.js cv object. Prevents WASM loading in unit tests.
- * Use vi.mock() with this in tests that import image-preprocessor.
+ * Align with OpenCVSubset interface in src/wasm/opencv-loader.ts.
  */
 export const mockCV = {
   Mat: class {
@@ -84,17 +84,30 @@ export const mockCV = {
     cols = 10;
     delete = vi.fn();
   },
-  Size: vi.fn().mockReturnValue({ width: 0, height: 0 }),
+  Size: class { constructor(public width: number, public height: number) {} },
+  Point: class { constructor(public x: number, public y: number) {} },
+  Scalar: vi.fn(),
+  
+  cvtColor: vi.fn(),
   GaussianBlur: vi.fn(),
   adaptiveThreshold: vi.fn(),
-  erode: vi.fn(),
-  dilate: vi.fn(),
-  findContours: vi.fn().mockReturnValue([]),
+  findContours: vi.fn(),
   warpAffine: vi.fn(),
+  getRotationMatrix2D: vi.fn(),
+  morphologyEx: vi.fn(),
+  getStructuringElement: vi.fn(),
   matchTemplate: vi.fn(),
-  minMaxLoc: vi.fn().mockReturnValue({ maxVal: 0.9, maxLoc: { x: 0, y: 0 } }),
+  minMaxLoc: vi.fn().mockReturnValue({ minVal: 0, maxVal: 0.9, minLoc: { x: 0, y: 0 }, maxLoc: { x: 0, y: 0 } }),
+
+  COLOR_RGBA2GRAY: 6,
   ADAPTIVE_THRESH_GAUSSIAN_C: 1,
   THRESH_BINARY: 0,
-  RETR_EXTERNAL: 0,
+  RETR_CCOMP: 2,
   CHAIN_APPROX_SIMPLE: 2,
+  MORPH_RECT: 0,
+  MORPH_CLOSE: 3,
+  TM_CCOEFF_NORMED: 5,
+
+  delete: vi.fn(),
 };
+

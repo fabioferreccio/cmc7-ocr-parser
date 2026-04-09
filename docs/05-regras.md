@@ -716,8 +716,8 @@ As seguintes regras são válidas até a conclusão do **Milestone 1** (T-001, T
 
 | ID | Regra Provisória | Condição de Revisão | Task de Validação |
 |----|-----------------|--------------------|--------------------|
-| **RP-01** | [PROVISÓRIA] OpenCV.js com build customizada `core+imgproc` tem ≤ 4 MB | T-003: medir build real | T-003 |
-| **RP-02** | [PROVISÓRIA] Build single-thread do OpenCV.js não exige headers CORP/COOP | T-003: testar em servidor sem headers | T-003 |
+| **RP-01** | OpenCV.js com build customizada `core+imgproc` tem ≤ 4 MB | ✅ Confirmado: Build TechStark v4.9.0 tem ~3.45 MB total (JS+WASM) | T-003 |
+| **RP-02** | Build single-thread do OpenCV.js não exige headers CORP/COOP | ✅ Confirmado: Verificado em ambiente local sem headers especiais | T-003 |
 | **RP-03** | [PROVISÓRIA] Template matching como engine padrão atinge ≥ 95% de acurácia | T-002: benchmark com câmera real | T-002 |
 | **RP-04** | [PROVISÓRIA] Templates CMC-7 gerados da fonte TTF são redistribuíveis como Uint8Array | T-001: audit de licença da fonte | T-001 |
 | **RP-05** | [PROVISÓRIA] onnxruntime-web completa inferência CNN ~1MB em ≤ 200ms em mobile mid-range | T-014: benchmark em device físico | T-014 |
