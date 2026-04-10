@@ -9,8 +9,8 @@
 
 - **Última atualização:** 2026-04-09
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 3 / 25
-- **Tasks em progresso:** Nenhuma (Próxima: T-004)
+- **Tasks concluídas:** 4 / 25
+- **Tasks em progresso:** Nenhuma (Próxima: T-005)
 
 ---
 
@@ -22,6 +22,7 @@
 | 2026-04-08 | T-001 | Audit de Licença da Fonte CMC-7 TTF | ✅ Sucesso | audit/font-audit-report.md |
 | 2026-04-08 | T-002 | PoC de Segmentação CMC-7 | ✅ Sucesso | poc/segmentation-benchmark.test.ts |
 | 2026-04-09 | T-003 | Benchmark Build OpenCV.js | ✅ Sucesso | src/wasm/opencv-loader.ts, poc/opencv-build.test.ts |
+| 2026-04-10 | T-004 | Setup do Projeto e Infraestrutura | ✅ Sucesso | package.json, tsconfig.json, tsup.config.ts, vitest.config.ts, build/build-output.test.ts |
 
 ---
 
@@ -30,14 +31,15 @@
 - [T-001] Audit de Licença da Fonte CMC-7 TTF
 - [T-002] PoC de Segmentação CMC-7 em Imagens de Câmera
 - [T-003] Benchmark Build Customizada OpenCV.js
+- [T-004] Setup do Projeto e Infraestrutura de Build/Testes
 
 ---
 
 ## Próxima Task
 
-**T-003 — Benchmark de Build Customizada OpenCV.js [RISCO]**  
-Milestone 1 — PoC de Risco  
-Gerar e validar o tamanho da build customizada do OpenCV.js (RNF-003). Pendente: build atual (10MB) excede limite e possui pthreads.
+**T-005 — EnvironmentDetector**  
+Milestone 2 — Fundação  
+Implementar detecção de ambiente (Safari vs WKWebView vs HTTPS) para garantir compatibilidade com getUserMedia.
 
 ---
 
@@ -63,6 +65,7 @@ Gerar e validar o tamanho da build customizada do OpenCV.js (RNF-003). Pendente:
 | 2026-04-08 | T-002 | Substituição de 'node-canvas' por MockImageData sintético para evitar dependências nativas (C++) no desenvolvimento local. | Uso de node-canvas ou jimp. |
 | 2026-04-08 | T-003 | Decisão de não utilizar a build padrão do OpenCV.js (~10MB) e buscar/gerar build customizada para conformidade com RNF-003. | Uso de build padrão vs customizada. |
 | 2026-04-08 | T-003 | Confirmado que a build single-thread não requer headers COOP/CORP, facilitando o deploy. | Requisito de headers SharedArrayBuffer. |
+| 2026-04-10 | T-004 | Configuração de subpath exports para React/Vue confirmada em package.json e tsup.config.ts para evitar bloating do bundle principal. | Export único vs subpath. |
 
 ---
 

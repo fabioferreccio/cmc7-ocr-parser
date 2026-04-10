@@ -156,11 +156,11 @@ build/build-output.test.ts
 ```
 
 **Critério de done:**
-- [ ] `package.json` com `exports`, `types`, `engines` configurados
-- [ ] `tsconfig.json` com `strict: true`
-- [ ] `tsup.config.ts` gerando ESM + CJS + `.d.ts`
-- [ ] Vitest configurado com coverage
-- [ ] CI básico (GitHub Actions) executando testes
+- [x] `package.json` com `exports`, `types`, `engines` configurados
+- [x] `tsconfig.json` com `strict: true`
+- [x] `tsup.config.ts` gerando ESM + CJS + `.d.ts`
+- [x] Vitest configurado com coverage
+- [x] CI básico (GitHub Actions) executando testes
 
 ---
 
