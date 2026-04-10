@@ -9,7 +9,7 @@
 
 - **Última atualização:** 2026-04-10
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 16 / 25
+- **Tasks concluídas:** 17 / 25
 - **Tasks em progresso:** Nenhuma
 
 ---
@@ -34,6 +34,7 @@
 | 2026-04-10 | T-015 | DVValidator (Módulo 10 e Módulo 11) | ✅ Sucesso | src/validation/dv-validator.ts, src/validation/dv-validator.test.ts |
 | 2026-04-10 | T-016 | BankRegistry (5 maiores bancos) | ✅ Sucesso | src/validation/bank-registry.ts, src/validation/bank-registry.test.ts |
 | 2026-04-10 | T-017 | CMC7Parser | ✅ Sucesso | src/parser/cmc7-parser.ts, src/parser/cmc7-parser.test.ts |
+| 2026-04-10 | T-018 | FieldExtractor & Integração L3 | ✅ Sucesso | src/parser/field-extractor.ts, src/integration/layer3.test.ts |
 
 ---
 
@@ -55,14 +56,15 @@
 - [T-015] DVValidator (Módulo 10 e Módulo 11)
 - [T-016] BankRegistry (5 maiores bancos)
 - [T-017] CMC7Parser
+- [T-018] FieldExtractor e Integração de Camada 3
 
 ---
 
 ## Próxima Task
 
-**T-018 — FieldExtractor e Integração de Camada 3**  
-Camada 3 (Integração)  
-Integrar DVValidator + BankRegistry + CMC7Parser em um FieldExtractor que valida e retorna um `CMC7Result` completo.
+**T-019 — Sistema de Eventos e CMC7Reader (shell)**  
+Camada 4 (API Pública)  
+Definir a casca principal da biblioteca e o sistema de eventos (`on('result', ...)`), preparando o terreno para a integração com a câmera.
 
 ---
 

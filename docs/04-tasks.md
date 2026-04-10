@@ -632,8 +632,8 @@ integration/layer3.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/parser/field-extractor.ts` implementado
-- [ ] Testes de integração de Camada 3 passando com strings reais
+- [x] `src/parser/field-extractor.ts` implementado
+- [x] Testes de integração de Camada 3 passando com strings reais
 
 ---
 
