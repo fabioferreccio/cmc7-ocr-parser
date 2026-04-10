@@ -28,3 +28,30 @@ if (!globalThis.WebAssembly) {
     validate: vi.fn(),
   } as unknown as typeof WebAssembly;
 }
+// ─── Canvas Context mock (not fully implemented in jsdom) ───────────────────
+HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation((contextId) => {
+  if (contextId === '2d') {
+    return {
+      drawImage: vi.fn(),
+      getImageData: vi.fn().mockImplementation((_x, _y, w, h) => ({
+        data: new Uint8ClampedArray(w * h * 4).fill(0),
+        width: w,
+        height: h,
+      })),
+      putImageData: vi.fn(),
+      canvas: { width: 0, height: 0 },
+    } as unknown as CanvasRenderingContext2D;
+  }
+  return null;
+}) as any;
+
+if (!globalThis.OffscreenCanvas) {
+  globalThis.OffscreenCanvas = class {
+    constructor(public width: number, public height: number) {}
+    getContext(id: string) {
+      return (document.createElement('canvas') as any).getContext(id);
+    }
+    convertToBlob() { return Promise.resolve(new Blob()); }
+    transferToImageBitmap() { return {} as ImageBitmap; }
+  } as any;
+}
