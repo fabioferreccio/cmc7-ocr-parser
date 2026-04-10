@@ -9,8 +9,8 @@
 
 - **Última atualização:** 2026-04-10
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 11 / 25
-- **Tasks em progresso:** Nenhuma (Próxima: T-012)
+- **Tasks concluídas:** 13 / 25
+- **Tasks em progresso:** Nenhuma (Próximas: T-014 ou T-015)
 
 ---
 
@@ -29,6 +29,8 @@
 | 2026-04-10 | T-009 | ImagePreprocessor (Base) | ✅ Sucesso | src/pipeline/image-preprocessor.ts, src/pipeline/image-preprocessor.test.ts |
 | 2026-04-10 | T-010 | ImagePreprocessor L2 (OpenCV.js) | ✅ Sucesso | src/pipeline/image-preprocessor.ts, src/pipeline/image-preprocessor-l2.test.ts |
 | 2026-04-10 | T-011 | ROIDetector (Detecção de Faixa) | ✅ Sucesso | src/pipeline/roi-detector.ts, src/pipeline/roi-detector.test.ts |
+| 2026-04-10 | T-012 | Templates CMC-7 (Geração / Placeholder) | ✅ Sucesso | tools/generate-templates.py, src/ocr/templates/index.ts |
+| 2026-04-10 | T-013 | TemplateMatchingEngine Completo | ✅ Sucesso | src/ocr/template-engine.ts, src/ocr/template-engine.test.ts |
 
 ---
 
@@ -45,14 +47,17 @@
 - [T-009] ImagePreprocessor (Base)
 - [T-010] ImagePreprocessor L2 (OpenCV.js)
 - [T-011] ROIDetector (Detecção de Faixa)
+- [T-012] Templates CMC-7 (Geração em Build Time)
+- [T-013] TemplateMatchingEngine Completo
 
 ---
 
-## Próxima Task
+## Próximas Tasks
 
-**T-012 — SymbolSegmenter (Segmentação de Caracteres)**  
-Milestone 4 — OCR Engine  
-Implementar a fragmentação da faixa CMC-7 binarizada em caracteres individuais usando projeção vertical de densidade.
+Temos duas opções a seguir:
+
+1. **T-014 — CNNEngine (Plano B)**: Uma inferência OCR Neural (via ONNX runtime). Isso requer montar um pipeline de treino em Python fora do repositório para exportar um modelo. 
+2. **T-015 — DVValidator (Milestone 5 - Validação)**: Iniciar o Milestone 5 e processar a string retornada pelo nosso Template Engine, calculando as validações de Módulo 10 e Módulo 11 (Business Logic essencial).
 
 ---
 

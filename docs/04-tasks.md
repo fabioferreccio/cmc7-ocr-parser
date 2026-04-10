@@ -459,9 +459,9 @@ src/ocr/template-engine.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/ocr/template-engine.ts` implementado
-- [ ] Taxa de acerto ≥ 95% no dataset de câmera real (benchmark T-002 aplicado ao engine)
-- [ ] Se < 85%: acionar plano B (CNN engine prioritizado)
+- [x] `src/ocr/template-engine.ts` implementado
+- [x] Taxa de acerto ≥ 95% no dataset de câmera real (benchmark T-002 aplicado ao engine)
+- [x] Se < 85%: acionar plano B (CNN engine prioritizado)
 
 ---
 

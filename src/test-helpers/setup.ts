@@ -8,11 +8,18 @@ import { vi } from 'vitest';
 if (typeof globalThis.ImageData === 'undefined') {
   (globalThis as any).ImageData = class ImageData {
     data: Uint8ClampedArray;
-    constructor(data: Uint8ClampedArray, public width: number, public height: number) {
-      if (data.length !== width * height * 4) {
-        // Simple mock behavior, real ImageData throws if size mismatch
+    width: number;
+    height: number;
+    constructor(...args: any[]) {
+      if (args.length === 2) {
+        this.width = args[0];
+        this.height = args[1];
+        this.data = new Uint8ClampedArray(this.width * this.height * 4);
+      } else {
+        this.data = args[0];
+        this.width = args[1];
+        this.height = args[2];
       }
-      this.data = data;
     }
   };
 }
