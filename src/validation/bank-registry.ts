@@ -11,7 +11,7 @@ import type { BankSpec } from '../types/index.js';
  * Implemented in T-016.
  */
 export class BankRegistry {
-  private readonly specs: Map<string, BankSpec> = new Map();
+  // private readonly specs: Map<string, BankSpec> = new Map();
 
   constructor() {
     // TODO (T-016): Populate with validated specs for BB, CEF, Bradesco, Itaú, Santander

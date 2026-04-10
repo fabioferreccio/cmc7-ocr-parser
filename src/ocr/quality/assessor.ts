@@ -1,4 +1,4 @@
-import type { FrameQualityReport } from '../types/index.js';
+import type { FrameQualityReport } from '../../types/index.js';
 
 /**
  * Assesses frame quality using Canvas API only (no WASM).
