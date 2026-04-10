@@ -33,13 +33,15 @@ export function mockGetUserMedia(
  * Creates a mock HTMLVideoElement with realistic dimensions.
  */
 export function mockVideoElement(width = 1280, height = 720): HTMLVideoElement {
-  return Object.assign(document.createElement('video'), {
-    videoWidth: width,
-    videoHeight: height,
-    readyState: 4, // HAVE_ENOUGH_DATA
-    play: vi.fn().mockResolvedValue(undefined),
-    pause: vi.fn(),
-  });
+  const video = document.createElement('video');
+  Object.defineProperty(video, 'videoWidth', { value: width, configurable: true });
+  Object.defineProperty(video, 'videoHeight', { value: height, configurable: true });
+  Object.defineProperty(video, 'readyState', { value: 4, configurable: true });
+  
+  video.play = vi.fn().mockResolvedValue(undefined);
+  video.pause = vi.fn();
+  
+  return video;
 }
 
 // ─── ImageBitmap mock ────────────────────────────────────────────────────────
@@ -65,10 +67,19 @@ export function mockEnvironment(overrides: Partial<EnvironmentInfo> = {}): void 
     configurable: true,
   });
 
-  Object.defineProperty(globalThis.location, 'protocol', {
-    value: overrides.isHTTPS === false ? 'http:' : 'https:',
-    configurable: true,
-  });
+  // location.protocol can be tricky in jsdom, we use vi.stubGlobal for better results if simple defineProperty fails
+  try {
+    Object.defineProperty(globalThis.location, 'protocol', {
+      value: overrides.isHTTPS === false ? 'http:' : 'https:',
+      configurable: true,
+    });
+  } catch {
+    vi.stubGlobal('location', {
+      ...globalThis.location,
+      protocol: overrides.isHTTPS === false ? 'http:' : 'https:',
+      hostname: globalThis.location.hostname
+    });
+  }
 }
 
 // ─── OpenCV.js mock ──────────────────────────────────────────

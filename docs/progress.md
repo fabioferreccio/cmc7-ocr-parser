@@ -7,10 +7,10 @@
 
 ## Status Geral
 
-- **Última atualização:** 2026-04-09
+- **Última atualização:** 2026-04-10
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 5 / 25
-- **Tasks em progresso:** Nenhuma (Próxima: T-006)
+- **Tasks concluídas:** 6 / 25
+- **Tasks em progresso:** Nenhuma (Próxima: T-007)
 
 ---
 
@@ -24,6 +24,7 @@
 | 2026-04-09 | T-003 | Benchmark Build OpenCV.js | ✅ Sucesso | src/wasm/opencv-loader.ts, poc/opencv-build.test.ts |
 | 2026-04-10 | T-004 | Setup do Projeto e Infraestrutura | ✅ Sucesso | package.json, tsconfig.json, tsup.config.ts, vitest.config.ts, build/build-output.test.ts |
 | 2026-04-10 | T-005 | EnvironmentDetector | ✅ Sucesso | src/capture/environment-detector.ts, src/capture/environment-detector.test.ts |
+| 2026-04-10 | T-006 | CameraCapture e FrameSampler | ✅ Sucesso | src/capture/camera-capture.ts, src/capture/frame-sampler.ts |
 
 ---
 
@@ -34,14 +35,15 @@
 - [T-003] Benchmark Build Customizada OpenCV.js
 - [T-004] Setup do Projeto e Infraestrutura de Build/Testes
 - [T-005] EnvironmentDetector (Safari vs WKWebView)
+- [T-006] CameraCapture e FrameSampler
 
 ---
 
 ## Próxima Task
 
-**T-006 — CameraCapture e FrameSampler**  
+**T-007 — ImagePreprocessor (Base)**  
 Milestone 2 — Fundação  
-Implementar o gerenciamento do MediaStream e a amostragem de frames para processamento.
+Implementar o Nível 1 do pipeline de imagem (Grayscale, Resize, QualityCheck via Canvas).
 
 ---
 
