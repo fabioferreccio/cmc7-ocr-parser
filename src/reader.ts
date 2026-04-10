@@ -7,6 +7,13 @@ import type {
   EnvironmentInfo,
   BankSpec
 } from './types/index.js';
+import { ImagePreprocessor } from './pipeline/image-preprocessor.js';
+import { ROIDetector } from './pipeline/roi-detector.js';
+import { SymbolSegmenter } from './ocr/symbol-segmenter.js';
+import { TemplateEngine } from './ocr/template-engine.js';
+import { CMC7Parser } from './parser/cmc7-parser.js';
+import { BankRegistry } from './validation/bank-registry.js';
+import { FieldExtractor } from './parser/field-extractor.js';
 
 /**
  * Implementation of the CMC7Reader interface.
@@ -18,26 +25,90 @@ class ReaderImpl implements CMC7Reader {
   private iteratorQueue: CMC7Result[] = [];
   private iteratorResolvers: ((value: IteratorResult<CMC7Result>) => void)[] = [];
 
-  constructor(private readonly options: CMC7ReaderOptions = {}) {}
+  // Pipeline components
+  private readonly preprocessor = new ImagePreprocessor();
+  private readonly roiDetector = new ROIDetector();
+  private readonly segmenter = new SymbolSegmenter();
+  private readonly ocrEngine = new TemplateEngine();
+  private readonly bankRegistry = new BankRegistry();
+  private readonly parser: CMC7Parser;
+  private readonly extractor: FieldExtractor;
+
+  constructor(private readonly options: CMC7ReaderOptions = {}) {
+    this.parser = new CMC7Parser(this.bankRegistry);
+    this.extractor = new FieldExtractor(this.parser);
+  }
 
   async start(videoElement: HTMLVideoElement): Promise<void> {
     this.isRunning = true;
-    // Implementation will follow in subsequent tasks
+    // Real-time loop implementation will follow in T-021
   }
 
   async startCamera(container?: HTMLElement): Promise<HTMLVideoElement> {
-    // Implementation will follow
     throw new Error('Method not implemented.');
   }
 
   async stop(): Promise<void> {
     this.isRunning = false;
-    // Implementation will follow
   }
 
-  async readImage(input: any): Promise<CMC7Result> {
-    // Implementation will follow in T-020
-    throw new Error('Method not implemented.');
+  /**
+   * Processes a static image source and returns the CMC-7 result.
+   */
+  async readImage(input: HTMLCanvasElement | HTMLImageElement | ImageData): Promise<CMC7Result> {
+    const startTime = Date.now();
+    
+    // 1. Get ImageData from input
+    const imageData = this.ensureImageData(input);
+
+    // 2. Preprocessing & OCR Pipeline
+    // Level 1: Resize and Grayscale
+    const { imageData: grayData } = await this.preprocessor.process(imageData, { grayscale: true });
+    
+    // Level 2: Binarization (Required for ROI Detection and Segmentation)
+    const binary = await this.preprocessor.binarize(grayData!);
+    
+    // Layer 1 integration: ROI Detection
+    const roi = this.roiDetector.detect(binary);
+
+    if (!roi) {
+      throw {
+        type: 'CMC7_NOT_FOUND',
+        message: 'No CMC-7 strip detected in image.',
+        frameQuality: 0 // Quality assessment will be integrated later
+      } as CMC7Error;
+    }
+
+    // Layer 2: Character Extraction
+    const segments = this.segmenter.segment(binary, roi);
+    const matches = this.ocrEngine.recognize(segments);
+    const rawString = matches.map(m => m.char).join('');
+
+    // Layer 3: Parsing & Validation
+    const result = this.extractor.extract(rawString, {
+      frameQuality: 100, // Placeholder
+      startTime
+    });
+
+    return result;
+  }
+
+  private ensureImageData(input: HTMLCanvasElement | HTMLImageElement | ImageData): ImageData {
+    if (input instanceof ImageData) return input;
+    
+    const canvas = input instanceof HTMLCanvasElement ? input : this.imageToCanvas(input);
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) throw new Error('Could not get canvas context');
+    return ctx.getImageData(0, 0, canvas.width, canvas.height);
+  }
+
+  private imageToCanvas(img: HTMLImageElement): HTMLCanvasElement {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx?.drawImage(img, 0, 0);
+    return canvas;
   }
 
   on(event: string, handler: (...args: any[]) => void): this {
@@ -54,7 +125,7 @@ class ReaderImpl implements CMC7Reader {
   }
 
   registerBank(spec: BankSpec): void {
-    // Integration with BankRegistry will follow
+    this.bankRegistry.register(spec);
   }
 
   /** Internal helper to emit events to listeners. */

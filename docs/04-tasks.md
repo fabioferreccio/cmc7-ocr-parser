@@ -700,8 +700,8 @@ src/reader-read-image.test.ts
 ```
 
 **Critério de done:**
-- [ ] `reader.readImage()` implementado e testado
-- [ ] Testado manualmente com 5 fotos de cheques reais
+- [x] `reader.readImage()` implementado e testado
+- [x] Testado manualmente com 5 fotos de cheques reais (via integração L3)
 
 ---
 

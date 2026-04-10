@@ -9,7 +9,7 @@
 
 - **Última atualização:** 2026-04-10
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 18 / 25
+- **Tasks concluídas:** 19 / 25
 - **Tasks em progresso:** Nenhuma
 
 ---
@@ -36,6 +36,7 @@
 | 2026-04-10 | T-017 | CMC7Parser | ✅ Sucesso | src/parser/cmc7-parser.ts, src/parser/cmc7-parser.test.ts |
 | 2026-04-10 | T-018 | FieldExtractor & Integração L3 | ✅ Sucesso | src/parser/field-extractor.ts, src/integration/layer3.test.ts |
 | 2026-04-10 | T-019 | Sistema de Eventos & CMC7Reader | ✅ Sucesso | src/reader.ts, src/reader.test.ts |
+| 2026-04-10 | T-020 | readImage (Modo Estático) | ✅ Sucesso | src/reader.ts, src/api/read-image.test.ts |
 
 ---
 
@@ -59,14 +60,15 @@
 - [T-017] CMC7Parser
 - [T-018] FieldExtractor e Integração de Camada 3
 - [T-019] Sistema de Eventos e CMC7Reader (shell)
+- [T-020] readImage (Modo Imagem Estática)
 
 ---
 
 ## Próxima Task
 
-**T-020 — readImage (Modo Imagem Estática)**  
+**T-021 — start (Loop de Tempo Real)**  
 Camada 4 (API Pública)  
-Implementar o método `readImage()` integrando Pipeline L1 + L2 + L3 para processar uma imagem estática (Canvas/Blob/File) de ponta a ponta.
+Implementar o loop de captura contínua (`requestAnimationFrame`) que consome frames do vídeo, avalia qualidade e emite resultados via eventos.
 
 ---
 
