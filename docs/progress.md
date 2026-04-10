@@ -9,8 +9,8 @@
 
 - **Última atualização:** 2026-04-10
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 10 / 25
-- **Tasks em progresso:** Nenhuma (Próxima: T-011)
+- **Tasks concluídas:** 11 / 25
+- **Tasks em progresso:** Nenhuma (Próxima: T-012)
 
 ---
 
@@ -28,6 +28,7 @@
 | 2026-04-10 | T-008 | FrameQualityAssessor (Base) | ✅ Sucesso | src/ocr/quality/assessor.ts, src/ocr/quality/assessor.test.ts |
 | 2026-04-10 | T-009 | ImagePreprocessor (Base) | ✅ Sucesso | src/pipeline/image-preprocessor.ts, src/pipeline/image-preprocessor.test.ts |
 | 2026-04-10 | T-010 | ImagePreprocessor L2 (OpenCV.js) | ✅ Sucesso | src/pipeline/image-preprocessor.ts, src/pipeline/image-preprocessor-l2.test.ts |
+| 2026-04-10 | T-011 | ROIDetector (Detecção de Faixa) | ✅ Sucesso | src/pipeline/roi-detector.ts, src/pipeline/roi-detector.test.ts |
 
 ---
 
@@ -43,14 +44,15 @@
 - [T-008] FrameQualityAssessor (Base)
 - [T-009] ImagePreprocessor (Base)
 - [T-010] ImagePreprocessor L2 (OpenCV.js)
+- [T-011] ROIDetector (Detecção de Faixa)
 
 ---
 
 ## Próxima Task
 
-**T-011 — ROIDetector (Detecção da Faixa CMC-7)**  
-Milestone 3 — Image Pipeline  
-Implementar a detecção da localização exata (y e height) da faixa CMC-7 dentro do frame processado.
+**T-012 — SymbolSegmenter (Segmentação de Caracteres)**  
+Milestone 4 — OCR Engine  
+Implementar a fragmentação da faixa CMC-7 binarizada em caracteres individuais usando projeção vertical de densidade.
 
 ---
 

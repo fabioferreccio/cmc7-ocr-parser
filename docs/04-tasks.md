@@ -379,9 +379,9 @@ src/pipeline/roi-detector.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/pipeline/roi-detector.ts` implementado
-- [ ] Taxa de detecção ≥ 90% no dataset de benchmark (validado contra T-002)
-- [ ] Todos os testes unitários passando
+- [x] `src/pipeline/roi-detector.ts` implementado
+- [x] Taxa de detecção ≥ 90% no dataset de benchmark (validado contra T-002)
+- [x] Todos os testes unitários passando
 
 ---
 
