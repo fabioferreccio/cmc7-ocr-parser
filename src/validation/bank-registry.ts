@@ -11,19 +11,53 @@ import type { BankSpec } from '../types/index.js';
  * Implemented in T-016.
  */
 export class BankRegistry {
-  // private readonly specs: Map<string, BankSpec> = new Map();
+  private readonly specs: Map<string, BankSpec> = new Map();
 
   constructor() {
-    // TODO (T-016): Populate with validated specs for BB, CEF, Bradesco, Itaú, Santander
+    // Populate with validated specs for BB, CEF, Bradesco, Itaú, Santander
+    
+    this.register({
+      compeCode: '001',
+      name: 'Banco do Brasil',
+      dvAlgorithm: 'mod10',
+      block1Layout: { agencyDigits: 4, accountDigits: 8, checkNumDigits: 6 }
+    });
+
+    this.register({
+      compeCode: '104',
+      name: 'Caixa Econômica Federal',
+      dvAlgorithm: 'mod10',
+      block1Layout: { agencyDigits: 4, accountDigits: 9, checkNumDigits: 6 }
+    });
+
+    this.register({
+      compeCode: '237',
+      name: 'Bradesco',
+      dvAlgorithm: 'mod10',
+      block1Layout: { agencyDigits: 4, accountDigits: 7, checkNumDigits: 6 }
+    });
+
+    this.register({
+      compeCode: '341',
+      name: 'Itaú',
+      dvAlgorithm: 'mod10',
+      block1Layout: { agencyDigits: 4, accountDigits: 5, checkNumDigits: 6 }
+    });
+
+    this.register({
+      compeCode: '033',
+      name: 'Santander',
+      dvAlgorithm: 'mod10',
+      block1Layout: { agencyDigits: 4, accountDigits: 8, checkNumDigits: 6 }
+    });
   }
 
   /**
    * Returns the spec for the given COMPE bank code.
    * @returns `null` if bank is not registered (emits 'bank-spec-unknown' warning upstream)
    */
-  getSpec(_compeCode: string): BankSpec | null {
-    // TODO (T-016): Implement lookup
-    throw new Error('Not yet implemented. See docs/04-tasks.md T-016.');
+  getSpec(compeCode: string): BankSpec | null {
+    return this.specs.get(compeCode) || null;
   }
 
   /**
@@ -35,8 +69,7 @@ export class BankRegistry {
    * reader.registerBank({ compeCode: '999', name: 'My Bank', ... });
    * ```
    */
-  register(_spec: BankSpec): void {
-    // TODO (T-016): this.specs.set(spec.compeCode, spec)
-    throw new Error('Not yet implemented. See docs/04-tasks.md T-016.');
+  register(spec: BankSpec): void {
+    this.specs.set(spec.compeCode, spec);
   }
 }

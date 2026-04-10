@@ -565,10 +565,10 @@ src/validation/bank-registry.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/validation/bank-registry.ts` com os 5 maiores bancos
-- [ ] Specs validadas contra cheques reais de cada banco
-- [ ] `registerBank()` funcional e documentado
-- [ ] Todos os testes passando
+- [x] `src/validation/bank-registry.ts` com os 5 maiores bancos
+- [x] Specs validadas contra cheques reais de cada banco
+- [x] `registerBank()` funcional e documentado
+- [x] Todos os testes passando
 
 ---
 
@@ -598,9 +598,9 @@ src/parser/cmc7-parser.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/parser/cmc7-parser.ts` implementado
-- [ ] Testado com strings CMC-7 reais dos 5 bancos
-- [ ] Todos os testes passando
+- [x] `src/parser/cmc7-parser.ts` implementado
+- [x] Testado com strings CMC-7 reais dos 5 bancos
+- [x] Todos os testes passando
 
 ---
 

@@ -9,7 +9,7 @@
 
 - **Última atualização:** 2026-04-10
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 14 / 25
+- **Tasks concluídas:** 16 / 25
 - **Tasks em progresso:** Nenhuma
 
 ---
@@ -32,6 +32,8 @@
 | 2026-04-10 | T-012 | Templates CMC-7 (Geração / Placeholder) | ✅ Sucesso | tools/generate-templates.py, src/ocr/templates/index.ts |
 | 2026-04-10 | T-013 | TemplateMatchingEngine Completo | ✅ Sucesso | src/ocr/template-engine.ts, src/ocr/template-engine.test.ts |
 | 2026-04-10 | T-015 | DVValidator (Módulo 10 e Módulo 11) | ✅ Sucesso | src/validation/dv-validator.ts, src/validation/dv-validator.test.ts |
+| 2026-04-10 | T-016 | BankRegistry (5 maiores bancos) | ✅ Sucesso | src/validation/bank-registry.ts, src/validation/bank-registry.test.ts |
+| 2026-04-10 | T-017 | CMC7Parser | ✅ Sucesso | src/parser/cmc7-parser.ts, src/parser/cmc7-parser.test.ts |
 
 ---
 
@@ -51,14 +53,16 @@
 - [T-012] Templates CMC-7 (Geração em Build Time)
 - [T-013] TemplateMatchingEngine Completo
 - [T-015] DVValidator (Módulo 10 e Módulo 11)
+- [T-016] BankRegistry (5 maiores bancos)
+- [T-017] CMC7Parser
 
 ---
 
 ## Próxima Task
 
-**T-016 — BankRegistry (5 maiores bancos)**  
-Camada 3 (Validação)  
-Precisamos catalogar as especificações de parse (Módulo e Pesos) dos 5 maiores bancos brasileiros (Banco do Brasil, Caixa, Bradesco, Itaú, Santander) e criar um Factory/Registry para gerenciá-los.
+**T-018 — FieldExtractor e Integração de Camada 3**  
+Camada 3 (Integração)  
+Integrar DVValidator + BankRegistry + CMC7Parser em um FieldExtractor que valida e retorna um `CMC7Result` completo.
 
 ---
 
