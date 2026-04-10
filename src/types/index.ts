@@ -249,3 +249,21 @@ export interface CMC7Reader {
   // Extensibility (docs/03-arquitetura.md §3.3)
   registerBank(spec: BankSpec): void;
 }
+
+// ─── Worker Contract ──────────────────────────────────────────────────────────
+
+export type WorkerAction = 'init' | 'process' | 'stop';
+
+export interface WorkerMessage {
+  action: WorkerAction;
+  payload?: {
+    bitmap?: ImageBitmap;
+    options?: CMC7ReaderOptions;
+    assetsBaseUrl?: string;
+  };
+}
+
+export interface WorkerResponse {
+  type: 'result' | 'quality' | 'error' | 'ready';
+  payload?: CMC7Result | FrameQualityReport | CMC7Error | { status: 'ok' };
+}

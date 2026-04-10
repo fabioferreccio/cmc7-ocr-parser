@@ -252,9 +252,9 @@ src/workers/pipeline-worker.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/workers/pipeline.worker.ts` implementado (shell que aceita mensagens)
-- [ ] Protocol de mensagens tipado (`WorkerMessage`, `WorkerResponse`)
-- [ ] Testes passando com `jsdom` + mock de `Worker`
+- [x] `src/workers/pipeline.worker.ts` implementado (shell que aceita mensagens)
+- [x] Protocol de mensagens tipado (`WorkerMessage`, `WorkerResponse`)
+- [x] Testes passando com `jsdom` + mock de `Worker`
 
 ---
 

@@ -9,8 +9,8 @@
 
 - **Última atualização:** 2026-04-10
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 8 / 25
-- **Tasks em progresso:** Nenhuma (Próxima: T-007)
+- **Tasks concluídas:** 9 / 25
+- **Tasks em progresso:** Nenhuma (Próxima: T-010)
 
 ---
 
@@ -24,7 +24,7 @@
 | 2026-04-09 | T-003 | Benchmark Build OpenCV.js | ✅ Sucesso | src/wasm/opencv-loader.ts, poc/opencv-build.test.ts |
 | 2026-04-10 | T-004 | Setup do Projeto e Infraestrutura | ✅ Sucesso | package.json, tsconfig.json, tsup.config.ts, vitest.config.ts, build/build-output.test.ts |
 | 2026-04-10 | T-005 | EnvironmentDetector | ✅ Sucesso | src/capture/environment-detector.ts, src/capture/environment-detector.test.ts |
-| 2026-04-10 | T-006 | CameraCapture e FrameSampler | ✅ Sucesso | src/capture/camera-capture.ts, src/capture/frame-sampler.ts |
+| 2026-04-10 | T-007 | Web Worker Infrastructure | ✅ Sucesso | src/workers/worker-client.ts, src/workers/pipeline.worker.ts |
 | 2026-04-10 | T-008 | FrameQualityAssessor (Base) | ✅ Sucesso | src/ocr/quality/assessor.ts, src/ocr/quality/assessor.test.ts |
 | 2026-04-10 | T-009 | ImagePreprocessor (Base) | ✅ Sucesso | src/pipeline/image-preprocessor.ts, src/pipeline/image-preprocessor.test.ts |
 
@@ -38,6 +38,7 @@
 - [T-004] Setup do Projeto e Infraestrutura de Build/Testes
 - [T-005] EnvironmentDetector (Safari vs WKWebView)
 - [T-006] CameraCapture e FrameSampler
+- [T-007] Web Worker Infrastructure
 - [T-008] FrameQualityAssessor (Base)
 - [T-009] ImagePreprocessor (Base)
 
@@ -45,9 +46,9 @@
 
 ## Próxima Task
 
-**T-007 — Web Worker Infrastructure**  
-Milestone 2 — Fundação  
-Implementar a infraestrutura de mensagens e transferência de ImageBitmap via Workers.
+**T-010 — ImagePreprocessor L2 (OpenCV.js)**  
+Milestone 3 — Image Pipeline  
+Implementar as operações de binarização adaptativa, deskew (correção de inclinação) e remoção de ruído via OpenCV.js.
 
 ---
 
