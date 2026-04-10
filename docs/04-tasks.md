@@ -533,9 +533,9 @@ src/validation/dv-validator.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/validation/dv-validator.ts` implementado
-- [ ] Todos os testes passando com valores conhecidos de dvs reais
-- [ ] Cobertura de linha ≥ 100% (lógica determinística)
+- [x] `src/validation/dv-validator.ts` implementado
+- [x] Todos os testes passando com valores conhecidos de dvs reais
+- [x] Cobertura de linha ≥ 100% (lógica determinística)
 
 ---
 
