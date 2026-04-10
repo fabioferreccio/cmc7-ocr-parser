@@ -93,8 +93,11 @@ export const mockCV = {
     data = new Uint8Array(100);
     rows = 10;
     cols = 10;
-    delete = vi.fn();
+    delete() {}
+    static empty() { return true; }
+    empty() { return false; }
   },
+  matFromImageData: vi.fn().mockImplementation(() => new mockCV.Mat()),
   Size: class { constructor(public width: number, public height: number) {} },
   Point: class { constructor(public x: number, public y: number) {} },
   Scalar: vi.fn(),
@@ -103,21 +106,27 @@ export const mockCV = {
   GaussianBlur: vi.fn(),
   adaptiveThreshold: vi.fn(),
   findContours: vi.fn(),
+  findNonZero: vi.fn(),
+  minAreaRect: vi.fn().mockReturnValue({ angle: -5, size: { width: 10, height: 10 } }),
   warpAffine: vi.fn(),
-  getRotationMatrix2D: vi.fn(),
+  getRotationMatrix2D: vi.fn().mockImplementation(() => new mockCV.Mat()),
   morphologyEx: vi.fn(),
-  getStructuringElement: vi.fn(),
+  getStructuringElement: vi.fn().mockImplementation(() => new mockCV.Mat()),
   matchTemplate: vi.fn(),
   minMaxLoc: vi.fn().mockReturnValue({ minVal: 0, maxVal: 0.9, minLoc: { x: 0, y: 0 }, maxLoc: { x: 0, y: 0 } }),
 
   COLOR_RGBA2GRAY: 6,
+  COLOR_GRAY2RGBA: 8,
   ADAPTIVE_THRESH_GAUSSIAN_C: 1,
   THRESH_BINARY: 0,
+  THRESH_BINARY_INV: 1,
   RETR_CCOMP: 2,
   CHAIN_APPROX_SIMPLE: 2,
   MORPH_RECT: 0,
   MORPH_CLOSE: 3,
   TM_CCOEFF_NORMED: 5,
+  INTER_LINEAR: 1,
+  BORDER_REPLICATE: 2,
 
   delete: vi.fn(),
 };

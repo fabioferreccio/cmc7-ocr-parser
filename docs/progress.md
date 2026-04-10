@@ -9,8 +9,8 @@
 
 - **Última atualização:** 2026-04-10
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 9 / 25
-- **Tasks em progresso:** Nenhuma (Próxima: T-010)
+- **Tasks concluídas:** 10 / 25
+- **Tasks em progresso:** Nenhuma (Próxima: T-011)
 
 ---
 
@@ -27,6 +27,7 @@
 | 2026-04-10 | T-007 | Web Worker Infrastructure | ✅ Sucesso | src/workers/worker-client.ts, src/workers/pipeline.worker.ts |
 | 2026-04-10 | T-008 | FrameQualityAssessor (Base) | ✅ Sucesso | src/ocr/quality/assessor.ts, src/ocr/quality/assessor.test.ts |
 | 2026-04-10 | T-009 | ImagePreprocessor (Base) | ✅ Sucesso | src/pipeline/image-preprocessor.ts, src/pipeline/image-preprocessor.test.ts |
+| 2026-04-10 | T-010 | ImagePreprocessor L2 (OpenCV.js) | ✅ Sucesso | src/pipeline/image-preprocessor.ts, src/pipeline/image-preprocessor-l2.test.ts |
 
 ---
 
@@ -41,14 +42,15 @@
 - [T-007] Web Worker Infrastructure
 - [T-008] FrameQualityAssessor (Base)
 - [T-009] ImagePreprocessor (Base)
+- [T-010] ImagePreprocessor L2 (OpenCV.js)
 
 ---
 
 ## Próxima Task
 
-**T-010 — ImagePreprocessor L2 (OpenCV.js)**  
+**T-011 — ROIDetector (Detecção da Faixa CMC-7)**  
 Milestone 3 — Image Pipeline  
-Implementar as operações de binarização adaptativa, deskew (correção de inclinação) e remoção de ruído via OpenCV.js.
+Implementar a detecção da localização exata (y e height) da faixa CMC-7 dentro do frame processado.
 
 ---
 

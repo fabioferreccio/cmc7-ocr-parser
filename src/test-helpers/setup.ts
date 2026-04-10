@@ -4,6 +4,19 @@
  */
 import { vi } from 'vitest';
 
+// ─── Browser Globals ─────────────────────────────────────────────────────────
+if (typeof globalThis.ImageData === 'undefined') {
+  (globalThis as any).ImageData = class ImageData {
+    data: Uint8ClampedArray;
+    constructor(data: Uint8ClampedArray, public width: number, public height: number) {
+      if (data.length !== width * height * 4) {
+        // Simple mock behavior, real ImageData throws if size mismatch
+      }
+      this.data = data;
+    }
+  };
+}
+
 // ─── ImageBitmap mock (not in jsdom) ────────────────────────────────────────
 globalThis.createImageBitmap = vi.fn().mockImplementation(
   async (_source: unknown): Promise<ImageBitmap> =>

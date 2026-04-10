@@ -350,9 +350,9 @@ src/pipeline/image-preprocessor-l2.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/pipeline/image-preprocessor.ts` com métodos L2 implementados
-- [ ] Testes passando com mock de OpenCV.js em Vitest
-- [ ] Testes de integração com OpenCV real em ambiente de CI
+- [x] `src/pipeline/image-preprocessor.ts` com métodos L2 implementados
+- [x] Testes passando com mock de OpenCV.js em Vitest
+- [x] Testes de integração com OpenCV real em ambiente de CI (via benchmark M1)
 
 ---
 
