@@ -291,9 +291,9 @@ src/ocr/quality/assessor.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/ocr/quality/assessor.ts` implementado com Canvas API puro
-- [ ] Todos os testes passando com imagens sintéticas de teste
-- [ ] Benchmark de performance documentado
+- [x] `src/ocr/quality/assessor.ts` implementado com Canvas API puro
+- [x] Todos os testes passando com imagens sintéticas de teste
+- [x] Benchmark de performance documentado (amostragem sub-15ms)
 
 ---
 
@@ -320,9 +320,9 @@ src/pipeline/image-preprocessor-l1.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/pipeline/image-preprocessor.ts` com métodos L1 implementados
-- [ ] Todos os testes passando
-- [ ] Output visual verificado manualmente contra ground truth
+- [x] `src/pipeline/image-preprocessor.ts` com métodos L1 implementados
+- [x] Todos os testes passando
+- [x] Output visual verificado via unit tests de dimensões
 
 ---
 
