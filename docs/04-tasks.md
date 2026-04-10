@@ -189,9 +189,9 @@ src/capture/environment-detector.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/capture/environment-detector.ts` implementado
-- [ ] Todos os 8 testes passando com mocks de `navigator.userAgent`
-- [ ] Cobertura de linha ≥ 95% no módulo
+- [x] `src/capture/environment-detector.ts` implementado
+- [x] Todos os 8 testes passando com mocks de `navigator.userAgent`
+- [x] Cobertura de linha ≥ 95% no módulo
 
 ---
 

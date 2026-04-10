@@ -9,8 +9,8 @@
 
 - **Última atualização:** 2026-04-09
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 4 / 25
-- **Tasks em progresso:** Nenhuma (Próxima: T-005)
+- **Tasks concluídas:** 5 / 25
+- **Tasks em progresso:** Nenhuma (Próxima: T-006)
 
 ---
 
@@ -23,6 +23,7 @@
 | 2026-04-08 | T-002 | PoC de Segmentação CMC-7 | ✅ Sucesso | poc/segmentation-benchmark.test.ts |
 | 2026-04-09 | T-003 | Benchmark Build OpenCV.js | ✅ Sucesso | src/wasm/opencv-loader.ts, poc/opencv-build.test.ts |
 | 2026-04-10 | T-004 | Setup do Projeto e Infraestrutura | ✅ Sucesso | package.json, tsconfig.json, tsup.config.ts, vitest.config.ts, build/build-output.test.ts |
+| 2026-04-10 | T-005 | EnvironmentDetector | ✅ Sucesso | src/capture/environment-detector.ts, src/capture/environment-detector.test.ts |
 
 ---
 
@@ -32,14 +33,15 @@
 - [T-002] PoC de Segmentação CMC-7 em Imagens de Câmera
 - [T-003] Benchmark Build Customizada OpenCV.js
 - [T-004] Setup do Projeto e Infraestrutura de Build/Testes
+- [T-005] EnvironmentDetector (Safari vs WKWebView)
 
 ---
 
 ## Próxima Task
 
-**T-005 — EnvironmentDetector**  
+**T-006 — CameraCapture e FrameSampler**  
 Milestone 2 — Fundação  
-Implementar detecção de ambiente (Safari vs WKWebView vs HTTPS) para garantir compatibilidade com getUserMedia.
+Implementar o gerenciamento do MediaStream e a amostragem de frames para processamento.
 
 ---
 
