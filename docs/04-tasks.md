@@ -670,8 +670,8 @@ src/reader.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/reader.ts` + `src/index.ts` implementados (shell com eventos)
-- [ ] Todos os testes passando
+- [x] `src/reader.ts` + `src/index.ts` implementados (shell com eventos)
+- [x] Todos os testes passando
 
 ---
 

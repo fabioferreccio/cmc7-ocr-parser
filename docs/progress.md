@@ -9,7 +9,7 @@
 
 - **Última atualização:** 2026-04-10
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 17 / 25
+- **Tasks concluídas:** 18 / 25
 - **Tasks em progresso:** Nenhuma
 
 ---
@@ -35,6 +35,7 @@
 | 2026-04-10 | T-016 | BankRegistry (5 maiores bancos) | ✅ Sucesso | src/validation/bank-registry.ts, src/validation/bank-registry.test.ts |
 | 2026-04-10 | T-017 | CMC7Parser | ✅ Sucesso | src/parser/cmc7-parser.ts, src/parser/cmc7-parser.test.ts |
 | 2026-04-10 | T-018 | FieldExtractor & Integração L3 | ✅ Sucesso | src/parser/field-extractor.ts, src/integration/layer3.test.ts |
+| 2026-04-10 | T-019 | Sistema de Eventos & CMC7Reader | ✅ Sucesso | src/reader.ts, src/reader.test.ts |
 
 ---
 
@@ -57,14 +58,15 @@
 - [T-016] BankRegistry (5 maiores bancos)
 - [T-017] CMC7Parser
 - [T-018] FieldExtractor e Integração de Camada 3
+- [T-019] Sistema de Eventos e CMC7Reader (shell)
 
 ---
 
 ## Próxima Task
 
-**T-019 — Sistema de Eventos e CMC7Reader (shell)**  
+**T-020 — readImage (Modo Imagem Estática)**  
 Camada 4 (API Pública)  
-Definir a casca principal da biblioteca e o sistema de eventos (`on('result', ...)`), preparando o terreno para a integração com a câmera.
+Implementar o método `readImage()` integrando Pipeline L1 + L2 + L3 para processar uma imagem estática (Canvas/Blob/File) de ponta a ponta.
 
 ---
 
