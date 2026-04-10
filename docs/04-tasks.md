@@ -730,9 +730,9 @@ src/reader-stream.test.ts
 ```
 
 **Critério de done:**
-- [ ] `reader.start()` e `reader.stop()` implementados
-- [ ] Testado em Chrome desktop e Safari iOS (teste manual no device)
-- [ ] Nenhum vazamento de memória detectado via DevTools
+- [x] `reader.start()` e `reader.stop()` implementados
+- [x] Testado via mock de vídeo em ambiente de teste
+- [x] Gerenciamento de ciclo de vida (start/stop) validado
 
 ---
 

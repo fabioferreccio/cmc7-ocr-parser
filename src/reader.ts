@@ -39,17 +39,76 @@ class ReaderImpl implements CMC7Reader {
     this.extractor = new FieldExtractor(this.parser);
   }
 
+  private loopId: number | null = null;
+  private lastProcessTime = 0;
+  private videoElement: HTMLVideoElement | null = null;
+  private internalCanvas = document.createElement('canvas');
+
   async start(videoElement: HTMLVideoElement): Promise<void> {
+    if (this.isRunning) return;
+    this.videoElement = videoElement;
     this.isRunning = true;
-    // Real-time loop implementation will follow in T-021
+    this.lastProcessTime = 0;
+    
+    this.loop();
   }
 
   async startCamera(container?: HTMLElement): Promise<HTMLVideoElement> {
-    throw new Error('Method not implemented.');
+    // This will be implemented in T-022 (Camera Integration)
+    throw new Error('Method not implemented. Use start(videoElement) for now.');
   }
 
   async stop(): Promise<void> {
     this.isRunning = false;
+    if (this.loopId !== null) {
+      cancelAnimationFrame(this.loopId);
+      this.loopId = null;
+    }
+  }
+
+  private loop = (): void => {
+    if (!this.isRunning) return;
+
+    const now = Date.now();
+    const interval = this.options.frameIntervalMs || 300;
+
+    if (now - this.lastProcessTime >= interval) {
+      this.processFrame().catch(err => {
+        this.emit('error', err);
+      });
+      this.lastProcessTime = now;
+    }
+
+    this.loopId = requestAnimationFrame(this.loop);
+  };
+
+  private async processFrame(): Promise<void> {
+    if (!this.videoElement || this.videoElement.readyState < 2) return;
+
+    // Use current video frame as input
+    try {
+      // 1. Quality Assessment
+      const imageData = this.ensureImageData(this.videoElement);
+      const quality = new (await import('./ocr/quality/assessor.js')).FrameQualityAssessor().assess(
+        imageData, 
+        this.options.minFrameQualityScore || 40
+      );
+
+      this.emit('frame-quality', quality);
+
+      if (!quality.shouldProcess) {
+        return;
+      }
+
+      // 2. Full OCR Pipeline
+      const result = await this.readImage(imageData);
+      this.emit('result', result);
+    } catch (e: any) {
+      // Ignore "NotFound" in real-time loop to avoid flooding errors
+      if (e.type !== 'CMC7_NOT_FOUND') {
+        this.emit('error', e);
+      }
+    }
   }
 
   /**
