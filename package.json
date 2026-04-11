@@ -48,6 +48,7 @@
     "build": "tsup",
     "build:check": "tsc --noEmit",
     "dev": "vite ./demo --host",
+    "dev:tunnel": "localtunnel --port 5173",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -83,14 +84,15 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "husky": "^9.0.0",
+    "jimp": "^0.22.12",
     "jsdom": "^24.0.0",
     "license-checker": "^25.0.1",
     "lint-staged": "^15.2.0",
     "prettier": "^3.2.0",
     "tsup": "^8.0.0",
     "typescript": "^5.4.0",
-    "vitest": "^1.4.0",
-    "jimp": "^0.22.12"
+    "vite-plugin-mkcert": "^2.0.0",
+    "vitest": "^1.4.0"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
