@@ -47,6 +47,7 @@
     "pretest": "npm run opencv:prepare",
     "build": "tsup",
     "build:check": "tsc --noEmit",
+    "dev": "vite ./demo --host",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",

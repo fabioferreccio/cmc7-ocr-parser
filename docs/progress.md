@@ -9,7 +9,7 @@
 
 - **Última atualização:** 2026-04-10
 - **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 20 / 25
+- **Tasks concluídas:** 21 / 25
 - **Tasks em progresso:** Nenhuma
 
 ---
@@ -38,6 +38,7 @@
 | 2026-04-10 | T-019 | Sistema de Eventos & CMC7Reader | ✅ Sucesso | src/reader.ts, src/reader.test.ts |
 | 2026-04-10 | T-020 | readImage (Modo Estático) | ✅ Sucesso | src/reader.ts, src/api/read-image.test.ts |
 | 2026-04-10 | T-021 | start (Loop Tempo Real) | ✅ Sucesso | src/reader.ts, src/api/reader-stream.test.ts |
+| 2026-04-10 | T-022 | startCamera (Câmera & Demo) | ✅ Sucesso | src/reader.ts, demo/index.html |
 
 ---
 
@@ -63,14 +64,15 @@
 - [T-019] Sistema de Eventos e CMC7Reader (shell)
 - [T-020] readImage (Modo Imagem Estática)
 - [T-021] start (Loop de Tempo Real)
+- [T-022] startCamera (Integração com Câmera)
 
 ---
 
 ## Próxima Task
 
-**T-022 — startCamera (Integração com Câmera)**  
-Camada 4 (API Pública)  
-Implementar `startCamera()` usando `getUserMedia()`, configurando restrições de ambiente e gerenciando o ciclo de vida do stream.
+**T-023 — Testes E2E com Playwright**  
+Milestone 7 (Refinamento)  
+Validar o fluxo completo em múltiplos navegadores (Chromium, WebKit) simulando mobile e câmera.
 
 ---
 

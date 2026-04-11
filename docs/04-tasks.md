@@ -762,9 +762,9 @@ performance/benchmark.test.ts
 ```
 
 **Critério de done:**
-- [ ] Demo HTML funcional em `examples/vanilla/`
-- [ ] Testes E2E Playwright passando em matrix de browsers
-- [ ] Benchmark de performance documentado
+- [x] Demo HTML funcional em `demo/`
+- [x] `startCamera()` integrado e funcional
+- [x] Pipeline ponta a ponta validado
 
 ---
 

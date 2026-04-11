@@ -53,9 +53,45 @@ class ReaderImpl implements CMC7Reader {
     this.loop();
   }
 
-  async startCamera(container?: HTMLElement): Promise<HTMLVideoElement> {
-    // This will be implemented in T-022 (Camera Integration)
-    throw new Error('Method not implemented. Use start(videoElement) for now.');
+  private stream: MediaStream | null = null;
+
+  async startCamera(container: HTMLElement = document.body): Promise<HTMLVideoElement> {
+    if (this.stream) return this.videoElement!;
+
+    const constraints: MediaStreamConstraints = {
+      video: {
+        facingMode: 'environment', // RF-002: Preferencialmente câmera traseira
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        ...this.options.cameraConstraints,
+      },
+      audio: false,
+    };
+
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      const video = document.createElement('video');
+      video.setAttribute('playsinline', 'true');
+      video.style.width = '100%';
+      video.style.height = '100%';
+      video.style.objectFit = 'cover';
+      video.srcObject = this.stream;
+      
+      container.appendChild(video);
+      await video.play();
+      
+      this.videoElement = video;
+      await this.start(video);
+      
+      return video;
+    } catch (err) {
+      throw {
+        type: 'PERMISSION_ERROR',
+        message: 'Could not access camera',
+        cause: err
+      } as CMC7Error;
+    }
   }
 
   async stop(): Promise<void> {
@@ -63,6 +99,18 @@ class ReaderImpl implements CMC7Reader {
     if (this.loopId !== null) {
       cancelAnimationFrame(this.loopId);
       this.loopId = null;
+    }
+
+    if (this.stream) {
+      this.stream.getTracks().forEach(track => track.stop());
+      this.stream = null;
+    }
+
+    if (this.videoElement && this.videoElement.parentElement) {
+      // Logic on whether to remove video element from DOM is debatable, 
+      // but for simple startCamera/stop cycle, we'll clean it up.
+      this.videoElement.remove();
+      this.videoElement = null;
     }
   }
 
