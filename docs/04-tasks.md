@@ -465,7 +465,7 @@ src/ocr/template-engine.test.ts
 
 ---
 
-### T-014 — CNNEngine via onnxruntime-web
+### T-014 — CNNEngine via onnxruntime-web [DONE]
 
 | Campo | Valor |
 |-------|-------|
@@ -493,10 +493,10 @@ tools/train/
 ```
 
 **Critério de done:**
-- [ ] Modelo `dist/models/cmc7-cnn.onnx` treinado e exportado (≤ 2 MB)
-- [ ] `src/ocr/cnn-engine.ts` implementado
-- [ ] Taxa de acerto ≥ 98% em dataset de câmera
-- [ ] Performance < 200ms em mobile mid-range benchmarkada (Premissa P-07)
+- [x] Modelo `dist/models/cmc7-cnn.onnx` treinado e exportado (≤ 2 MB)
+- [x] `src/ocr/cnn-engine.ts` implementado
+- [x] Taxa de acerto ≥ 98% em dataset de câmera
+- [x] Performance < 200ms em mobile mid-range benchmarkada (Premissa P-07)
 
 ---
 

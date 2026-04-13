@@ -9,7 +9,7 @@
 
 - **Última atualização:** 2026-04-13
 - **Milestone atual:** 7 — Release (Iniciando planejamento M8 - Segurança)
-- **Tasks concluídas:** 24 / 30
+- **Tasks concluídas:** 25 / 30
 - **Tasks em progresso:** Nenhuma (Próximas: T-026, T-027)
 
 
@@ -32,6 +32,7 @@
 | 2026-04-10 | T-011 | ROIDetector (Detecção de Faixa) | ✅ Sucesso | src/pipeline/roi-detector.ts, src/pipeline/roi-detector.test.ts |
 | 2026-04-10 | T-012 | Templates CMC-7 (Geração / Placeholder) | ✅ Sucesso | tools/generate-templates.py, src/ocr/templates/index.ts |
 | 2026-04-10 | T-013 | TemplateMatchingEngine Completo | ✅ Sucesso | src/ocr/template-engine.ts, src/ocr/template-engine.test.ts |
+| 2026-04-13 | T-014 | CNNEngine via onnxruntime-web | ✅ Sucesso | src/ocr/cnn-engine.ts, src/ocr/cnn-engine.test.ts, tools/train/* |
 | 2026-04-10 | T-015 | DVValidator (Módulo 10 e Módulo 11) | ✅ Sucesso | src/validation/dv-validator.ts, src/validation/dv-validator.test.ts |
 | 2026-04-10 | T-016 | BankRegistry (5 maiores bancos) | ✅ Sucesso | src/validation/bank-registry.ts, src/validation/bank-registry.test.ts |
 | 2026-04-10 | T-017 | CMC7Parser | ✅ Sucesso | src/parser/cmc7-parser.ts, src/parser/cmc7-parser.test.ts |
@@ -63,6 +64,7 @@
 - [T-011] ROIDetector (Detecção de Faixa)
 - [T-012] Templates CMC-7 (Geração em Build Time)
 - [T-013] TemplateMatchingEngine Completo
+- [T-014] CNNEngine via onnxruntime-web (Implementado Lazy Load)
 - [T-015] DVValidator (Módulo 10 e Módulo 11)
 - [T-016] BankRegistry (5 maiores bancos)
 - [T-017] CMC7Parser

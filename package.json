@@ -126,5 +126,8 @@
     "docs/**/*.md": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "onnxruntime-web": "^1.24.3"
   }
 }
