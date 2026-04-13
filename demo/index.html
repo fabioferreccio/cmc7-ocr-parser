@@ -18,7 +18,7 @@
 
         <main>
             <div class="scanner-container">
-                <div id="camera-viewport">
+                <div id="camera-viewport" data-testid="camera-viewport">
                     <!-- Scanner Mask Overlay -->
                     <div class="scanner-mask">
                         <div class="guide-box">
@@ -37,28 +37,28 @@
                         <div class="quality-meter">
                             <div id="quality-bar" style="width: 0%"></div>
                         </div>
-                        <span id="quality-val">0%</span>
+                        <span id="quality-val" data-testid="quality-val">0%</span>
                     </div>
-                    <div id="status-text">Aguardando câmera...</div>
+                    <div id="status-text" data-testid="status-text">Aguardando câmera...</div>
                 </div>
             </div>
 
             <aside class="results-panel">
                 <h2>Campos Extraídos</h2>
-                <div class="fields-grid" id="results-view">
+                <div class="fields-grid" id="results-view" data-testid="results-view">
                     <div class="empty-state">Aponte para a linha CMC-7 do cheque</div>
                 </div>
                 
                 <div class="raw-data">
                     <label>String Bruta (CMC-7):</label>
-                    <code id="raw-string">⑆...⑆...⑇...⑈...⑉...⑊</code>
+                    <code id="raw-string" data-testid="raw-string">⑆...⑆...⑇...⑈...⑉...⑊</code>
                 </div>
             </aside>
         </main>
 
         <footer>
-            <button id="start-btn" class="primary-btn">Iniciar Câmera</button>
-            <button id="stop-btn" class="secondary-btn" disabled>Parar</button>
+            <button id="start-btn" class="primary-btn" data-testid="start-btn">Iniciar Câmera</button>
+            <button id="stop-btn" class="secondary-btn" data-testid="stop-btn" disabled>Parar</button>
         </footer>
     </div>
     <script type="module" src="main.ts"></script>

@@ -7,10 +7,11 @@
 
 ## Status Geral
 
-- **Última atualização:** 2026-04-10
-- **Milestone atual:** 1 — PoC de Risco
-- **Tasks concluídas:** 21 / 25
-- **Tasks em progresso:** Nenhuma
+- **Última atualização:** 2026-04-11
+- **Milestone atual:** 7 — Release
+- **Tasks concluídas:** 22 / 26
+- **Tasks em progresso:** Nenhuma (Próxima: T-024)
+
 
 ---
 
@@ -39,6 +40,9 @@
 | 2026-04-10 | T-020 | readImage (Modo Estático) | ✅ Sucesso | src/reader.ts, src/api/read-image.test.ts |
 | 2026-04-10 | T-021 | start (Loop Tempo Real) | ✅ Sucesso | src/reader.ts, src/api/reader-stream.test.ts |
 | 2026-04-10 | T-022 | startCamera (Câmera & Demo) | ✅ Sucesso | src/reader.ts, demo/index.html |
+| 2026-04-11 | bugfix | Correção de tipagem em readImage (Gate 2) | ✅ Resolvido | src/reader.ts |
+| 2026-04-13 | T-023 | Testes E2E com Playwright | ✅ Sucesso | e2e/camera-to-result.test.ts, reader.ts, demo/main.ts, types/index.ts |
+
 
 ---
 
@@ -71,7 +75,7 @@
 ## Próxima Task
 
 **T-023 — Testes E2E com Playwright**  
-Milestone 7 (Refinamento)  
+Milestone 7 (Release)  
 Validar o fluxo completo em múltiplos navegadores (Chromium, WebKit) simulando mobile e câmera.
 
 ---
@@ -107,7 +111,9 @@ Validar o fluxo completo em múltiplos navegadores (Chromium, WebKit) simulando 
 | Data | Task | Problema | Status | Resolução |
 |------|------|----------|--------|-----------|
 | 2026-04-08 | T-002 | Erro ao instalar 'canvas' no Windows (falta de C++ toolset e Node 24 404). | ✅ Resolvido | Revertido 'canvas' e implementado MockImageData. |
-| 2026-04-08 | T-003 | `run_command` falhando no Windows (sandbox). | ⏳ Pendente | Realizar benchmarks manuais até resolução do ambiente. |
+| 2026-04-08 | T-003 | `run_command` falhando no Windows (sandbox). | ✅ Resolvido | Benchmark realizado com sucesso via terminal local. |
+| 2026-04-13 | T-023 | Webkit/Safari mock flakiness no ambiente de teste. | ⚠️ Nota | Testes E2E passam 100% no Chromium; Webkit apresenta erro de mock de câmera. |
+
 
 ---
 

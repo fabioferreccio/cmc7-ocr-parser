@@ -88,6 +88,7 @@ cmc7-ocr-parser/
 | `@commitlint/cli` | ^19.0.0 | MIT ✅ | docs/05 §8.1 |
 | `@commitlint/config-conventional` | ^19.0.0 | MIT ✅ | docs/05 §8.1 |
 | `license-checker` | ^25.0.1 | BSD-3-Clause ✅ | docs/05 §5.2 |
+| `@playwright/test` | ^1.42.0 | Apache-2.0 ✅ | docs/04 T-023 (E2E) |
 
 ### Runtime dependencies — NENHUMA no bundle principal
 

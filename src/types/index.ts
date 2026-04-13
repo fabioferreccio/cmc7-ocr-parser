@@ -118,9 +118,15 @@ export interface FrameQualityReport {
   score: number;
   /** List of detected quality issues. */
   issues: QualityIssue[];
+  /** 
+   * Whether the frame meets requirements for OCR. 
+   * Derived from score >= minFrameQualityScore.
+   */
+  shouldProcess: boolean;
   /** Actionable suggestion for the user. */
   suggestion?: 'move-closer' | 'reduce-glare' | 'stabilize' | 'improve-lighting';
 }
+
 
 export type QualityIssue =
   | 'blur'

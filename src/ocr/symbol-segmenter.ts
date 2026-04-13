@@ -1,3 +1,5 @@
+import type { ROI } from '../pipeline/roi-detector.js';
+
 export interface Segment {
   x: number;
   y: number;
@@ -13,20 +15,28 @@ export class SymbolSegmenter {
   /**
    * Segments the CMC-7 strip into individual characters.
    * 
-   * @param image - The binarized ROI of the CMC-7 strip.
+   * @param image - The binarized image.
+   * @param roi - Optional region of interest.
    * @returns Array of ordered, normalized segments (32x64px).
    */
-  segment(image: ImageData): Segment[] {
+  segment(image: ImageData, roi?: ROI): Segment[] {
     const { width, height, data } = image;
+    
+    // Bounds to scan
+    const startX = roi ? roi.x : 0;
+    const endX = roi ? roi.x + roi.width : width;
+    const startY = roi ? roi.y : 0;
+    const endY = roi ? roi.y + roi.height : height;
+
     const colHasPixel = new Array(width).fill(false);
     const colMinY = new Array(width).fill(height);
     const colMaxY = new Array(width).fill(0);
 
     // 1. Scan columns
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
+    for (let x = startX; x < endX; x++) {
+      for (let y = startY; y < endY; y++) {
         const idx = (y * width + x) * 4;
-        if (data[idx] < 128) { // Black pixel
+        if (data[idx]! < 128) { // Black pixel
           colHasPixel[x] = true;
           if (y < colMinY[x]) colMinY[x] = y;
           if (y > colMaxY[x]) colMaxY[x] = y;
@@ -117,10 +127,10 @@ export class SymbolSegmenter {
           const sIdx = (sy * source.width + sx) * 4;
           const tIdx = (ty * targetW + tx) * 4;
 
-          result.data[tIdx] = source.data[sIdx];
-          result.data[tIdx + 1] = source.data[sIdx + 1];
-          result.data[tIdx + 2] = source.data[sIdx + 2];
-          result.data[tIdx + 3] = source.data[sIdx + 3];
+          result.data[tIdx]! = source.data[sIdx]!;
+          result.data[tIdx + 1]! = source.data[sIdx + 1]!;
+          result.data[tIdx + 2]! = source.data[sIdx + 2]!;
+          result.data[tIdx + 3]! = source.data[sIdx + 3]!;
         }
       }
     }

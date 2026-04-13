@@ -1,6 +1,6 @@
-import type { CMC7Result, CMC7Validation, ValidationError, ParseWarning } from '../types/index.js';
+import type { CMC7Result, CMC7Validation, ParseWarning } from '../types/index.js';
 import type { CMC7Parser } from './cmc7-parser.js';
-import { mod10, mod11, validateField } from '../validation/dv-validator.js';
+import { mod10, validateField } from '../validation/dv-validator.js';
 
 export interface ExtractionContext {
   frameQuality?: number;

@@ -25,10 +25,25 @@ if (typeof globalThis.ImageData === 'undefined') {
 }
 
 // ─── ImageBitmap mock (not in jsdom) ────────────────────────────────────────
+if (typeof globalThis.ImageBitmap === 'undefined') {
+  (globalThis as any).ImageBitmap = class ImageBitmap {
+    constructor() {
+      throw new TypeError("Illegal constructor");
+    }
+    width = 0;
+    height = 0;
+    close() {}
+  };
+}
+
 globalThis.createImageBitmap = vi.fn().mockImplementation(
-  async (_source: unknown): Promise<ImageBitmap> =>
-    ({ width: 960, height: 540, close: vi.fn() }) as unknown as ImageBitmap,
+  async (_source: unknown): Promise<ImageBitmap> => {
+    const bitmap = Object.create(ImageBitmap.prototype);
+    Object.assign(bitmap, { width: 960, height: 540, close: vi.fn() });
+    return bitmap as ImageBitmap;
+  }
 );
+
 
 // ─── Worker mock (not in jsdom) ──────────────────────────────────────────────
 globalThis.Worker = vi.fn().mockImplementation(() => ({

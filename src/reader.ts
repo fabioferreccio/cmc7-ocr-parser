@@ -1,11 +1,9 @@
-import type { 
-  CMC7Reader, 
-  CMC7ReaderOptions, 
-  CMC7Result, 
-  CMC7Error, 
-  FrameQualityReport, 
-  EnvironmentInfo,
-  BankSpec
+import {
+  type CMC7Reader,
+  type CMC7Result,
+  type CMC7ReaderOptions,
+  type CMC7Error,
+  type BankSpec,
 } from './types/index.js';
 import { ImagePreprocessor } from './pipeline/image-preprocessor.js';
 import { ROIDetector } from './pipeline/roi-detector.js';
@@ -14,16 +12,24 @@ import { TemplateEngine } from './ocr/template-engine.js';
 import { CMC7Parser } from './parser/cmc7-parser.js';
 import { BankRegistry } from './validation/bank-registry.js';
 import { FieldExtractor } from './parser/field-extractor.js';
+import { FrameQualityAssessor } from './ocr/quality/assessor.js';
+import { detectEnvironment } from './capture/environment-detector.js';
+
 
 /**
  * Implementation of the CMC7Reader interface.
  * Coordinates between Capture, Pipeline, and Parser layers.
  */
 class ReaderImpl implements CMC7Reader {
-  private readonly handlers: Map<string, Set<(...args: any[]) => void>> = new Map();
+  private readonly handlers: Map<string, Set<(...args: unknown[]) => void>> = new Map();
+
+  private qualityAssessor = new FrameQualityAssessor();
   private isRunning = false;
   private iteratorQueue: CMC7Result[] = [];
   private iteratorResolvers: ((value: IteratorResult<CMC7Result>) => void)[] = [];
+  private unsupportedEnvInfo: unknown = null;
+
+
 
   // Pipeline components
   private readonly preprocessor = new ImagePreprocessor();
@@ -37,12 +43,21 @@ class ReaderImpl implements CMC7Reader {
   constructor(private readonly options: CMC7ReaderOptions = {}) {
     this.parser = new CMC7Parser(this.bankRegistry);
     this.extractor = new FieldExtractor(this.parser);
+
+    // AD-02: Check environment compatibility on initialization (docs/03-arquitetura.md §4.3)
+    const env = detectEnvironment();
+    if (env.isWKWebView || !env.hasCamera || !env.isHTTPS) {
+      this.unsupportedEnvInfo = env;
+      // Also queue for those already listening (if any)
+      queueMicrotask(() => this.emit('unsupported-environment', env));
+    }
   }
+
+
 
   private loopId: number | null = null;
   private lastProcessTime = 0;
   private videoElement: HTMLVideoElement | null = null;
-  private internalCanvas = document.createElement('canvas');
 
   async start(videoElement: HTMLVideoElement): Promise<void> {
     if (this.isRunning) return;
@@ -73,25 +88,52 @@ class ReaderImpl implements CMC7Reader {
       
       const video = document.createElement('video');
       video.setAttribute('playsinline', 'true');
+      video.setAttribute('data-testid', 'camera-video'); // Useful for E2E
       video.style.width = '100%';
       video.style.height = '100%';
       video.style.objectFit = 'cover';
       video.srcObject = this.stream;
       
       container.appendChild(video);
-      await video.play();
+
+      // Aguarda metadados para garantir que o vídeo tenha dimensões e esteja pronto
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Timeout waiting for video metadata')), 5000);
+        if (video.readyState >= 2) {
+          clearTimeout(timeout);
+          resolve();
+        }
+        video.onloadedmetadata = () => {
+          clearTimeout(timeout);
+          resolve();
+        };
+        video.onerror = () => {
+          clearTimeout(timeout);
+          reject(new Error('Video element error'));
+        };
+      });
+
+      try {
+        await video.play();
+      } catch (e) {
+        console.warn('Video play interrupted or failed', e);
+        // On some mobile browsers, play() might fail without user gesture, 
+        // but here it's called from startBtn.onclick, so it should be fine.
+      }
       
       this.videoElement = video;
       await this.start(video);
       
       return video;
     } catch (err) {
+      const error = err as Error;
       throw {
-        type: 'PERMISSION_ERROR',
-        message: 'Could not access camera',
-        cause: err
+        type: 'CAMERA_PERMISSION_DENIED',
+        message: error.message || 'Camera access denied by user',
       } as CMC7Error;
     }
+
+
   }
 
   async stop(): Promise<void> {
@@ -136,45 +178,46 @@ class ReaderImpl implements CMC7Reader {
     // Use current video frame as input
     try {
       // 1. Quality Assessment
-      const imageData = this.ensureImageData(this.videoElement);
-      const quality = new (await import('./ocr/quality/assessor.js')).FrameQualityAssessor().assess(
-        imageData, 
-        this.options.minFrameQualityScore || 40
-      );
+      const imageData = await this.ensureImageData(this.videoElement);
+      const quality = this.qualityAssessor.assess(imageData);
 
       this.emit('frame-quality', quality);
 
-      if (!quality.shouldProcess) {
+      if (quality.score < (this.options.minFrameQualityScore || 40)) {
         return;
       }
 
       // 2. Full OCR Pipeline
       const result = await this.readImage(imageData);
       this.emit('result', result);
-    } catch (e: any) {
+    } catch (e) {
+      const err = e as CMC7Error;
       // Ignore "NotFound" in real-time loop to avoid flooding errors
-      if (e.type !== 'CMC7_NOT_FOUND') {
-        this.emit('error', e);
+      if (err.type !== 'CMC7_NOT_FOUND') {
+        this.emit('error', err);
       }
     }
+
   }
 
   /**
    * Processes a static image source and returns the CMC-7 result.
    */
-  async readImage(input: HTMLCanvasElement | HTMLImageElement | ImageData): Promise<CMC7Result> {
+  async readImage(
+    input: HTMLCanvasElement | HTMLImageElement | ImageBitmap | File | Blob | string | ImageData | HTMLVideoElement,
+  ): Promise<CMC7Result> {
     const startTime = Date.now();
-    
+
     // 1. Get ImageData from input
-    const imageData = this.ensureImageData(input);
+    const imageData = await this.ensureImageData(input);
 
     // 2. Preprocessing & OCR Pipeline
     // Level 1: Resize and Grayscale
     const { imageData: grayData } = await this.preprocessor.process(imageData, { grayscale: true });
-    
+
     // Level 2: Binarization (Required for ROI Detection and Segmentation)
     const binary = await this.preprocessor.binarize(grayData!);
-    
+
     // Layer 1 integration: ROI Detection
     const roi = this.roiDetector.detect(binary);
 
@@ -182,39 +225,75 @@ class ReaderImpl implements CMC7Reader {
       throw {
         type: 'CMC7_NOT_FOUND',
         message: 'No CMC-7 strip detected in image.',
-        frameQuality: 0 // Quality assessment will be integrated later
+        frameQuality: 0, // Quality assessment will be integrated later
       } as CMC7Error;
     }
 
     // Layer 2: Character Extraction
     const segments = this.segmenter.segment(binary, roi);
     const matches = this.ocrEngine.recognize(segments);
-    const rawString = matches.map(m => m.char).join('');
+    const rawString = matches.map((m) => m.char).join('');
 
     // Layer 3: Parsing & Validation
     const result = this.extractor.extract(rawString, {
       frameQuality: 100, // Placeholder
-      startTime
+      startTime,
     });
 
     return result;
   }
 
-  private ensureImageData(input: HTMLCanvasElement | HTMLImageElement | ImageData): ImageData {
+  private async ensureImageData(
+    input: HTMLCanvasElement | HTMLImageElement | ImageBitmap | File | Blob | string | ImageData | HTMLVideoElement,
+  ): Promise<ImageData> {
     if (input instanceof ImageData) return input;
-    
-    const canvas = input instanceof HTMLCanvasElement ? input : this.imageToCanvas(input);
+
+    let source: CanvasImageSource;
+
+    if (typeof input === 'string' || input instanceof Blob) {
+      source = await this.loadImage(input);
+    } else {
+      source = input;
+    }
+
+    const canvas = source instanceof HTMLCanvasElement ? source : this.imageToCanvas(source);
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) throw new Error('Could not get canvas context');
     return ctx.getImageData(0, 0, canvas.width, canvas.height);
   }
 
-  private imageToCanvas(img: HTMLImageElement): HTMLCanvasElement {
+  private loadImage(input: Blob | string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('Failed to load image source'));
+      if (input instanceof Blob) {
+        img.src = URL.createObjectURL(input);
+      } else {
+        img.src = input;
+      }
+    });
+  }
+
+  private imageToCanvas(img: CanvasImageSource): HTMLCanvasElement {
     const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
+    if (img instanceof HTMLImageElement) {
+      canvas.width = img.naturalWidth || img.width;
+      canvas.height = img.naturalHeight || img.height;
+    } else if (img instanceof HTMLVideoElement) {
+      canvas.width = img.videoWidth || img.width;
+      canvas.height = img.videoHeight || img.height;
+    } else if (img instanceof ImageBitmap || img instanceof HTMLCanvasElement) {
+      canvas.width = img.width;
+      canvas.height = img.height;
+    }
+
+
     const ctx = canvas.getContext('2d');
-    ctx?.drawImage(img, 0, 0);
+    if (img instanceof HTMLVideoElement || img instanceof HTMLCanvasElement || img instanceof HTMLImageElement || img instanceof ImageBitmap) {
+        ctx?.drawImage(img as CanvasImageSource, 0, 0);
+    }
+
     return canvas;
   }
 
@@ -223,8 +302,16 @@ class ReaderImpl implements CMC7Reader {
       this.handlers.set(event, new Set());
     }
     this.handlers.get(event)!.add(handler);
+
+    // AD-02: If this is an environment warning and we already have info, emit immediately
+    if (event === 'unsupported-environment' && this.unsupportedEnvInfo) {
+      handler(this.unsupportedEnvInfo as never);
+    }
+
+
     return this;
   }
+
 
   off(event: string, handler: (...args: any[]) => void): this {
     this.handlers.get(event)?.delete(handler);

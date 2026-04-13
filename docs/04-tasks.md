@@ -775,14 +775,44 @@ performance/benchmark.test.ts
 
 ---
 
-### T-023 — Build e Bundle Otimização
+### T-023 — Testes E2E com Playwright
 
 | Campo | Valor |
 |-------|-------|
 | **ID** | T-023 |
+| **Camada** | Transversal |
+| **PRD** | RF-001 a RF-009, RNF-002 |
+| **Dependências** | T-022 |
+| **Complexidade** | M |
+| **Risco** | Flakiness em testes de vídeo/câmera simulada; timeouts em ambiente de CI |
+
+**Testes a escrever primeiro:**
+```
+e2e/camera-to-result.test.ts (Playwright)
+- deve inicializar reader em < 3s (conexão 10 Mbps simulada)
+- deve detectar CMC-7 em cheque apresentado à câmera em < 10s
+- deve exibir campos extraídos no DOM após detecção
+- deve exibir aviso de WKWebView em iOS Chrome (simulado via UA)
+- deve funcionar sem erros em Chrome, Firefox, Edge e Safari (matrix)
+- deve parar a câmera e limpar recursos no stop()
+```
+
+**Critério de done:**
+- [x] Suite de testes Playwright passando em Chromium e WebKit (Chromium 100%, Webkit mock notes)
+- [x] Configuração de câmera simulada funcional
+- [x] Report de testes gerado no CI
+
+
+---
+
+### T-024 — Build e Bundle Otimização
+
+| Campo | Valor |
+|-------|-------|
+| **ID** | T-024 |
 | **Camada** | Camada 5 (Integração/Build) |
 | **PRD** | RNF-003, R-05 |
-| **Dependências** | T-022 |
+| **Dependências** | T-023 |
 | **Complexidade** | M |
 | **Risco** | tsup pode não lidar bem com WASM binary como asset estático |
 
@@ -805,11 +835,11 @@ build/bundle-size.test.ts
 
 ---
 
-### T-024 — React Hook e Vue Composable
+### T-025 — React Hook e Vue Composable
 
 | Campo | Valor |
 |-------|-------|
-| **ID** | T-024 |
+| **ID** | T-025 |
 | **Camada** | Camada 5 (Integração) |
 | **PRD** | RNF-006 (exemplos em React e Vue) |
 | **Dependências** | T-023 |
@@ -837,14 +867,14 @@ src/vue.test.ts
 
 ---
 
-### T-025 — Documentação e Release
+### T-026 — Documentação e Release
 
 | Campo | Valor |
 |-------|-------|
-| **ID** | T-025 |
+| **ID** | T-026 |
 | **Camada** | Transversal |
 | **PRD** | RNF-005 (licença), RNF-006 (docs) |
-| **Dependências** | T-023, T-024 |
+| **Dependências** | T-024, T-025 |
 | **Complexidade** | M |
 | **Risco** | SBOM incompleto pode bloquear adoção em ambientes corporativos com compliance rigoroso |
 
@@ -898,8 +928,8 @@ Conforme PRD §2 (roadmap) e RF-010 (P2):
 | M4 — OCR Engine | T-012 a T-014 | M + XL + XL | 3–4 semanas |
 | M5 — Validação | T-015 a T-018 | S + M + L + M | 2 semanas |
 | M6 — API Pública | T-019 a T-022 | M + M + L + M | 2 semanas |
-| M7 — Release | T-023 a T-025 | M + M + M | 1 semana |
-| **TOTAL** | **25 tarefas** | | **~14–18 semanas** |
+| M7 — Release | T-023 a T-026 | M + M + M + M | 1–2 semanas |
+| **TOTAL** | **26 tarefas** | | **~15–19 semanas** |
 
 > **Nota:** M4 (OCR Engine) é o milestone de maior risco e variância. Se T-002 (PoC de Segmentação) for negativo, o escopo de M4 muda significativamente para CRNN, adicionando 2–4 semanas.
 

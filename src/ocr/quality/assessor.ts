@@ -13,11 +13,12 @@ export class FrameQualityAssessor {
    * Assesses the quality of an image.
    *
    * @param imageData - Raw image data from Canvas API
-   * @param minScore - Minimum score to set shouldProcess=true
+   * @param minScore - Minimum score to set shouldProcess to true (default: 40)
    * @returns Quality report with score, issues and suggestion
    */
   assess(imageData: ImageData, minScore = 40): FrameQualityReport {
     const { data, width, height } = imageData;
+
     const issues: QualityIssue[] = [];
 
     // --- 1. Glare & Contrast (Histogram) ---
@@ -27,15 +28,15 @@ export class FrameQualityAssessor {
     // We sample to ensure < 15ms on mobile (every 4th pixel = skip 16 pixels area basically)
     // Actually, imageData.data is [R,G,B,A, R,G,B,A...]
     for (let i = 0; i < data.length; i += 16) {
-      const gray = data[i]; // Assuming grayscale or just using Red channel as proxy for speed
-      histogram[gray]++;
+      const gray = data[i]!; // Assuming grayscale or just using Red channel as proxy for speed
+      histogram[gray]!++;
       totalPixels++;
     }
 
     // 1.1 Glare detection (> 20% of pixels > 240)
     let brightPixels = 0;
     for (let i = 240; i < 256; i++) {
-      brightPixels += histogram[i];
+      brightPixels += histogram[i]!;
     }
     const glareRatio = brightPixels / totalPixels;
     if (glareRatio > 0.2) {
@@ -45,11 +46,11 @@ export class FrameQualityAssessor {
     // 1.2 Contrast detection (Standard Deviation of histogram)
     let mean = 0;
     for (let i = 0; i < 256; i++) {
-      mean += i * (histogram[i] / totalPixels);
+      mean += i * (histogram[i]! / totalPixels);
     }
     let variance = 0;
     for (let i = 0; i < 256; i++) {
-      variance += Math.pow(i - mean, 2) * (histogram[i] / totalPixels);
+      variance += Math.pow(i - mean, 2) * (histogram[i]! / totalPixels);
     }
     const stdDev = Math.sqrt(variance);
     if (stdDev < 30) {
@@ -75,7 +76,7 @@ export class FrameQualityAssessor {
       const west = (y * width + (x - 1)) * 4;
 
       // Laplacian kernel: [0, 1, 0; 1, -4, 1; 0, 1, 0]
-      const L = data[north] + data[south] + data[east] + data[west] - 4 * data[idx];
+      const L = data[north]! + data[south]! + data[east]! + data[west]! - 4 * data[idx]!;
       
       lapSum += L;
       lapSumSq += L * L;
@@ -102,8 +103,8 @@ export class FrameQualityAssessor {
       issues,
       shouldProcess: score >= minScore,
       suggestion: this.getSuggestion(issues),
-      ignoreIssues: false, // Default to false in this layer
     };
+
   }
 
   private getSuggestion(issues: QualityIssue[]): FrameQualityReport['suggestion'] {

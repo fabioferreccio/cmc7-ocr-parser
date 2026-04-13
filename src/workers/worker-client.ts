@@ -1,10 +1,7 @@
 import type { 
   WorkerMessage, 
   WorkerResponse, 
-  CMC7ReaderOptions, 
-  CMC7Result, 
-  FrameQualityReport,
-  CMC7Error
+  CMC7ReaderOptions
 } from '../types/index.js';
 
 export type WorkerClientEvent = 'result' | 'quality' | 'error' | 'ready';
@@ -15,7 +12,8 @@ export type WorkerClientEvent = 'result' | 'quality' | 'error' | 'ready';
  */
 export class WorkerClient {
   private worker: Worker | null = null;
-  private handlers: Map<string, Array<(...args: any[]) => void>> = new Map();
+  private handlers: Map<string, Array<(...args: unknown[]) => void>> = new Map();
+
 
   /**
    * Initializes the worker.
@@ -76,7 +74,8 @@ export class WorkerClient {
   /**
    * Simple event emitter implementation.
    */
-  on(event: WorkerClientEvent, handler: (...args: any[]) => void): this {
+  on(event: WorkerClientEvent, handler: (...args: unknown[]) => void): this {
+
     if (!this.handlers.has(event)) {
       this.handlers.set(event, []);
     }
@@ -84,9 +83,10 @@ export class WorkerClient {
     return this;
   }
 
-  private emit(event: string, ...args: any[]): void {
+  private emit(event: string, ...args: unknown[]): void {
     this.handlers.get(event)?.forEach((h) => h(...args));
   }
+
 
   private postMessage(message: WorkerMessage, transfer?: Transferable[]): void {
     if (!this.worker) {

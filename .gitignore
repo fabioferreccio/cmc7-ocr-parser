@@ -9,8 +9,11 @@ Thumbs.db
 # Assets gerados (não versionados — gerados em build/CI)
 dist/wasm/
 dist/models/
+playwright-report/
+test-results/
 
 # Ferramentas de treinamento (não fazem parte da lib)
+tools/templates-preview/
 tools/__pycache__/
 tools/*.pyc
 tools/datasets/

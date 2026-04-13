@@ -1,5 +1,5 @@
 import { detectEnvironment } from './environment-detector.js';
-import type { EnvironmentInfo, CMC7Error } from '../types/index.js';
+
 
 export type CameraCaptureEvent = 'unsupported-environment' | 'error';
 

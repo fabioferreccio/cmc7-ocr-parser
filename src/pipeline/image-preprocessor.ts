@@ -21,7 +21,7 @@ export class ImagePreprocessor {
    * @returns Processed canvas and optional ImageData.
    */
   async process(
-    input: ImageBitmap | HTMLCanvasElement | HTMLImageElement,
+    input: ImageBitmap | HTMLCanvasElement | HTMLImageElement | ImageData,
     options: { grayscale?: boolean; roiCrop?: boolean } = {},
   ): Promise<{ canvas: HTMLCanvasElement; imageData?: ImageData }> {
     const { width: originalWidth, height: originalHeight } = input;
@@ -47,7 +47,11 @@ export class ImagePreprocessor {
     }
 
     // 2. Draw and Resize
-    ctx.drawImage(input, 0, 0, targetWidth, targetHeight);
+    if (input instanceof ImageData) {
+      ctx.putImageData(input, 0, 0);
+    } else {
+      ctx.drawImage(input, 0, 0, targetWidth, targetHeight);
+    }
 
     // 3. ROI Crop (Bottom 40% typically contains judicial/bank code line)
     // Architecture §1.2: ROI Search Area is y: 60%-100%
@@ -89,7 +93,7 @@ export class ImagePreprocessor {
 
     // Luminance formula: 0.299R + 0.587G + 0.114B
     for (let i = 0; i < data.length; i += 4) {
-      const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+      const gray = 0.299 * data[i]! + 0.587 * data[i + 1]! + 0.114 * data[i + 2]!;
       data[i] = gray;     // R
       data[i + 1] = gray; // G
       data[i + 2] = gray; // B

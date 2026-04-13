@@ -47,17 +47,23 @@ describe('FrameQualityAssessor', () => {
   it('deve aceitar imagem nítida e bem iluminada', () => {
     const goodImg = mockImageData(100, 100);
     // Padrão de alta frequência (alternando preto e branco para forçar variância e contraste)
-    for (let i = 0; i < goodImg.data.length; i += 4) {
-      const v = (i / 4) % 2 === 0 ? 0 : 255;
-      goodImg.data[i] = v;
-      goodImg.data[i+1] = v;
-      goodImg.data[i+2] = v;
-      goodImg.data[i+3] = 255;
+    for (let y = 0; y < 100; y++) {
+      for (let x = 0; x < 100; x++) {
+        const i = (y * 100 + x) * 4;
+        const v = (x + y) % 2 === 0 ? 20 : 200;
+        goodImg.data[i] = v;
+        goodImg.data[i+1] = v;
+        goodImg.data[i+2] = v;
+        goodImg.data[i+3] = 255;
+      }
     }
+
+
 
     const report = assessor.assess(goodImg, 40);
     expect(report.shouldProcess).toBe(true);
-    expect(report.ignoreIssues).toBe(false); // No issues expected
+    expect(report.issues.length).toBe(0); // No issues expected
+
     expect(report.score).toBeGreaterThan(60);
   });
 });

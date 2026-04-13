@@ -1,10 +1,13 @@
-/**
- * Detects the Region of Interest (ROI) corresponding to the CMC-7 strip.
- *
- * @remarks
- * Uses horizontal projection of binary pixels to find the most dense line.
- * Operates on L2 binarized images (usually 960px width).
+/** 
+ * Represents the detection region for the CMC-7 strip.
  */
+export interface ROI {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export class ROIDetector {
   // Configuração baseada na anatomia do CMC-7 (docs/03-arquitetura.md)
   private readonly MIN_WIDTH_PERCENT = 0.3; // 30% da largura deve ter pixels pretos
@@ -17,7 +20,7 @@ export class ROIDetector {
    * @param binaryImageData - Binarized image data (single channel logic).
    * @returns The detected ROI or null if not found.
    */
-  detect(binaryImageData: ImageData): { y: number; height: number } | null {
+  detect(binaryImageData: ImageData): ROI | null {
     const { width, height, data } = binaryImageData;
     const projection = new Int32Array(height);
 
@@ -27,11 +30,11 @@ export class ROIDetector {
       for (let x = 0; x < width; x++) {
         const idx = (y * width + x) * 4;
         // Na binarização, R=G=B. Olhamos apenas o R.
-        if (data[idx] < 128) {
+        if (data[idx]! < 128) {
           blackPixels++;
         }
       }
-      projection[y] = blackPixels;
+      projection[y]! = blackPixels;
     }
 
     // 2. Identificação da maior sequência de linhas densas
@@ -44,7 +47,7 @@ export class ROIDetector {
     const threshold = width * this.MIN_WIDTH_PERCENT;
 
     for (let y = 0; y < height; y++) {
-      if (projection[y] >= threshold) {
+      if (projection[y]! >= threshold) {
         if (currentStart === -1) currentStart = y;
         currentHeight++;
       } else {
@@ -68,7 +71,12 @@ export class ROIDetector {
 
     if (bestY === -1) return null;
 
-    return { y: bestY, height: bestHeight };
+    return { 
+      x: 0, 
+      y: bestY, 
+      width: width, 
+      height: bestHeight 
+    };
   }
 
   private isValidStrip(height: number): boolean {

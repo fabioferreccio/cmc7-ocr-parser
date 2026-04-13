@@ -1,4 +1,4 @@
-import { createCMC7Reader } from '../src/index.js';
+import { createCMC7Reader } from '../src/index.ts';
 
 const viewport = document.getElementById('camera-viewport')!;
 const startBtn = document.getElementById('start-btn') as HTMLButtonElement;
@@ -18,6 +18,29 @@ async function init() {
       frameIntervalMs: 250,
       minFrameQualityScore: 45
     });
+
+    // Expondo para testes E2E
+    (window as any).__CMC7_READER__ = reader;
+
+    let isUnsupported = false;
+    reader.on('unsupported-environment', (info: any) => {
+      isUnsupported = true;
+      statusText.innerText = 'Ambiente não suportado';
+      statusText.style.color = '#ff5252';
+      startBtn.disabled = true;
+      console.warn('Ambiente incompatível detectado:', info);
+      
+      // Adiciona banner de orientação se disponível
+      if (info.isWKWebView) {
+        const warning = document.createElement('div');
+        warning.className = 'env-warning';
+        warning.innerText = info.isIOS ? 'Por favor, abra este link no Safari para usar a câmera.' : 'Ambiente não suportado.';
+        document.body.prepend(warning);
+      }
+    });
+
+    if (isUnsupported) return;
+
 
     reader.on('frame-quality', (report: any) => {
       qualityBar.style.width = `${report.score}%`;
@@ -49,9 +72,11 @@ async function init() {
         stopBtn.disabled = false;
         statusText.innerText = 'Câmera ativa';
       } catch (e: any) {
-        alert(`Erro ao iniciar câmera: ${e.message}`);
+        statusText.innerText = `Erro na câmera: ${e.message || 'Desconhecido'}`;
+        statusText.style.color = '#ff5252';
         startBtn.disabled = false;
       }
+
     };
 
     stopBtn.onclick = async () => {

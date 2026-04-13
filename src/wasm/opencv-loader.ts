@@ -34,8 +34,10 @@ export interface OpenCVSubset {
 
   // Constants (subset)
   COLOR_RGBA2GRAY: number;
+  COLOR_GRAY2RGBA: number;
   ADAPTIVE_THRESH_GAUSSIAN_C: number;
   THRESH_BINARY: number;
+  THRESH_BINARY_INV: number;
   RETR_CCOMP: number;
   CHAIN_APPROX_SIMPLE: number;
   MORPH_RECT: number;
