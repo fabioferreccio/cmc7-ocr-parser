@@ -27,7 +27,7 @@ export class TemplateEngine {
    * Given a list of normalized 32x64 segments, returns the array of recognized characters.
    */
   recognize(segments: Segment[]): RecognitionResult[] {
-    return segments.map(seg => this.recognizeSegment(seg));
+    return segments.map((seg) => this.recognizeSegment(seg));
   }
 
   /**
@@ -41,7 +41,7 @@ export class TemplateEngine {
     // Both segment and template should mathematically have 2048 pixels.
     for (const [char, templatePixels] of Object.entries(this.templates)) {
       let scoreAccumulator = 0;
-      
+
       for (let i = 0; i < 2048; i++) {
         // Obter pixel R (o segmento binarizado tem R=G=B).
         // array imageData contem rgba (4 iteradores).
@@ -50,11 +50,11 @@ export class TemplateEngine {
 
         // Diferença absoluta de cor
         const diff = Math.abs(segPixel - tmplPixel);
-        
+
         // Transformar diferença em similaridade (0 = dif maxima, 1 = iguais)
         scoreAccumulator += (255 - diff) / 255.0;
       }
-      
+
       const score = scoreAccumulator / 2048.0;
 
       if (score > bestScore) {

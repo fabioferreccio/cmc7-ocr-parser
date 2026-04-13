@@ -7,14 +7,14 @@
 
 ## Sumário Executivo
 
-| # | Componente | Veredicto |
-|---|-----------|-----------|
-| 1 | Captura de câmera em tempo real | ✅ **VIÁVEL** |
-| 2 | Pré-processamento de imagem client-side | ✅ **VIÁVEL COM RESSALVAS** |
-| 3 | OCR da linha CMC-7 | ✅ **VIÁVEL COM RESSALVAS** |
-| 4 | OCR de texto manuscrito (valor e data) | ⚠️ **INVIÁVEL CLIENT-SIDE** (como feature principal) |
-| 5 | Validação dos dados CMC-7 | ✅ **VIÁVEL** |
-| 6 | Compatibilidade de licenças | ✅ **VIÁVEL** |
+| #   | Componente                              | Veredicto                                            |
+| --- | --------------------------------------- | ---------------------------------------------------- |
+| 1   | Captura de câmera em tempo real         | ✅ **VIÁVEL**                                        |
+| 2   | Pré-processamento de imagem client-side | ✅ **VIÁVEL COM RESSALVAS**                          |
+| 3   | OCR da linha CMC-7                      | ✅ **VIÁVEL COM RESSALVAS**                          |
+| 4   | OCR de texto manuscrito (valor e data)  | ⚠️ **INVIÁVEL CLIENT-SIDE** (como feature principal) |
+| 5   | Validação dos dados CMC-7               | ✅ **VIÁVEL**                                        |
+| 6   | Compatibilidade de licenças             | ✅ **VIÁVEL**                                        |
 
 ---
 
@@ -25,21 +25,25 @@
 A API padrão para captura de câmera no browser é `MediaDevices.getUserMedia()`, parte da especificação Media Capture and Streams (W3C). A API retorna um `MediaStream` que pode ser exibido diretamente em um elemento `<video>` e frames podem ser extraídos periodicamente via `<canvas>`.
 
 **Desktop:**
+
 - Suporte amplo: Chrome 53+, Firefox 36+, Edge 12+, Safari 11+.
 - Frame rate negociável via `constraints` (`frameRate: { ideal: 30 }`), com entrega real de 15–30 fps dependendo do hardware.
 - Acesso à câmera traseira/frontal via `facingMode: 'environment'`.
 
 **Mobile (Android):**
+
 - Chrome para Android suporta bem, incluindo `facingMode: 'environment'` para câmera traseira desde Chrome 49+.
 - Performance de captura: 15–30 fps viável.
 
 **Mobile (iOS/Safari):**
+
 - `getUserMedia` funciona no Safari desde iOS 11, mas **apenas dentro do Safari nativo**.
 - **Limitação crítica:** Em iOS, apps que usam `WKWebView` (praticamente todos os browsers de terceiros: Chrome iOS, Firefox iOS, in-app browsers de WhatsApp/Instagram) **não têm acesso à câmera** — são forçados a usar o WebKit de sistema sem permissão de câmera.
 - Desde iOS 14.3, PWAs instaladas via Safari ganham acesso completo à câmera.
 - Não há suporte a `ImageCapture API` no Safari; o grab de frame deve ser via `canvas.drawImage(videoElement)`.
 
 **Frame rate viável para processamento:**
+
 - A captura pode operar a 30 fps, mas o **processamento OCR não precisa acompanhar**.
 - Estratégia padrão: processar 1 frame a cada 200–500ms (2–5 fps de análise), enquanto o vídeo flui normalmente.
 - Isso é suficiente para feedback em tempo real ao usuário.
@@ -63,11 +67,13 @@ Com a ressalva de documentar as limitações de iOS/WKWebView e exigir HTTPS.
 O pré-processamento é fundamental para aumentar a taxa de acerto do OCR. Para CMC-7, as operações típicas são: conversão para escala de cinza, binarização (threshold adaptativo ou Otsu), detecção e recorte da linha CMC-7, deskew (correção de inclinação) e normalização de tamanho.
 
 **Canvas API Nativa:**
+
 - Zero bundle overhead.
 - Suporta: conversão para cinza (via `getImageData` + manipulação de pixels), redimensionamento, recorte.
 - **Não suporta nativamente:** threshold adaptativo, transformações morfológicas (erosão, dilatação), detecção de bordas (Canny), Hough Transform para linhas. Para binarização básica, é necessário implementar manualmente via `getImageData` — factível mas trabalhoso.
 
 **OpenCV.js (WASM):**
+
 - Port oficial do OpenCV para WebAssembly, mantido pela comunidade OpenCV.
 - Licença: **Apache 2.0** ✅
 - Suporta virtualmente toda a API C++ do OpenCV: `threshold`, `GaussianBlur`, `Canny`, `HoughLines`, `warpAffine` (deskew), operações morfológicas, `findContours`.
@@ -76,6 +82,7 @@ O pré-processamento é fundamental para aumentar a taxa de acerto do OCR. Para 
 - **Carregamento inicial:** Parse + compilação JIT do WASM: 500ms–2s na primeira carga. Após cache do browser, esse custo desaparece.
 
 **Alternativas mais leves:**
+
 - **`jimp`** (puro JS): Suporta threshold global, redimensionamento, recorte. Bundle ~400KB. Mais lento que WASM, mas sem overhead de inicialização.
 - **`@techstark/opencv-js`**: Build customizada do OpenCV.js, mais fácil de integrar via npm com tree-shaking.
 - **`sharp`**: Apenas Node.js — não aplicável ao browser.
@@ -99,12 +106,14 @@ Canvas API nativa para operações básicas; OpenCV.js via carregamento lazy e b
 Esta é a peça central da biblioteca. CMC-7 é uma fonte **tipográfica padronizada** criada pela Bull (1957), usada em cheques brasileiros (padrão FEBRABAN), franceses e de outros países que adotaram o padrão ISO 1004. Ao contrário de texto manuscrito, os caracteres são **fixos e previsíveis**.
 
 A linha CMC-7 em cheques brasileiros contém:
+
 - `⑆` `⑇` `⑈` `⑉` `⑊` — 5 símbolos especiais de delimitação
 - Os 10 dígitos numéricos (0–9)
 
 **Total: 15 classes de caracteres — alfabeto extremamente reduzido.**
 
 Estrutura típica da linha:
+
 ```
 ⑆ [banco][agência/conta][cheque] ⑆ [valor-codificado] ⑇ [N] ⑈ [banco] ⑉ [conta] ⑊
 ```
@@ -125,12 +134,14 @@ Estrutura típica da linha:
 ### Sub-análise 3B: Template Matching (sem ML)
 
 Esta abordagem é **altamente viável** para CMC-7, pelas seguintes razões:
+
 1. A fonte é padronizada — formas geométricas fixas e previsíveis.
 2. Alfabeto pequeno — apenas 15 classes.
 3. Os caracteres CMC-7 têm espaçamento definido pelo padrão.
 4. Sem variabilidade de "caligrafia".
 
 **Pipeline:**
+
 1. **Binarização:** Otsu threshold ou threshold adaptativo local.
 2. **Detecção da faixa CMC-7:** Análise de projeção horizontal na região inferior do cheque (maior densidade de pixels escuros).
 3. **Deskew:** Correção de inclinação via `HoughLines` ou bounding boxes dos componentes conectados.
@@ -172,20 +183,24 @@ Esta abordagem é **altamente viável** para CMC-7, pelas seguintes razões:
 HTR (Handwritten Text Recognition) é substancialmente mais difícil que OCR de fontes impressas.
 
 **Estado da arte (2025–2026):**
+
 - Modelos como **TrOCR** (Microsoft), **PaddleOCR** (Baidu) e **Donut** (Naver) têm alta acurácia para HTR.
 - Tamanhos típicos: **300MB–1.5GB** para modelos completos. Não viáveis para browser.
 
 **Opções client-side:**
+
 - **Modelos destilados/quantizados:** Versões comprimidas podem chegar a ~50–100MB em ONNX. Tecnicamente executáveis via onnxruntime-web com WebGL, mas grandes para uma biblioteca.
 - **Tesseract.js modo handwriting:** Performance muito baixa para cursivo. Taxa de erro >40% sem fine-tuning massivo. Inaceitável para produção.
 - **Modelos de dígitos numéricos (MNIST-like):** Um modelo de classificação de dígitos isolados pode ser ~1–2MB, mas reconhecimento de **sequências** (ex: `1.250,00`) exige CRNN/LSTM, que é maior e menos preciso para manuscrito.
 - **Contexto de cheques:** O campo de valor numérico (sequência de dígitos + vírgula) é mais factível que o valor por extenso. A data em formato DD/MM/AAAA em letra de forma é mais factível que cursivo.
 
 **[RISCO] Avaliação realista:**
+
 - Dígitos manuscritos em letra de forma: modelo leve (~5–10MB) via onnxruntime-web com acurácia ~80–90% em condições ideais.
 - Cursivo ou texto por extenso manuscrito: **não existe solução client-side viável** com acurácia aceitável em dispositivos consumer.
 
 **Abordagem recomendada:**
+
 1. **Client-side (best-effort):** Modelo leve para o campo numérico do valor + UI de confirmação obrigatória.
 2. **Backend próprio (fallback):** Endpoint self-hosted com TrOCR ou similar servido via FastAPI. Mantém o requisito de "zero tráfego para terceiros".
 
@@ -207,16 +222,20 @@ Recomendação: (1) best-effort client-side para campo numérico com UI de confi
 A linha CMC-7 em cheques brasileiros segue especificação da FEBRABAN. Cada campo tem seu próprio dígito verificador.
 
 **Estrutura geral da linha CMC-7 brasileira:**
+
 ```
 ⑆ [banco 3d][agência 4d][conta 7d][cheque 6d][DV] ⑆ [valor 10d][DV] ⑇ [N] ⑈ [banco 10d][DV] ⑉ [conta 10d][DV] ⑊
 ```
-*(Estrutura simplificada; varia por banco)*
+
+_(Estrutura simplificada; varia por banco)_
 
 **Algoritmos de validação:**
+
 - **Módulo 10:** Mais comum nos campos CMC-7. Pesos alternados 2 e 1 da direita para a esquerda; soma dos dígitos dos produtos; DV = `(10 - (soma % 10)) % 10`.
 - **Módulo 11:** Usado em alguns campos de conta bancária. Pesos 2–7 (ou 2–9) da direita para a esquerda; DV = `11 - (soma % 11)` (com regras para restos 0 e 1).
 
 **Campos validáveis automaticamente:**
+
 - ✅ Código do banco — verificar contra lista COMPE pública (~200 bancos)
 - ✅ Dígitos verificadores dos campos com algoritmo conhecido
 - ✅ Contagem e posicionamento dos 5 símbolos especiais
@@ -241,22 +260,24 @@ Validação 100% client-side, determinística, sem dependências externas. O esf
 
 ### Análise
 
-| Dependência | Licença | Uso proposto | Compatível MIT? |
-|------------|---------|-------------|-----------------|
-| Tesseract.js | Apache 2.0 | OCR engine | ✅ Sim |
-| OpenCV.js / `@techstark/opencv-js` | Apache 2.0 | Pré-processamento | ✅ Sim |
-| onnxruntime-web | MIT | Inferência de modelos | ✅ Sim |
-| TensorFlow.js | Apache 2.0 | Inferência alternativa | ✅ Sim |
-| `jimp` | MIT | Processamento básico JS | ✅ Sim |
-| Canvas API (browser nativo) | N/A | Captura e manipulação | ✅ Sem licença |
-| MediaDevices API (browser nativo) | N/A | Captura de câmera | ✅ Sem licença |
+| Dependência                        | Licença    | Uso proposto            | Compatível MIT? |
+| ---------------------------------- | ---------- | ----------------------- | --------------- |
+| Tesseract.js                       | Apache 2.0 | OCR engine              | ✅ Sim          |
+| OpenCV.js / `@techstark/opencv-js` | Apache 2.0 | Pré-processamento       | ✅ Sim          |
+| onnxruntime-web                    | MIT        | Inferência de modelos   | ✅ Sim          |
+| TensorFlow.js                      | Apache 2.0 | Inferência alternativa  | ✅ Sim          |
+| `jimp`                             | MIT        | Processamento básico JS | ✅ Sim          |
+| Canvas API (browser nativo)        | N/A        | Captura e manipulação   | ✅ Sem licença  |
+| MediaDevices API (browser nativo)  | N/A        | Captura de câmera       | ✅ Sem licença  |
 
 **Riscos de copyleft:**
+
 - Nenhuma das dependências principais usa GPL, LGPL ou AGPL.
 - **[VERIFICAR]** Modelos pré-treinados (`.traineddata` do Tesseract, modelos ONNX de terceiros) podem ter licenças **independentes** da engine que os executa. Qualquer modelo de terceiros deve ter licença auditada antes de redistribuição.
 - O Tesseract engine C++ e os dados padrão (`tessdata`) são Apache 2.0.
 
 **Fontes CMC-7:**
+
 - A fonte tipográfica CMC-7 (para geração de templates e dados de treinamento sintéticos) está disponível em vários repositórios públicos.
 - **[VERIFICAR]** A licença específica de cada variante da fonte CMC-7 TTF disponível publicamente deve ser auditada antes de incluir os arquivos no bundle da biblioteca.
 
@@ -269,6 +290,7 @@ O stack principal (Apache 2.0 + MIT) é integralmente compatível com distribui�
 ## Auto-verificação
 
 ### Afirmações com alta confiança
+
 - Estrutura da API `getUserMedia` e limitações de iOS/WKWebView
 - Bundle size do OpenCV.js ~8–9 MB para build completa
 - Ausência de `.traineddata` oficial CMC-7 no repositório padrão do Tesseract
@@ -278,14 +300,14 @@ O stack principal (Apache 2.0 + MIT) é integralmente compatível com distribui�
 
 ### Itens a verificar antes do desenvolvimento
 
-| Item | Prioridade | Como verificar |
-|------|-----------|---------------|
-| Traineddata CMC-7 comunitário com licença auditada | Alta | GitHub search + leitura de LICENSE dos repos |
-| Requisito CORP/COOP headers para OpenCV.js com WASM threads | Alta | Testar build single-thread vs multi-thread |
-| Especificações FEBRABAN por banco (algoritmos de DV) | Alta | Manual SBC + scraping do site FEBRABAN |
-| Performance onnxruntime-web em mobile mid-range para CNN ~1MB | Média | PoC com dispositivo físico |
-| Licença da fonte CMC-7 TTF disponível publicamente | Alta | Leitura dos cabeçalhos das fontes candidatas |
-| Existência de PoC open-source de segmentação CMC-7 em imagens de câmera | Média | GitHub search |
+| Item                                                                    | Prioridade | Como verificar                               |
+| ----------------------------------------------------------------------- | ---------- | -------------------------------------------- |
+| Traineddata CMC-7 comunitário com licença auditada                      | Alta       | GitHub search + leitura de LICENSE dos repos |
+| Requisito CORP/COOP headers para OpenCV.js com WASM threads             | Alta       | Testar build single-thread vs multi-thread   |
+| Especificações FEBRABAN por banco (algoritmos de DV)                    | Alta       | Manual SBC + scraping do site FEBRABAN       |
+| Performance onnxruntime-web em mobile mid-range para CNN ~1MB           | Média      | PoC com dispositivo físico                   |
+| Licença da fonte CMC-7 TTF disponível publicamente                      | Alta       | Leitura dos cabeçalhos das fontes candidatas |
+| Existência de PoC open-source de segmentação CMC-7 em imagens de câmera | Média      | GitHub search                                |
 
 ---
 
@@ -339,4 +361,4 @@ O projeto é técnica e legalmente viável para sua funcionalidade **core** — 
 
 ---
 
-*Documento gerado como análise técnica de viabilidade. Os itens marcados com `[VERIFICAR]` devem ser validados com pesquisa adicional ou protótipos antes de iniciar o desenvolvimento. Os itens marcados com `[RISCO]` devem ter planos de mitigação explícitos antes de iniciar cada componente.*
+_Documento gerado como análise técnica de viabilidade. Os itens marcados com `[VERIFICAR]` devem ser validados com pesquisa adicional ou protótipos antes de iniciar o desenvolvimento. Os itens marcados com `[RISCO]` devem ter planos de mitigação explícitos antes de iniciar cada componente._

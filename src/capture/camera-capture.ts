@@ -1,6 +1,5 @@
 import { detectEnvironment } from './environment-detector.js';
 
-
 export type CameraCaptureEvent = 'unsupported-environment' | 'error';
 
 /**
@@ -12,7 +11,7 @@ export type CameraCaptureEvent = 'unsupported-environment' | 'error';
 export class CameraCapture {
   private stream: MediaStream | null = null;
   private videoElement: HTMLVideoElement | null = null;
-  private handlers: Map<string, Array<(...args: any[]) => void>> = new Map();
+  private handlers: Map<string, Array<(...args: unknown[]) => void>> = new Map();
 
   /**
    * Starts the camera capture.
@@ -21,10 +20,7 @@ export class CameraCapture {
    * @param constraints - Optional MediaTrackConstraints.
    * @throws CMC7PermissionError | CMC7InitError
    */
-  async start(
-    videoElement: HTMLVideoElement,
-    constraints?: MediaTrackConstraints,
-  ): Promise<void> {
+  async start(videoElement: HTMLVideoElement, constraints?: MediaTrackConstraints): Promise<void> {
     const env = detectEnvironment();
 
     if (!env.isHTTPS) {
@@ -56,7 +52,7 @@ export class CameraCapture {
 
       this.videoElement = videoElement;
       this.videoElement.srcObject = this.stream;
-      
+
       // video.play() returns a Promise that resolves when playback starts
       await this.videoElement.play();
     } catch (error: unknown) {
@@ -73,7 +69,7 @@ export class CameraCapture {
   /**
    * Stops the capture and releases all resources.
    */
-  async stop(): Promise<void> {
+  stop(): void {
     if (this.stream) {
       this.stream.getTracks().forEach((track) => track.stop());
       this.stream = null;
@@ -89,7 +85,7 @@ export class CameraCapture {
   /**
    * Simple event emitter implementation.
    */
-  on(event: CameraCaptureEvent, handler: (...args: any[]) => void): this {
+  on(event: CameraCaptureEvent, handler: (...args: unknown[]) => void): this {
     if (!this.handlers.has(event)) {
       this.handlers.set(event, []);
     }
@@ -97,7 +93,7 @@ export class CameraCapture {
     return this;
   }
 
-  private emit(event: CameraCaptureEvent, ...args: any[]): void {
+  private emit(event: CameraCaptureEvent, ...args: unknown[]): void {
     this.handlers.get(event)?.forEach((h) => h(...args));
   }
 }

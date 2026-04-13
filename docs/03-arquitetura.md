@@ -51,17 +51,18 @@ A camada de imagem é responsável por: (a) adquirir frames da câmera ou aceita
 
 **Opções consideradas:**
 
-| Opção | Descrição | Prós | Contras |
-|-------|-----------|------|---------|
-| **A: `requestAnimationFrame` + throttle** | Extrai frames a cada N ms usando rAF | Sincronizado com renderização; nativo | Roda na main thread; pode causar jank |
-| **B: `setInterval` em Web Worker + `OffscreenCanvas`** | Worker solicita frames via mensagens | Não bloqueia main thread | OffscreenCanvas não disponível em Safari <16.4 |
-| **C: `ImageCapture API` + `grabFrame()`** | API dedicada para captura de frames | Mais eficiente em hardware | Não suportada no Safari (nenhuma versão) |
+| Opção                                                  | Descrição                            | Prós                                  | Contras                                        |
+| ------------------------------------------------------ | ------------------------------------ | ------------------------------------- | ---------------------------------------------- |
+| **A: `requestAnimationFrame` + throttle**              | Extrai frames a cada N ms usando rAF | Sincronizado com renderização; nativo | Roda na main thread; pode causar jank          |
+| **B: `setInterval` em Web Worker + `OffscreenCanvas`** | Worker solicita frames via mensagens | Não bloqueia main thread              | OffscreenCanvas não disponível em Safari <16.4 |
+| **C: `ImageCapture API` + `grabFrame()`**              | API dedicada para captura de frames  | Mais eficiente em hardware            | Não suportada no Safari (nenhuma versão)       |
 
 **Decisão: Opção A com transferência de `ImageBitmap` para Worker**
 
-Usar `setInterval` na main thread *apenas* para capturar o frame via `canvas.drawImage(videoElement)` e chamar `createImageBitmap()`. O `ImageBitmap` criado é transferido (zero-copy via `Transferable`) para um Web Worker que executa todo o processamento pesado. A main thread nunca processa pixels diretamente.
+Usar `setInterval` na main thread _apenas_ para capturar o frame via `canvas.drawImage(videoElement)` e chamar `createImageBitmap()`. O `ImageBitmap` criado é transferido (zero-copy via `Transferable`) para um Web Worker que executa todo o processamento pesado. A main thread nunca processa pixels diretamente.
 
 **Justificativa:**
+
 - `OffscreenCanvas` não tem suporte no Safari iOS < 16.4, inviabilizando a Opção B como padrão (PRD RNF-002).
 - `ImageCapture` é incompatível com Safari (PRD RNF-002).
 - `ImageBitmap` é transferível para Workers sem cópia, eliminando o custo de serialização de pixels.
@@ -79,12 +80,12 @@ export function detectEnvironment(): EnvironmentInfo {
   const ua = navigator.userAgent;
   const isIOS = /iPad|iPhone|iPod/.test(ua);
   const isSafari = /Safari/.test(ua) && !/Chrome|CriOS|FxiOS/.test(ua);
-  const hasGetUserMedia = !!(navigator.mediaDevices?.getUserMedia);
+  const hasGetUserMedia = !!navigator.mediaDevices?.getUserMedia;
 
   return {
     isIOS,
     isSafari,
-    isWKWebView: isIOS && !isSafari,  // iOS + não-Safari = WKWebView
+    isWKWebView: isIOS && !isSafari, // iOS + não-Safari = WKWebView
     hasCamera: hasGetUserMedia,
     isHTTPS: location.protocol === 'https:' || location.hostname === 'localhost',
   };
@@ -101,30 +102,33 @@ export function detectEnvironment(): EnvironmentInfo {
 
 **Opções consideradas:**
 
-| Opção | Bundle | Performance Mobile | Funcionalidades | Licença |
-|-------|--------|-------------------|----------------|---------|
-| **A: OpenCV.js (build completa)** | ~8–9 MB WASM | Boa | Total (Canny, HoughLines, morphology, etc.) | Apache 2.0 |
-| **B: OpenCV.js (build customizada `core`+`imgproc`)** | ~3–4 MB WASM | Boa | Suficiente para o pipeline | Apache 2.0 |
-| **C: Canvas API pura + aritmética de pixels** | 0 KB | Variável (JS puro) | Limitada (threshold global, recorte) | N/A |
-| **D: `jimp` (puro JS)** | ~400 KB | Lenta (JS puro) | Threshold global, resize, crop | MIT |
-| **E: Híbrido: Canvas para operações simples + OpenCV lazy para avançadas** | ~3–4 MB lazy | Boa | Total | Apache 2.0 + N/A |
+| Opção                                                                      | Bundle       | Performance Mobile | Funcionalidades                             | Licença          |
+| -------------------------------------------------------------------------- | ------------ | ------------------ | ------------------------------------------- | ---------------- |
+| **A: OpenCV.js (build completa)**                                          | ~8–9 MB WASM | Boa                | Total (Canny, HoughLines, morphology, etc.) | Apache 2.0       |
+| **B: OpenCV.js (build customizada `core`+`imgproc`)**                      | ~3–4 MB WASM | Boa                | Suficiente para o pipeline                  | Apache 2.0       |
+| **C: Canvas API pura + aritmética de pixels**                              | 0 KB         | Variável (JS puro) | Limitada (threshold global, recorte)        | N/A              |
+| **D: `jimp` (puro JS)**                                                    | ~400 KB      | Lenta (JS puro)    | Threshold global, resize, crop              | MIT              |
+| **E: Híbrido: Canvas para operações simples + OpenCV lazy para avançadas** | ~3–4 MB lazy | Boa                | Total                                       | Apache 2.0 + N/A |
 
 **Decisão: Opção E — Arquitetura Híbrida com dois níveis**
 
 **Nível 1 (Canvas API pura, síncrono, zero dependência):**
+
 - Conversão para escala de cinza
 - Redimensionamento do frame para resolução de trabalho (960px de largura máxima)
 - Crop da ROI de busca (terço inferior da imagem)
 - Estimativa rápida de qualidade (variância de Laplaciano via JS puro para blur detection)
 
 **Nível 2 (OpenCV.js, carregado lazy, WASM):**
+
 - Threshold adaptativo (`cv.adaptiveThreshold`)
 - Operações morfológicas de limpeza (erosão/dilatação mínimas)
 - Deskew via análise de componentes conectados (PCA dos bounding boxes)
 - `findContours` para segmentação dos caracteres
 
 **Justificativa:**
-- O Nível 1 permite rejeitar frames de baixa qualidade *sem* pagar o custo do WASM, economizando ciclos de CPU em mobile.
+
+- O Nível 1 permite rejeitar frames de baixa qualidade _sem_ pagar o custo do WASM, economizando ciclos de CPU em mobile.
 - O Nível 2 (OpenCV.js com build customizada) é carregado uma única vez via `import()` dinâmico e fica em cache.
 - Build customizada usando apenas os módulos `core`, `imgproc` e `features2d` resulta em ~3–4 MB (PRD RNF-003: ≤ 4 MB).
 - Sem requisito de headers CORP/COOP usando build single-thread (mitiga PRD Risco R5 / Premissa P-04).
@@ -178,10 +182,11 @@ export function detectCMC7Strip(binaryMat: cv.Mat): { y: number; height: number 
   // Projeção horizontal: soma de pixels pretos por linha
   const projection = new Array(binaryMat.rows).fill(0);
   const data = binaryMat.data;
-  
+
   for (let row = 0; row < binaryMat.rows; row++) {
     for (let col = 0; col < binaryMat.cols; col++) {
-      if (data[row * binaryMat.cols + col] === 0) { // pixel preto
+      if (data[row * binaryMat.cols + col] === 0) {
+        // pixel preto
         projection[row]++;
       }
     }
@@ -200,12 +205,12 @@ export function detectCMC7Strip(binaryMat: cv.Mat): { y: number; height: number 
 
 Executa no Nível 1 (Canvas puro, antes do WASM) para economizar recursos:
 
-| Métrica | Algoritmo | Threshold de rejeição |
-|---------|-----------|----------------------|
-| **Blur** | Variância do Laplaciano (kernel 3×3 via JS) | Variância < 80 |
-| **Contraste** | Desvio padrão do histograma de luminância | σ < 30 |
-| **Brilho excessivo** | % de pixels com luminância > 240 | > 20% |
-| **Tamanho mínimo** | Largura do frame | < 400px |
+| Métrica              | Algoritmo                                   | Threshold de rejeição |
+| -------------------- | ------------------------------------------- | --------------------- |
+| **Blur**             | Variância do Laplaciano (kernel 3×3 via JS) | Variância < 80        |
+| **Contraste**        | Desvio padrão do histograma de luminância   | σ < 30                |
+| **Brilho excessivo** | % de pixels com luminância > 240            | > 20%                 |
+| **Tamanho mínimo**   | Largura do frame                            | < 400px               |
 
 ---
 
@@ -221,12 +226,12 @@ Esta é a decisão mais crítica da arquitetura. O PRD (RF-005) permite tanto te
 
 **Opções consideradas:**
 
-| Opção | Acurácia Esperada | Bundle | Latência (mobile) | Esforço de ML | Licença |
-|-------|------------------|--------|-------------------|--------------|---------|
-| **A: Template Matching (OpenCV `matchTemplate`)** | 93–97% pós-seg. | ~0 KB extra | ~50ms | Nenhum | Apache 2.0 |
-| **B: CNN custom + ONNX Runtime Web** | 98–99% pós-seg. | ~500KB–2MB | ~30–80ms | Alto (treinamento) | MIT (runtime) |
-| **C: Tesseract.js + traineddata CMC-7 custom** | 90–95%+ pós-seg. | ~10–20MB (traineddata) | 500ms–2s | Alto (tesstrain) | Apache 2.0 |
-| **D: CRNN end-to-end (sem segmentação)** | 95–99% | ~5–20MB | ~100–300ms | Muito alto | Depende |
+| Opção                                             | Acurácia Esperada | Bundle                 | Latência (mobile) | Esforço de ML      | Licença       |
+| ------------------------------------------------- | ----------------- | ---------------------- | ----------------- | ------------------ | ------------- |
+| **A: Template Matching (OpenCV `matchTemplate`)** | 93–97% pós-seg.   | ~0 KB extra            | ~50ms             | Nenhum             | Apache 2.0    |
+| **B: CNN custom + ONNX Runtime Web**              | 98–99% pós-seg.   | ~500KB–2MB             | ~30–80ms          | Alto (treinamento) | MIT (runtime) |
+| **C: Tesseract.js + traineddata CMC-7 custom**    | 90–95%+ pós-seg.  | ~10–20MB (traineddata) | 500ms–2s          | Alto (tesstrain)   | Apache 2.0    |
+| **D: CRNN end-to-end (sem segmentação)**          | 95–99%            | ~5–20MB                | ~100–300ms        | Muito alto         | Depende       |
 
 **Decisão: Dual-Engine com Template Matching como padrão e CNN como alternativa selecionável**
 
@@ -303,14 +308,28 @@ Os 15 templates CMC-7 são armazenados como dados binários embutidos no bundle 
 ```typescript
 // src/ocr/templates/index.ts — gerado em build time por script Python
 export const TEMPLATES: Record<CMC7Char, Uint8Array> = {
-  '0': new Uint8Array([/* ... pixels 32×64 ... */]),
-  '1': new Uint8Array([/* ... */]),
+  '0': new Uint8Array([
+    /* ... pixels 32×64 ... */
+  ]),
+  '1': new Uint8Array([
+    /* ... */
+  ]),
   // ...
-  '\u2446': new Uint8Array([/* símbolo ⑆ */]),
-  '\u2447': new Uint8Array([/* símbolo ⑇ */]),
-  '\u2448': new Uint8Array([/* símbolo ⑈ */]),
-  '\u2449': new Uint8Array([/* símbolo ⑉ */]),
-  '\u244A': new Uint8Array([/* símbolo ⑊ */]),
+  '\u2446': new Uint8Array([
+    /* símbolo ⑆ */
+  ]),
+  '\u2447': new Uint8Array([
+    /* símbolo ⑇ */
+  ]),
+  '\u2448': new Uint8Array([
+    /* símbolo ⑈ */
+  ]),
+  '\u2449': new Uint8Array([
+    /* símbolo ⑉ */
+  ]),
+  '\u244A': new Uint8Array([
+    /* símbolo ⑊ */
+  ]),
 };
 ```
 
@@ -364,18 +383,18 @@ Executado antes de qualquer OCR pelo Worker. Retorna decisão binária (prossegu
 ```typescript
 // src/ocr/quality/assessor.ts
 export interface QualityReport {
-  score: number;         // 0–100
+  score: number; // 0–100
   issues: QualityIssue[];
   shouldProcess: boolean;
 }
 
 export type QualityIssue =
-  | 'blur'           // Laplacian variance < 80
-  | 'low-contrast'   // Histogram std < 30
-  | 'glare'          // >20% pixels sobreiluminados
-  | 'too-far'        // Linha CMC-7 detectada mas muito pequena
-  | 'angled'         // Inclinação > 20° (deskew não conseguirá corrigir)
-  | 'no-strip-found' // Faixa CMC-7 não localizada
+  | 'blur' // Laplacian variance < 80
+  | 'low-contrast' // Histogram std < 30
+  | 'glare' // >20% pixels sobreiluminados
+  | 'too-far' // Linha CMC-7 detectada mas muito pequena
+  | 'angled' // Inclinação > 20° (deskew não conseguirá corrigir)
+  | 'no-strip-found'; // Faixa CMC-7 não localizada
 ```
 
 ---
@@ -414,10 +433,10 @@ export class CMC7Parser {
     if (!this.isValidStructure(segments)) {
       return { success: false, error: 'INVALID_STRUCTURE' };
     }
-    
+
     const bankCode = this.extractBankCode(segments[0]);
     const bankSpec = this.bankRegistry.getSpec(bankCode);
-    
+
     return {
       success: true,
       fields: bankSpec
@@ -516,7 +535,10 @@ Transforma o resultado do `CMC7Parser` + `DVValidator` no tipo final `CMC7Fields
 ```typescript
 // src/parser/field-extractor.ts
 export class FieldExtractor {
-  extract(parseResult: ParseResult, dvResult: DVResult): { fields: CMC7Fields; validation: CMC7Validation } {
+  extract(
+    parseResult: ParseResult,
+    dvResult: DVResult,
+  ): { fields: CMC7Fields; validation: CMC7Validation } {
     return {
       fields: {
         bankCode: parseResult.bankCode ?? null,
@@ -550,34 +572,30 @@ export class FieldExtractor {
  * Factory function — único ponto de criação do reader.
  * Retorna Promise para permitir inicialização assíncrona do WASM.
  */
-export async function createCMC7Reader(
-  options?: CMC7ReaderOptions
-): Promise<CMC7Reader>;
+export async function createCMC7Reader(options?: CMC7ReaderOptions): Promise<CMC7Reader>;
 
 /**
  * Interface principal da biblioteca.
  */
 export interface CMC7Reader {
   // === Modo Stream ===
-  
+
   /** Inicia captura de câmera e processamento contínuo. */
   start(videoElement: HTMLVideoElement): Promise<void>;
-  
+
   /** Inicia câmera internamente (sem videoElement externo). */
   startCamera(container?: HTMLElement): Promise<HTMLVideoElement>;
-  
+
   /** Para o stream e libera todos os recursos (câmera, WASM memory, workers). */
   stop(): Promise<void>;
 
   // === Modo Imagem Estática ===
-  
+
   /** Processa uma imagem única e retorna o resultado. */
-  readImage(
-    input: HTMLImageElement | ImageBitmap | File | Blob | string
-  ): Promise<CMC7Result>;
+  readImage(input: HTMLImageElement | ImageBitmap | File | Blob | string): Promise<CMC7Result>;
 
   // === Eventos (EventEmitter pattern) ===
-  
+
   on(event: 'result', handler: (result: CMC7Result) => void): this;
   on(event: 'frame-quality', handler: (report: FrameQualityReport) => void): this;
   on(event: 'error', handler: (error: CMC7Error) => void): this;
@@ -586,12 +604,12 @@ export interface CMC7Reader {
   off(event: string, handler: Function): this;
 
   // === AsyncIterator (alternativa aos eventos) ===
-  
+
   /** Itera sobre resultados CMC-7 detectados até stop() ser chamado. */
   [Symbol.asyncIterator](): AsyncIterator<CMC7Result>;
 
   // === Extensibilidade ===
-  
+
   /** Registra especificações de banco não incluídas no registry. */
   registerBank(spec: BankSpec): void;
 }
@@ -609,19 +627,19 @@ export interface CMC7Reader {
 export interface CMC7ReaderOptions {
   /** Engine de reconhecimento CMC-7. Padrão: 'template' */
   recognitionMode?: 'template' | 'cnn';
-  
+
   /** Intervalo entre análises de frame em ms. Padrão: 300 */
   frameIntervalMs?: number;
-  
+
   /** Score mínimo de qualidade do frame (0–100) para processar. Padrão: 40 */
   minFrameQualityScore?: number;
-  
+
   /** Constraints de câmera passadas ao getUserMedia. */
   cameraConstraints?: MediaTrackConstraints;
-  
+
   /** URL base para carregamento dos assets WASM/modelo (para CDN customizada). */
   assetsBaseUrl?: string;
-  
+
   /** Features experimentais (não recomendadas para produção). */
   experimental?: ExperimentalOptions;
 }
@@ -664,9 +682,9 @@ export interface CMC7Fields {
 }
 
 export type ParseWarning =
-  | 'bank-spec-unknown'      // Banco não registrado no BankRegistry
+  | 'bank-spec-unknown' // Banco não registrado no BankRegistry
   | 'ambiguous-field-length' // Tamanho do campo não determinável sem spec
-  | 'partial-parse';         // Só parte da linha foi parseada com confiança
+  | 'partial-parse'; // Só parte da linha foi parseada com confiança
 
 export interface CMC7Validation {
   /** true somente se todos os DVs validaram E nenhum erro crítico. */
@@ -685,7 +703,13 @@ export interface FrameQualityReport {
   suggestion?: 'move-closer' | 'reduce-glare' | 'stabilize' | 'improve-lighting';
 }
 
-export type QualityIssue = 'blur' | 'low-contrast' | 'glare' | 'too-far' | 'angled' | 'no-strip-found';
+export type QualityIssue =
+  | 'blur'
+  | 'low-contrast'
+  | 'glare'
+  | 'too-far'
+  | 'angled'
+  | 'no-strip-found';
 
 export interface ExperimentalResult {
   handwrittenValue?: {
@@ -745,7 +769,15 @@ export interface EnvironmentInfo {
 }
 
 export interface ValidationError {
-  field: 'bankCode' | 'agency' | 'account' | 'checkNumber' | 'block1' | 'block2' | 'block3' | 'block4';
+  field:
+    | 'bankCode'
+    | 'agency'
+    | 'account'
+    | 'checkNumber'
+    | 'block1'
+    | 'block2'
+    | 'block3'
+    | 'block4';
   expected: number;
   received: number;
   algorithm: 'mod10' | 'mod11' | 'unknown';
@@ -853,16 +885,17 @@ cmc7-ocr-parser/
 
 **Opções consideradas:**
 
-| Opção | Prós | Contras |
-|-------|------|---------|
-| **Rollup** | Excelente tree-shaking, outputs ESM+CJS, maduro | Config manual para Workers e WASM |
-| **tsup** (wrapper Rollup) | Zero-config para libs TS, suporte a ESM+CJS | Menos controle fino sobre tratamento de WASM |
-| **Vite (library mode)** | Ótimo DX, HMR em desenvolvimento | Overhead de Vite não necessário para biblioteca pura |
-| **esbuild** | Extremamente rápido | Sem tree-shaking tão eficiente quanto Rollup |
+| Opção                     | Prós                                            | Contras                                              |
+| ------------------------- | ----------------------------------------------- | ---------------------------------------------------- |
+| **Rollup**                | Excelente tree-shaking, outputs ESM+CJS, maduro | Config manual para Workers e WASM                    |
+| **tsup** (wrapper Rollup) | Zero-config para libs TS, suporte a ESM+CJS     | Menos controle fino sobre tratamento de WASM         |
+| **Vite (library mode)**   | Ótimo DX, HMR em desenvolvimento                | Overhead de Vite não necessário para biblioteca pura |
+| **esbuild**               | Extremamente rápido                             | Sem tree-shaking tão eficiente quanto Rollup         |
 
 **Decisão: `tsup` + `rollup` para casos especiais**
 
 `tsup` para o bundle principal (ESM + CJS + tipos), com configuração customizada para:
+
 - Workers: bundled separadamente como módulo autônomo
 - Assets WASM e ONNX: copiados como arquivos estáticos (não inlined)
 - Templates CMC-7: inlined como `Uint8Array` no bundle principal via plugin customizado
@@ -870,16 +903,16 @@ cmc7-ocr-parser/
 ```jsonc
 // tsup.config.ts (simplificado)
 {
-  entry: {
-    index: 'src/index.ts',
-    'workers/pipeline.worker': 'src/workers/pipeline.worker.ts',
+  "entry": {
+    "index": "src/index.ts",
+    "workers/pipeline.worker": "src/workers/pipeline.worker.ts",
   },
-  format: ['esm', 'cjs'],
-  dts: true,
-  splitting: true,       // Code splitting para lazy imports
-  treeshake: true,
-  external: [],          // Nenhuma dependência externa no bundle principal
-  noExternal: ['onnxruntime-web'], // Embarca somente se for importado dinamicamente
+  "format": ["esm", "cjs"],
+  "dts": true,
+  "splitting": true, // Code splitting para lazy imports
+  "treeshake": true,
+  "external": [], // Nenhuma dependência externa no bundle principal
+  "noExternal": ["onnxruntime-web"], // Embarca somente se for importado dinamicamente
 }
 ```
 
@@ -906,13 +939,15 @@ export function useCMC7Reader(options?: CMC7ReaderOptions) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    createCMC7Reader(options).then(reader => {
+    createCMC7Reader(options).then((reader) => {
       readerRef.current = reader;
       reader.on('result', setResult);
       reader.on('error', setError);
       setIsReady(true);
     });
-    return () => { readerRef.current?.stop(); };
+    return () => {
+      readerRef.current?.stop();
+    };
   }, []);
 
   const start = useCallback(() => {
@@ -941,15 +976,22 @@ export function useCMC7Reader(options?: CMC7ReaderOptions) {
   const videoRef = ref<HTMLVideoElement | null>(null);
   let reader: Awaited<ReturnType<typeof createCMC7Reader>> | null = null;
 
-  createCMC7Reader(options).then(r => {
+  createCMC7Reader(options).then((r) => {
     reader = r;
-    r.on('result', v => { result.value = v; });
-    r.on('error', e => { error.value = e; });
+    r.on('result', (v) => {
+      result.value = v;
+    });
+    r.on('error', (e) => {
+      error.value = e;
+    });
   });
 
   onUnmounted(() => reader?.stop());
 
-  return { videoRef, result, error,
+  return {
+    videoRef,
+    result,
+    error,
     start: () => videoRef.value && reader?.start(videoRef.value),
     stop: () => reader?.stop(),
   };
@@ -982,7 +1024,7 @@ const reader = await createCMC7Reader({
 
 // Internamente:
 const opencvUrl = `${options.assetsBaseUrl ?? './'}wasm/opencv.wasm`;
-const modelUrl  = `${options.assetsBaseUrl ?? './'}models/cmc7-cnn.onnx`;
+const modelUrl = `${options.assetsBaseUrl ?? './'}models/cmc7-cnn.onnx`;
 ```
 
 Isso permite que o consumidor sirva os assets de seu próprio CDN, evitando requisições a domínios da biblioteca (PRD RNF-004: zero tráfego para terceiros).
@@ -1081,19 +1123,19 @@ graph TD
 
 ## Decisões de Arquitetura — Resumo
 
-| ID | Decisão | Alternativa Descartada | Motivo do Descarte |
-|----|---------|----------------------|-------------------|
-| AD-01 | `ImageBitmap` transferível para Worker (zero-copy) | `OffscreenCanvas` | Sem suporte Safari < 16.4 |
-| AD-02 | Pipeline híbrido (Canvas L1 + OpenCV L2) | OpenCV apenas | Bundle completo 8–9MB inaceptável |
-| AD-03 | Template Matching como engine padrão | Tesseract.js | Bundle traineddata 5–20MB; latência 500ms–2s |
-| AD-04 | CNN via ONNX (~800KB) como modo alternativo | TensorFlow.js | onnxruntime-web tem menor footprint; licença MIT |
-| AD-05 | Templates como `Uint8Array` embedded (~30KB) | Fonte TTF CMC-7 distribuída | Risco de licença de redistribuição da fonte |
-| AD-06 | `BankRegistry` extensível via `registerBank()` | Registry fechado | Specs FEBRABAN não totalmente públicas; iteração necessária |
-| AD-07 | OpenCV.js single-thread build | Multi-thread (SharedArrayBuffer) | Multi-thread exige headers CORP/COOP que impactam deployments dos consumidores |
-| AD-08 | `tsup` como build system principal | Webpack / Vite | tsup é otimizado para bibliotecas; output ESM+CJS nativo |
-| AD-09 | Subpath exports para React/Vue wrappers | Bundle único com tudo | Wrappers adicionam dependências desnecessárias para consumidores vanilla |
-| AD-10 | `assetsBaseUrl` configurável | Assets hardcoded em CDN própria | Garante RNF-004 (zero tráfego para terceiros); consumidor controla origem |
+| ID    | Decisão                                            | Alternativa Descartada           | Motivo do Descarte                                                             |
+| ----- | -------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------ |
+| AD-01 | `ImageBitmap` transferível para Worker (zero-copy) | `OffscreenCanvas`                | Sem suporte Safari < 16.4                                                      |
+| AD-02 | Pipeline híbrido (Canvas L1 + OpenCV L2)           | OpenCV apenas                    | Bundle completo 8–9MB inaceptável                                              |
+| AD-03 | Template Matching como engine padrão               | Tesseract.js                     | Bundle traineddata 5–20MB; latência 500ms–2s                                   |
+| AD-04 | CNN via ONNX (~800KB) como modo alternativo        | TensorFlow.js                    | onnxruntime-web tem menor footprint; licença MIT                               |
+| AD-05 | Templates como `Uint8Array` embedded (~30KB)       | Fonte TTF CMC-7 distribuída      | Risco de licença de redistribuição da fonte                                    |
+| AD-06 | `BankRegistry` extensível via `registerBank()`     | Registry fechado                 | Specs FEBRABAN não totalmente públicas; iteração necessária                    |
+| AD-07 | OpenCV.js single-thread build                      | Multi-thread (SharedArrayBuffer) | Multi-thread exige headers CORP/COOP que impactam deployments dos consumidores |
+| AD-08 | `tsup` como build system principal                 | Webpack / Vite                   | tsup é otimizado para bibliotecas; output ESM+CJS nativo                       |
+| AD-09 | Subpath exports para React/Vue wrappers            | Bundle único com tudo            | Wrappers adicionam dependências desnecessárias para consumidores vanilla       |
+| AD-10 | `assetsBaseUrl` configurável                       | Assets hardcoded em CDN própria  | Garante RNF-004 (zero tráfego para terceiros); consumidor controla origem      |
 
 ---
 
-*Este documento define a arquitetura-alvo para o v1.0. Decisões marcadas com premissas do PRD (P-01 a P-07) devem ser revisitadas após as PoCs correspondentes. O diagrama de componentes é a fonte de verdade para a estrutura de módulos — qualquer desvio deve ser documentado neste arquivo.*
+_Este documento define a arquitetura-alvo para o v1.0. Decisões marcadas com premissas do PRD (P-01 a P-07) devem ser revisitadas após as PoCs correspondentes. O diagrama de componentes é a fonte de verdade para a estrutura de módulos — qualquer desvio deve ser documentado neste arquivo._

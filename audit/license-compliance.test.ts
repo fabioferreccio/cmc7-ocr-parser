@@ -32,26 +32,15 @@ describe('Conformidade de licenças', () => {
     const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as {
       author?: string | { name: string };
     };
-    const author =
-      typeof pkg.author === 'string' ? pkg.author : pkg.author?.name;
+    const author = typeof pkg.author === 'string' ? pkg.author : pkg.author?.name;
     expect(author).toBeTruthy();
   });
 
   it('dependência de produção onnxruntime-web deve ter licença MIT', () => {
-    const onnxLicensePath = join(
-      ROOT,
-      'node_modules',
-      'onnxruntime-web',
-      'LICENSE',
-    );
+    const onnxLicensePath = join(ROOT, 'node_modules', 'onnxruntime-web', 'LICENSE');
     if (!existsSync(onnxLicensePath)) {
       // Fallback: verificar package.json da dependência
-      const onnxPkgPath = join(
-        ROOT,
-        'node_modules',
-        'onnxruntime-web',
-        'package.json',
-      );
+      const onnxPkgPath = join(ROOT, 'node_modules', 'onnxruntime-web', 'package.json');
       expect(existsSync(onnxPkgPath)).toBe(true);
       const onnxPkg = JSON.parse(readFileSync(onnxPkgPath, 'utf-8')) as {
         license?: string;

@@ -13,7 +13,7 @@ describe('WorkerClient', () => {
   it('deve inicializar o worker e enviar mensagem de init', () => {
     vi.spyOn(globalThis, 'Worker');
     client.init({ assetsBaseUrl: '/assets' });
-    
+
     expect(globalThis.Worker).toHaveBeenCalled();
   });
 
@@ -27,14 +27,14 @@ describe('WorkerClient', () => {
     // O segundo argumento de postMessage deve conter o bitmap para transferência
     expect(postMessageSpy).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'process' }),
-      expect.arrayContaining([bitmap])
+      expect.arrayContaining([bitmap]),
     );
   });
 
   it('deve encerrar o worker corretamente ao chamar terminate()', () => {
     client.init();
     const terminateSpy = vi.spyOn(client['worker']!, 'terminate');
-    
+
     client.terminate();
     expect(terminateSpy).toHaveBeenCalled();
     expect(client['worker']).toBeNull();
@@ -47,11 +47,11 @@ describe('WorkerClient', () => {
 
     // Simula mensagem vinda do worker
     const mockEvent = new MessageEvent('message', {
-      data: { type: 'result', payload: { raw: '123' } }
+      data: { type: 'result', payload: { raw: '123' } },
     });
-    
+
     client['worker']!.onmessage!(mockEvent);
-    
+
     expect(resultSpy).toHaveBeenCalledWith(expect.objectContaining({ raw: '123' }));
   });
 });

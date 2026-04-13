@@ -24,7 +24,7 @@ export class FrameQualityAssessor {
     // --- 1. Glare & Contrast (Histogram) ---
     const histogram = new Int32Array(256);
     let totalPixels = 0;
-    
+
     // We sample to ensure < 15ms on mobile (every 4th pixel = skip 16 pixels area basically)
     // Actually, imageData.data is [R,G,B,A, R,G,B,A...]
     for (let i = 0; i < data.length; i += 16) {
@@ -68,7 +68,7 @@ export class FrameQualityAssessor {
     for (let s = 0; s < samples; s++) {
       const x = Math.floor(Math.random() * (width - 2)) + 1;
       const y = Math.floor(Math.random() * (height - 2)) + 1;
-      
+
       const idx = (y * width + x) * 4;
       const north = ((y - 1) * width + x) * 4;
       const south = ((y + 1) * width + x) * 4;
@@ -77,13 +77,13 @@ export class FrameQualityAssessor {
 
       // Laplacian kernel: [0, 1, 0; 1, -4, 1; 0, 1, 0]
       const L = data[north]! + data[south]! + data[east]! + data[west]! - 4 * data[idx]!;
-      
+
       lapSum += L;
       lapSumSq += L * L;
       lapCount++;
     }
 
-    const lapVariance = (lapSumSq / lapCount) - Math.pow(lapSum / lapCount, 2);
+    const lapVariance = lapSumSq / lapCount - Math.pow(lapSum / lapCount, 2);
     if (lapVariance < 80) {
       issues.push('blur');
     }
@@ -98,13 +98,13 @@ export class FrameQualityAssessor {
     // Boundary check
     score = Math.max(0, score);
 
+    const suggestion = this.getSuggestion(issues);
     return {
       score,
       issues,
       shouldProcess: score >= minScore,
-      suggestion: this.getSuggestion(issues),
+      ...(suggestion !== undefined && { suggestion }),
     };
-
   }
 
   private getSuggestion(issues: QualityIssue[]): FrameQualityReport['suggestion'] {

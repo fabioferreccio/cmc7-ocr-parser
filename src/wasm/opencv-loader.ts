@@ -1,6 +1,6 @@
 /**
  * OpenCV Loader — ESM Wrapper for the custom WASM build.
- * 
+ *
  * @remarks
  * This module provides an ESM-compatible interface to load the UMD-based OpenCV.js build.
  * It follows project rules:
@@ -19,15 +19,54 @@ export interface OpenCVSubset {
   Size: new (width: number, height: number) => any;
   Point: new (x: number, y: number) => any;
   Scalar: any;
-  
+
   // Imgproc
   cvtColor(src: any, dst: any, code: number): void;
-  GaussianBlur(src: any, dst: any, ksize: any, sigmaX: number, sigmaY?: number, borderType?: number): void;
-  adaptiveThreshold(src: any, dst: any, maxValue: number, adaptiveMethod: number, thresholdType: number, blockSize: number, C: number): void;
-  findContours(src: any, contours: any, hierarchy: any, mode: number, method: number, offset?: any): void;
-  warpAffine(src: any, dst: any, M: any, dsize: any, flags?: number, borderMode?: number, borderValue?: any): void;
+  GaussianBlur(
+    src: any,
+    dst: any,
+    ksize: any,
+    sigmaX: number,
+    sigmaY?: number,
+    borderType?: number,
+  ): void;
+  adaptiveThreshold(
+    src: any,
+    dst: any,
+    maxValue: number,
+    adaptiveMethod: number,
+    thresholdType: number,
+    blockSize: number,
+    C: number,
+  ): void;
+  findContours(
+    src: any,
+    contours: any,
+    hierarchy: any,
+    mode: number,
+    method: number,
+    offset?: any,
+  ): void;
+  warpAffine(
+    src: any,
+    dst: any,
+    M: any,
+    dsize: any,
+    flags?: number,
+    borderMode?: number,
+    borderValue?: any,
+  ): void;
   getRotationMatrix2D(center: any, angle: number, scale: number): any;
-  morphologyEx(src: any, dst: any, op: number, kernel: any, anchor?: any, iterations?: number, borderType?: number, borderValue?: any): void;
+  morphologyEx(
+    src: any,
+    dst: any,
+    op: number,
+    kernel: any,
+    anchor?: any,
+    iterations?: number,
+    borderType?: number,
+    borderValue?: any,
+  ): void;
   getStructuringElement(shape: number, ksize: any, anchor?: any): any;
   matchTemplate(image: any, templ: any, result: any, method: number, mask?: any): void;
   minMaxLoc(src: any, mask?: any): { minVal: number; maxVal: number; minLoc: any; maxLoc: any };
@@ -66,7 +105,9 @@ export async function loadOpenCV(assetsBaseUrl: string = './'): Promise<CV> {
       // In Node/Vitest, the loader should ideally be mocked.
       // If actually called in Node, we expect the user to provide a path or use the local build.
       // But per Rule 3.5, we use mocks for tests.
-      return reject(new Error('OpenCV loader must be used in a browser/worker environment or mocked.'));
+      return reject(
+        new Error('OpenCV loader must be used in a browser/worker environment or mocked.'),
+      );
     }
 
     // 2. Setup Module for Emscripten
@@ -82,7 +123,7 @@ export async function loadOpenCV(assetsBaseUrl: string = './'): Promise<CV> {
       },
       onAbort: (err: any) => {
         reject(new Error(`OpenCV runtime aborted: ${err}`));
-      }
+      },
     };
 
     // 3. Load the JS glue code

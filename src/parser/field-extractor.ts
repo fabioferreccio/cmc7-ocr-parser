@@ -15,7 +15,7 @@ export class FieldExtractor {
 
   /**
    * Extracts structured data and performs validation on a raw CMC-7 string.
-   * 
+   *
    * @param raw - Raw string from OCR.
    * @param context - Optional metadata (quality, timing).
    * @returns A complete CMC7Result.
@@ -57,13 +57,13 @@ export class FieldExtractor {
     // Structure found, now validate blocks
     // ⑆ block1 ⑆ block2 ⑇ N ⑈ block3 ⑉ block4 ⑊
     const blocks = this.splitBlocks(raw);
-    
+
     // Validate Block 1 (using bank spec if available)
     if (parseResult.warning === 'bank-spec-unknown') {
       validation.bankCodeValid = null;
     } else {
       validation.bankCodeValid = true; // If we found a spec, we assume it's valid for now
-      
+
       // Block 1 DV validation
       // BB, etc. Usually mod 10 for block 1.
       const b1Valid = validateField(blocks.b1, 'mod10');
@@ -105,7 +105,7 @@ export class FieldExtractor {
     };
   }
 
-  private splitBlocks(raw: string) {
+  private splitBlocks(raw: string): { b1: string; b2: string; n: string; b3: string; b4: string } {
     const s1 = '\u2446';
     const s2 = '\u2447';
     const s3 = '\u2448';
@@ -121,7 +121,12 @@ export class FieldExtractor {
     return { b1, b2, n, b3, b4 };
   }
 
-  private addError(validation: CMC7Validation, field: any, block: string, algo: 'mod10' | 'mod11') {
+  private addError(
+    validation: CMC7Validation,
+    field: import('../types/index.js').ValidationError['field'],
+    block: string,
+    algo: 'mod10' | 'mod11',
+  ): void {
     validation.errors.push({
       field,
       expected: algo === 'mod10' ? mod10(block.slice(0, -1)) : 0, // Simplified for now
@@ -130,23 +135,21 @@ export class FieldExtractor {
     });
   }
 
-  private findSymbolPositions(raw: string): any {
-    const symbols = ['⑆', '⑇', '⑈', '⑉', '⑊'] as const;
-    const unicode = { '⑆': '\u2446', '⑇': '\u2447', '⑈': '\u2448', '⑉': '\u2449', '⑊': '\u244A' };
-    const res: any = {};
+  private findSymbolPositions(raw: string): import('../types/index.js').CMC7Fields['symbolPositions'] {
+    type Sym = '⑆' | '⑇' | '⑈' | '⑉' | '⑊';
+    const symbols: readonly Sym[] = ['⑆', '⑇', '⑈', '⑉', '⑊'];
+    const res: Record<Sym, number[]> = { '⑆': [], '⑇': [], '⑈': [], '⑉': [], '⑊': [] };
     for (const s of symbols) {
-      res[s] = [];
-      let pos = raw.indexOf(unicode[s]);
+      let pos = raw.indexOf(s);
       while (pos !== -1) {
         res[s].push(pos);
-        pos = raw.indexOf(unicode[s], pos + 1);
+        pos = raw.indexOf(s, pos + 1);
       }
     }
     return res;
   }
 
-  private getEmptySymbolPositions() {
+  private getEmptySymbolPositions(): import('../types/index.js').CMC7Fields['symbolPositions'] {
     return { '⑆': [], '⑇': [], '⑈': [], '⑉': [], '⑊': [] };
   }
 }
-

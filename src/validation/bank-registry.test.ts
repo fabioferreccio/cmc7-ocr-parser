@@ -50,11 +50,11 @@ describe('BankRegistry', () => {
       compeCode: '999',
       name: 'Banco Fictício',
       dvAlgorithm: 'mod10',
-      block1Layout: { agencyDigits: 4, accountDigits: 6, checkNumDigits: 6 }
+      block1Layout: { agencyDigits: 4, accountDigits: 6, checkNumDigits: 6 },
     };
 
     registry.register(customBank);
-    
+
     const retrieved = registry.getSpec('999');
     expect(retrieved).toEqual(customBank);
   });
@@ -65,11 +65,11 @@ describe('BankRegistry', () => {
       compeCode: '341',
       name: 'Itaú Override',
       dvAlgorithm: 'mod11',
-      block1Layout: { agencyDigits: 5, accountDigits: 7, checkNumDigits: 6 }
+      block1Layout: { agencyDigits: 5, accountDigits: 7, checkNumDigits: 6 },
     };
 
     registry.register(overrideSpec);
-    
+
     const retrieved = registry.getSpec('341');
     expect(retrieved?.name).toBe('Itaú Override');
     expect(retrieved?.dvAlgorithm).toBe('mod11');

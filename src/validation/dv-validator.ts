@@ -50,7 +50,7 @@ export function mod11(digits: string, weights: number[] = [2, 3, 4, 5, 6, 7]): n
 
   if (subtraction === 10) return 'X';
   if (subtraction === 11) return 0;
-  
+
   return subtraction;
 }
 
@@ -61,7 +61,11 @@ export function mod11(digits: string, weights: number[] = [2, 3, 4, 5, 6, 7]): n
  * @param weights Array opcional de pesos para o mod11.
  * @returns true se o DV confere, false caso contrário.
  */
-export function validateField(valueWithDv: string, type: 'mod10' | 'mod11', weights?: number[]): boolean {
+export function validateField(
+  valueWithDv: string,
+  type: 'mod10' | 'mod11',
+  weights?: number[],
+): boolean {
   if (!valueWithDv || valueWithDv.length < 2) return false;
 
   const digits = valueWithDv.slice(0, -1);
@@ -75,4 +79,3 @@ export function validateField(valueWithDv: string, type: 'mod10' | 'mod11', weig
     return computed.toString() === providedDv.toUpperCase();
   }
 }
-

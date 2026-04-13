@@ -38,7 +38,7 @@ describe('ImagePreprocessor', () => {
   it('deve retornar ImageData em tons de cinza se solicitado', async () => {
     const bitmap = mockImageBitmap(100, 100);
     const result = await preprocessor.process(bitmap, { grayscale: true });
-    
+
     expect(result.imageData).toBeDefined();
     expect(result.imageData?.width).toBe(100);
   });

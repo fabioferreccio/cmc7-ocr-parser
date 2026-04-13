@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { mod10, mod11, validateField } from './dv-validator.js';
 
 describe('DVValidator - Modulo 10', () => {
-  it('mod10(\'12345\') deve retornar dígito verificador correto', () => {
+  it("mod10('12345') deve retornar dígito verificador correto", () => {
     // 12345
     // Pesos: 2 1 2 1 2
     // Calc: 5*2=10(1+0=1), 4*1=4, 3*2=6, 2*1=2, 1*2=2
@@ -14,14 +14,14 @@ describe('DVValidator - Modulo 10', () => {
 
   it('mod10 com dígito já exato deve retornar 0', () => {
     // 0000 -> soma 0 -> Mod10(10)-0... usually if sum is multiple of 10, DV is 0
-    // let's test a known zero-DV string. 
+    // let's test a known zero-DV string.
     // 1: 1*2=2. 2: 2*1=2. 3: 3*2=6. Soma: 10. DV: 0
     expect(mod10('123')).toBe(0);
   });
 });
 
 describe('DVValidator - Modulo 11', () => {
-  it('mod11(\'12345\') deve retornar DV correto usando pesos padrão 2-7', () => {
+  it("mod11('12345') deve retornar DV correto usando pesos padrão 2-7", () => {
     // 12345
     // Pesos padrão CMC-7/Boleto: 2, 3, 4, 5, 6, 7 (da direita para a esquerda)
     // Calc: 5*2=10 + 4*3=12 + 3*4=12 + 2*5=10 + 1*6=6

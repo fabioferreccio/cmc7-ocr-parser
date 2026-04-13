@@ -25,12 +25,13 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"]
-  }
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+  },
 }
 ```
 
 **Proibido na API pública:**
+
 - `any` (use `unknown` + type guard)
 - `as Type` sem verificação prévia
 - `!` (non-null assertion) sem comentário justificando
@@ -41,17 +42,17 @@
 > **Origem:** docs/03-arquitetura.md §1–5 (nomes de módulos definidos por camada)  
 > **Razão:** A arquitetura define 5 camadas com módulos nomeados explicitamente. Seguir esses nomes evita ambiguidade ao referenciar componentes nos PRs e no código.
 
-| Artefato | Convenção | Exemplo |
-|----------|-----------|---------|
-| Arquivos de módulo | `kebab-case.ts` | `dv-validator.ts` |
-| Arquivos de teste | `kebab-case.test.ts` | `dv-validator.test.ts` |
-| Classes | `PascalCase` | `TemplateMatchingEngine` |
-| Interfaces (públicas) | `PascalCase` sem prefixo `I` | `CMC7Result`, `CMC7Fields` |
-| Types / Union types | `PascalCase` | `QualityIssue`, `CMC7Error` |
-| Enums | `PascalCase` | `RecognitionMode` |
-| Funções e métodos | `camelCase` | `detectCMC7Strip()` |
-| Constantes exportadas | `UPPER_SNAKE_CASE` | `BANK_REGISTRY`, `TEMPLATES` |
-| Web Worker files | `kebab-case.worker.ts` | `pipeline.worker.ts` |
+| Artefato              | Convenção                    | Exemplo                      |
+| --------------------- | ---------------------------- | ---------------------------- |
+| Arquivos de módulo    | `kebab-case.ts`              | `dv-validator.ts`            |
+| Arquivos de teste     | `kebab-case.test.ts`         | `dv-validator.test.ts`       |
+| Classes               | `PascalCase`                 | `TemplateMatchingEngine`     |
+| Interfaces (públicas) | `PascalCase` sem prefixo `I` | `CMC7Result`, `CMC7Fields`   |
+| Types / Union types   | `PascalCase`                 | `QualityIssue`, `CMC7Error`  |
+| Enums                 | `PascalCase`                 | `RecognitionMode`            |
+| Funções e métodos     | `camelCase`                  | `detectCMC7Strip()`          |
+| Constantes exportadas | `UPPER_SNAKE_CASE`           | `BANK_REGISTRY`, `TEMPLATES` |
+| Web Worker files      | `kebab-case.worker.ts`       | `pipeline.worker.ts`         |
 
 ---
 
@@ -61,9 +62,7 @@
 
 ```typescript
 // ✅ Correto
-type WorkerInbound =
-  | { type: 'PROCESS_FRAME'; bitmap: ImageBitmap }
-  | { type: 'STOP' };
+type WorkerInbound = { type: 'PROCESS_FRAME'; bitmap: ImageBitmap } | { type: 'STOP' };
 
 type WorkerOutbound =
   | { type: 'RESULT'; payload: CMC7Result }
@@ -105,9 +104,9 @@ export { CNNEngine } from './cnn-engine';
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-non-null-assertion": "warn",
     "@typescript-eslint/explicit-function-return-type": "error", // em funções públicas
-    "no-console": "error",  // usar logger interno ou silêncio
-    "no-restricted-globals": ["error", "fetch", "XMLHttpRequest"] // proibir rede
-  }
+    "no-console": "error", // usar logger interno ou silêncio
+    "no-restricted-globals": ["error", "fetch", "XMLHttpRequest"], // proibir rede
+  },
 }
 ```
 
@@ -128,6 +127,7 @@ Camada 5 (API) → Camada 4 (Build) → Camada 3 (Parsing) → Camada 2 (OCR) �
 ```
 
 **Regras derivadas:**
+
 - Camada 3 (Parsing/Validação) **jamais** importa de Camada 2 (OCR) ou Camada 1
 - Camada 2 (OCR) **jamais** importa de Camada 3
 - Camada 1 (Pipeline) **jamais** importa de Camada 2 ou superior
@@ -215,7 +215,7 @@ throw 'falha no processamento';
 // vitest.config.ts
 export default defineConfig({
   test: {
-    environment: 'jsdom',      // para testes de DOM/Canvas
+    environment: 'jsdom', // para testes de DOM/Canvas
     coverage: {
       provider: 'v8',
       thresholds: { lines: 80, functions: 80, branches: 75 },
@@ -231,6 +231,7 @@ export default defineConfig({
 > **Razão:** Toda tarefa no task breakdown define "Testes a escrever primeiro". Um PR que adiciona testes e implementação no mesmo commit com todos os testes verdes desde o início indica que os testes foram escritos depois — isso é auditável no histórico git.
 
 **Verificação via CI:**
+
 - Branch de feature inicia com commit `test: [T-XXX] red phase` (todos falhando)
 - Commit subsequente `feat: [T-XXX] green phase` (testes passando)
 - CI rejeita PRs onde o primeiro commit já tem testes passando (via diff analysis)
@@ -261,16 +262,16 @@ poc/                             ← scripts de benchmark do M1
 > **Origem:** docs/02-prd.md RNF-006 (≥ 80% geral); risco de bugs silenciosos em validação financeira  
 > **Razão:** Camadas determinísticas (Validação/Parsing) têm zero desculpa para cobrir menos de 100%. Camadas com I/O externo (câmera, WASM) têm threshold menor porque dependem de mocks.
 
-| Camada | Arquivo(s) | Coverage mínima |
-|--------|-----------|----------------|
-| Camada 3 — DVValidator | `dv-validator.ts` | **100% lines** |
-| Camada 3 — CMC7Parser | `cmc7-parser.ts` | **95% lines** |
-| Camada 3 — BankRegistry | `bank-registry.ts` | **90% lines** |
-| Camada 2 — QualityAssessor | `assessor.ts` | **90% lines** |
-| Camada 2 — TemplateEngine | `template-engine.ts` | **85% lines** |
-| Camada 1 — Preprocessor | `image-preprocessor.ts` | **80% lines** |
-| Camada 1 — CameraCapture | `camera-capture.ts` | **75% lines** |
-| Camada 4 — API Pública | `reader.ts`, `index.ts` | **85% lines** |
+| Camada                     | Arquivo(s)              | Coverage mínima |
+| -------------------------- | ----------------------- | --------------- |
+| Camada 3 — DVValidator     | `dv-validator.ts`       | **100% lines**  |
+| Camada 3 — CMC7Parser      | `cmc7-parser.ts`        | **95% lines**   |
+| Camada 3 — BankRegistry    | `bank-registry.ts`      | **90% lines**   |
+| Camada 2 — QualityAssessor | `assessor.ts`           | **90% lines**   |
+| Camada 2 — TemplateEngine  | `template-engine.ts`    | **85% lines**   |
+| Camada 1 — Preprocessor    | `image-preprocessor.ts` | **80% lines**   |
+| Camada 1 — CameraCapture   | `camera-capture.ts`     | **75% lines**   |
+| Camada 4 — API Pública     | `reader.ts`, `index.ts` | **85% lines**   |
 
 ---
 
@@ -293,13 +294,20 @@ export function mockGetUserMedia(config?: Partial<MediaStream>) {
 // Mock de HTMLVideoElement com dimensões
 export function mockVideoElement(): HTMLVideoElement {
   return Object.assign(document.createElement('video'), {
-    videoWidth: 1280, videoHeight: 720, readyState: 4,
+    videoWidth: 1280,
+    videoHeight: 720,
+    readyState: 4,
   });
 }
 
 // Mock de OpenCV.js (não carrega WASM em testes unitários)
 export const mockCV = {
-  Mat: class { data = new Uint8Array(100); rows = 10; cols = 10; delete = vi.fn(); },
+  Mat: class {
+    data = new Uint8Array(100);
+    rows = 10;
+    cols = 10;
+    delete = vi.fn();
+  },
   GaussianBlur: vi.fn(),
   adaptiveThreshold: vi.fn(),
   findContours: vi.fn(),
@@ -343,6 +351,7 @@ CI executa Playwright com `--project=chromium,firefox,webkit` na matrix.
 > **Razão:** Dados de cheques são informações financeiras sensíveis. Uma chamada de rede acidental (ex: error reporting, analytics) configuraria transmissão não autorizada de dados financeiros — risco legal e de reputação crítico.
 
 **Operações proibidas em qualquer arquivo de `src/`:**
+
 - `fetch()` para qualquer URL externa
 - `XMLHttpRequest` para qualquer URL externa
 - `navigator.sendBeacon()`
@@ -351,6 +360,7 @@ CI executa Playwright com `--project=chromium,firefox,webkit` na matrix.
 - `new Image().src = 'http://...'` (tracking pixel)
 
 **Verificação automática:**
+
 ```json
 // .eslintrc — regras de rede
 "no-restricted-globals": ["error", "fetch", "XMLHttpRequest"],
@@ -370,6 +380,7 @@ CI executa Playwright com `--project=chromium,firefox,webkit` na matrix.
 > **Razão:** Frames de cheques contendo dados financeiros não podem ser armazenados sem consentimento explícito do usuário final.
 
 **Proibido em `src/`:**
+
 - `localStorage.setItem()` com qualquer dado de imagem ou CMC-7
 - `sessionStorage.setItem()` com dados de frames
 - `indexedDB` para armazenar frames ou resultados
@@ -383,6 +394,7 @@ CI executa Playwright com `--project=chromium,firefox,webkit` na matrix.
 > **Razão:** Uma dependência pode introduzir telemetria silenciosa (ex: `sentry`, `amplitude` embutidos em SDKs).
 
 **Checklist pré-adição de dependência:**
+
 1. Rodar `npm pack <package>` e inspecionar o bundle com `source-map-explorer` ou `bundle-buddy`
 2. Verificar se o package tem `fetch`, `XMLHttpRequest` ou `WebSocket` no source via `grep`
 3. Se package tem dependências transitivas: repetir para cada uma
@@ -398,8 +410,8 @@ CI executa Playwright com `--project=chromium,firefox,webkit` na matrix.
 
 ```typescript
 // ✅ Obrigatório após uso
-bitmap.close();     // libera GPU memory do ImageBitmap
-mat.delete();       // libera heap WASM do cv.Mat
+bitmap.close(); // libera GPU memory do ImageBitmap
+mat.delete(); // libera heap WASM do cv.Mat
 ```
 
 **Revisores devem rejeitar PRs** onde `cv.Mat` é criado sem `mat.delete()` no finally correspondente.
@@ -414,21 +426,21 @@ mat.delete();       // libera heap WASM do cv.Mat
 > **Origem:** docs/01-viabilidade.md §6; docs/02-prd.md RNF-005  
 > **Razão:** A biblioteca é distribuída como MIT. Dependências com licenças incompatíveis contaminariam o projeto e impediriam uso comercial.
 
-| Licença | Permitida? | Condição |
-|---------|-----------|---------|
-| MIT | ✅ Sim | Sem condições |
-| Apache-2.0 | ✅ Sim | Incluir NOTICE se existir |
-| BSD-2-Clause | ✅ Sim | Incluir copyright notice |
-| BSD-3-Clause | ✅ Sim | Incluir copyright notice |
-| ISC | ✅ Sim | Sem condições adicionais |
-| CC0-1.0 | ✅ Sim | Domínio público |
-| **GPL-2.0** | ❌ **Proibida** | Contamina MIT |
-| **GPL-3.0** | ❌ **Proibida** | Contamina MIT |
-| **AGPL-3.0** | ❌ **Proibida** | Contamina + exige abertura de backend |
-| **LGPL-2.1** | ⚠️ Restrita | Apenas se linkagem dinâmica — requer análise caso a caso |
-| **LGPL-3.0** | ⚠️ Restrita | Idem |
-| **SSPL** | ❌ **Proibida** | Não OSI-aprovada, contamina projetos SaaS |
-| **Proprietária** | ❌ **Proibida** | Viola MIT e RNF-005 |
+| Licença          | Permitida?      | Condição                                                 |
+| ---------------- | --------------- | -------------------------------------------------------- |
+| MIT              | ✅ Sim          | Sem condições                                            |
+| Apache-2.0       | ✅ Sim          | Incluir NOTICE se existir                                |
+| BSD-2-Clause     | ✅ Sim          | Incluir copyright notice                                 |
+| BSD-3-Clause     | ✅ Sim          | Incluir copyright notice                                 |
+| ISC              | ✅ Sim          | Sem condições adicionais                                 |
+| CC0-1.0          | ✅ Sim          | Domínio público                                          |
+| **GPL-2.0**      | ❌ **Proibida** | Contamina MIT                                            |
+| **GPL-3.0**      | ❌ **Proibida** | Contamina MIT                                            |
+| **AGPL-3.0**     | ❌ **Proibida** | Contamina + exige abertura de backend                    |
+| **LGPL-2.1**     | ⚠️ Restrita     | Apenas se linkagem dinâmica — requer análise caso a caso |
+| **LGPL-3.0**     | ⚠️ Restrita     | Idem                                                     |
+| **SSPL**         | ❌ **Proibida** | Não OSI-aprovada, contamina projetos SaaS                |
+| **Proprietária** | ❌ **Proibida** | Viola MIT e RNF-005                                      |
 
 ---
 
@@ -442,6 +454,7 @@ npx license-checker --production --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-
 ```
 
 **Para assets binários (modelos ONNX, fontes TTF, arquivos WASM):**
+
 1. Verificar arquivo `LICENSE` ou `NOTICE` no repositório de origem
 2. Verificar cabeçalho do arquivo com `strings <arquivo> | grep -i license`
 3. Registrar em `audit/assets/<nome-do-asset>.md` com: URL de origem, licença, data de verificação, hash SHA-256
@@ -458,6 +471,7 @@ npx @cyclonedx/cyclonedx-npm --output-format json --output-file sbom.json
 ```
 
 SBOM publicado como release asset no GitHub e referenciado no `package.json`:
+
 ```json
 { "sbom": "https://github.com/org/cmc7-ocr-parser/releases/download/v1.0.0/sbom.json" }
 ```
@@ -472,15 +486,16 @@ SBOM publicado como release asset no GitHub e referenciado no `package.json`:
 > **Origem:** docs/02-prd.md RNF-003; docs/03-arquitetura.md §5.1  
 > **Razão:** Esses são targets do PRD, não sugestões. Uma biblioteca que viola esses limites falha no critério de aceite do MVP.
 
-| Chunk | Limite máximo | Medição |
-|-------|--------------|---------|
+| Chunk                                  | Limite máximo  | Medição                              |
+| -------------------------------------- | -------------- | ------------------------------------ |
 | `dist/esm/index.js` (bundle principal) | **50 KB gzip** | `gzip -c dist/esm/index.js \| wc -c` |
-| `dist/workers/pipeline.worker.js` | **30 KB gzip** | Idem |
-| `dist/wasm/opencv.wasm` | **4 MB raw** | `wc -c dist/wasm/opencv.wasm` |
-| `dist/models/cmc7-cnn.onnx` | **2 MB raw** | `wc -c dist/models/cmc7-cnn.onnx` |
-| **Total lazy load (WASM + modelo)** | **6 MB raw** | Soma dos anteriores |
+| `dist/workers/pipeline.worker.js`      | **30 KB gzip** | Idem                                 |
+| `dist/wasm/opencv.wasm`                | **4 MB raw**   | `wc -c dist/wasm/opencv.wasm`        |
+| `dist/models/cmc7-cnn.onnx`            | **2 MB raw**   | `wc -c dist/models/cmc7-cnn.onnx`    |
+| **Total lazy load (WASM + modelo)**    | **6 MB raw**   | Soma dos anteriores                  |
 
 **CI check obrigatório:**
+
 ```yaml
 # .github/workflows/ci.yml
 - name: Bundle size check
@@ -495,16 +510,16 @@ SBOM publicado como release asset no GitHub e referenciado no `package.json`:
 > **Origem:** docs/02-prd.md RNF-001; docs/03-arquitetura.md §1.2 (pipeline detalhado)  
 > **Razão:** Os targets foram calculados com base na estimativa de latência por operação em mobile mid-range (Snapdragon 695). Qualquer fase que exceda o budget impacta a experiência em tempo real.
 
-| Fase | Target (mobile mid-range) | Target (desktop) | Onde medir |
-|------|--------------------------|-----------------|-----------|
-| Quality assessment (L1) | ≤ 15ms | ≤ 5ms | `assessor.test.ts` (benchmark) |
-| Preprocessor L1 total | ≤ 20ms | ≤ 8ms | `image-preprocessor-l1.test.ts` |
-| Preprocessor L2 + OpenCV | ≤ 200ms | ≤ 50ms | `image-preprocessor-l2.test.ts` |
-| ROI detection | ≤ 30ms | ≤ 10ms | `roi-detector.test.ts` |
-| Template matching (60 chars) | ≤ 300ms | ≤ 80ms | `template-engine.test.ts` |
-| CNN inference (onnxruntime) | ≤ 200ms | ≤ 50ms | `cnn-engine.test.ts` |
-| Parsing + validation total | ≤ 10ms | ≤ 2ms | `field-extractor.test.ts` |
-| **Pipeline total** | **≤ 800ms** | **≤ 300ms** | E2E benchmark |
+| Fase                         | Target (mobile mid-range) | Target (desktop) | Onde medir                      |
+| ---------------------------- | ------------------------- | ---------------- | ------------------------------- |
+| Quality assessment (L1)      | ≤ 15ms                    | ≤ 5ms            | `assessor.test.ts` (benchmark)  |
+| Preprocessor L1 total        | ≤ 20ms                    | ≤ 8ms            | `image-preprocessor-l1.test.ts` |
+| Preprocessor L2 + OpenCV     | ≤ 200ms                   | ≤ 50ms           | `image-preprocessor-l2.test.ts` |
+| ROI detection                | ≤ 30ms                    | ≤ 10ms           | `roi-detector.test.ts`          |
+| Template matching (60 chars) | ≤ 300ms                   | ≤ 80ms           | `template-engine.test.ts`       |
+| CNN inference (onnxruntime)  | ≤ 200ms                   | ≤ 50ms           | `cnn-engine.test.ts`            |
+| Parsing + validation total   | ≤ 10ms                    | ≤ 2ms            | `field-extractor.test.ts`       |
+| **Pipeline total**           | **≤ 800ms**               | **≤ 300ms**      | E2E benchmark                   |
 
 **Cada arquivo de teste de camada 1 e 2 tem um test case de benchmark** com `performance.now()` que falha se exceder o target.
 
@@ -518,14 +533,16 @@ SBOM publicado como release asset no GitHub e referenciado no `package.json`:
 // ✅ Correto — só emite novo frame se worker livre
 let workerBusy = false;
 const interval = setInterval(() => {
-  if (workerBusy) return;  // drop frame, não enfileira
+  if (workerBusy) return; // drop frame, não enfileira
   workerBusy = true;
   const bitmap = await createImageBitmap(canvas);
   worker.postMessage({ type: 'PROCESS_FRAME', bitmap }, [bitmap]);
 }, options.frameIntervalMs);
 
 // Na resposta do worker
-worker.onmessage = () => { workerBusy = false; };
+worker.onmessage = () => {
+  workerBusy = false;
+};
 ```
 
 ---
@@ -558,7 +575,7 @@ try {
 > **Origem:** docs/02-prd.md RNF-006 ("JSDoc em todas as funções públicas")  
 > **Razão:** A biblioteca é consumida por desenvolvedores que não têm acesso ao source. TSDoc é renderizado pelo IntelliSense do VS Code/WebStorm, reduzindo a necessidade de consultar README para uso básico.
 
-```typescript
+````typescript
 /**
  * Inicializa uma instância do leitor CMC-7.
  *
@@ -575,9 +592,10 @@ try {
  * ```
  */
 export async function createCMC7Reader(options?: CMC7ReaderOptions): Promise<CMC7Reader> { ... }
-```
+````
 
 **Mínimo exigido:**
+
 - `@param` para cada parâmetro não-óbvio
 - `@returns` descrevendo o retorno
 - `@throws` para cada tipo de erro que pode ser lançado
@@ -605,6 +623,7 @@ worker.postMessage({ type: 'PROCESS_FRAME', bitmap }, [bitmap]);
 > **Razão:** Público-alvo são desenvolvedores que decidem adotar ou não a biblioteca em 5 minutos. README incompleto aumenta a taxa de abandono.
 
 **Seções obrigatórias no README:**
+
 1. `## Installation` — npm/yarn/pnpm command
 2. `## Quick Start` — exemplo mínimo funcional (< 20 linhas)
 3. `## Browser Support` — tabela com todos os browsers e limitações iOS
@@ -625,20 +644,21 @@ worker.postMessage({ type: 'PROCESS_FRAME', bitmap }, [bitmap]);
 
 **Formato:** `<type>(<scope>): <description> [T-XXX]`
 
-| Type | Quando usar |
-|------|------------|
-| `feat` | Nova funcionalidade |
-| `fix` | Correção de bug |
-| `test` | Adição/modificação de testes |
-| `perf` | Melhoria de performance |
+| Type       | Quando usar                              |
+| ---------- | ---------------------------------------- |
+| `feat`     | Nova funcionalidade                      |
+| `fix`      | Correção de bug                          |
+| `test`     | Adição/modificação de testes             |
+| `perf`     | Melhoria de performance                  |
 | `refactor` | Refatoração sem mudança de comportamento |
-| `docs` | Documentação apenas |
-| `build` | Build system, dependências |
-| `ci` | Pipeline de CI |
-| `chore` | Tarefas de manutenção |
-| `spike` | PoC/experimento (M1 apenas) |
+| `docs`     | Documentação apenas                      |
+| `build`    | Build system, dependências               |
+| `ci`       | Pipeline de CI                           |
+| `chore`    | Tarefas de manutenção                    |
+| `spike`    | PoC/experimento (M1 apenas)              |
 
 **Exemplos:**
+
 ```
 test(dv-validator): red phase — mod10 e mod11 [T-015]
 feat(dv-validator): implementa mod10 e mod11 [T-015]
@@ -664,6 +684,7 @@ main ─────────────────────────
 ```
 
 **Regras:**
+
 - `main` é protegido: nenhum push direto
 - PRs para `main` exigem: (a) todos os testes passando, (b) coverage ≥ threshold, (c) bundle size check verde, (d) 1 review aprovado
 - PRs para `milestone/*` exigem: (a) testes passando, (b) description com referência ao task ID
@@ -675,11 +696,14 @@ main ─────────────────────────
 > **Razão:** "Done" tem definição formal em cada tarefa. O checklist de PR é a verificação automática dessa definição.
 
 **PR template obrigatório:**
+
 ```markdown
 ## Task
+
 Closes T-XXX
 
 ## Checklist
+
 - [ ] Testes escritos ANTES da implementação (red phase commitado separadamente)
 - [ ] Todos os testes passando (`npm test`)
 - [ ] Coverage não reduziu abaixo do threshold da camada
@@ -690,6 +714,7 @@ Closes T-XXX
 - [ ] Nenhuma chamada de rede (`fetch`, `XHR`, `WebSocket`) em `src/`
 
 ## Decisões de trade-off (se houver)
+
 <!-- Descreva qualquer decisão não-óbvia tomada durante a implementação -->
 ```
 
@@ -699,14 +724,14 @@ Closes T-XXX
 > **Origem:** docs/02-prd.md §2 (roadmap com versões explícitas v1.0, v1.1, v1.2)  
 > **Razão:** Consumidores de fintechs usam pinning de versão (`"cmc7-ocr-parser": "^1.0.0"`). Uma breaking change não sinalizada em `MAJOR` causa regressões silenciosas em produção financeira.
 
-| Mudança | Version bump |
-|---------|-------------|
-| Novo método ou tipo na API pública | `MINOR` |
-| Remoção ou renomeação de método/tipo público | `MAJOR` |
-| Bug fix sem mudança de API | `PATCH` |
-| Feature experimental (`experimental: true`) adicionada | `MINOR` |
-| Feature experimental removida | `MINOR` (não `MAJOR` — era experimental) |
-| Aumento de cobertura de `BankRegistry` | `PATCH` |
+| Mudança                                                | Version bump                             |
+| ------------------------------------------------------ | ---------------------------------------- |
+| Novo método ou tipo na API pública                     | `MINOR`                                  |
+| Remoção ou renomeação de método/tipo público           | `MAJOR`                                  |
+| Bug fix sem mudança de API                             | `PATCH`                                  |
+| Feature experimental (`experimental: true`) adicionada | `MINOR`                                  |
+| Feature experimental removida                          | `MINOR` (não `MAJOR` — era experimental) |
+| Aumento de cobertura de `BankRegistry`                 | `PATCH`                                  |
 
 ---
 
@@ -714,17 +739,17 @@ Closes T-XXX
 
 As seguintes regras são válidas até a conclusão do **Milestone 1** (T-001, T-002, T-003). Devem ser revisadas com os resultados dos spikes antes do início do Milestone 2.
 
-| ID | Regra Provisória | Condição de Revisão | Task de Validação |
-|----|-----------------|--------------------|--------------------|
-| **RP-01** | OpenCV.js com build customizada `core+imgproc` tem ≤ 4 MB | ✅ Confirmado: Build TechStark v4.9.0 tem ~3.45 MB total (JS+WASM) | T-003 |
-| **RP-02** | Build single-thread do OpenCV.js não exige headers CORP/COOP | ✅ Confirmado: Verificado em ambiente local sem headers especiais | T-003 |
-| **RP-03** | [PROVISÓRIA] Template matching como engine padrão atinge ≥ 95% de acurácia | T-002: benchmark com câmera real | T-002 |
-| **RP-04** | [PROVISÓRIA] Templates CMC-7 gerados da fonte TTF são redistribuíveis como Uint8Array | T-001: audit de licença da fonte | T-001 |
-| **RP-05** | [PROVISÓRIA] onnxruntime-web completa inferência CNN ~1MB em ≤ 200ms em mobile mid-range | T-014: benchmark em device físico | T-014 |
-| **RP-06** | [PROVISÓRIA] Especificações FEBRABAN dos 5 maiores bancos estão acessíveis publicamente | T-016: curadoria manual das specs | T-016 |
+| ID        | Regra Provisória                                                                         | Condição de Revisão                                                | Task de Validação |
+| --------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ----------------- |
+| **RP-01** | OpenCV.js com build customizada `core+imgproc` tem ≤ 4 MB                                | ✅ Confirmado: Build TechStark v4.9.0 tem ~3.45 MB total (JS+WASM) | T-003             |
+| **RP-02** | Build single-thread do OpenCV.js não exige headers CORP/COOP                             | ✅ Confirmado: Verificado em ambiente local sem headers especiais  | T-003             |
+| **RP-03** | [PROVISÓRIA] Template matching como engine padrão atinge ≥ 95% de acurácia               | T-002: benchmark com câmera real                                   | T-002             |
+| **RP-04** | [PROVISÓRIA] Templates CMC-7 gerados da fonte TTF são redistribuíveis como Uint8Array    | T-001: audit de licença da fonte                                   | T-001             |
+| **RP-05** | [PROVISÓRIA] onnxruntime-web completa inferência CNN ~1MB em ≤ 200ms em mobile mid-range | T-014: benchmark em device físico                                  | T-014             |
+| **RP-06** | [PROVISÓRIA] Especificações FEBRABAN dos 5 maiores bancos estão acessíveis publicamente  | T-016: curadoria manual das specs                                  | T-016             |
 
 **Protocolo de revisão:** Após cada spike do M1, o responsável pela task abre um PR em `docs/05-regras.md` removendo o marcador `[PROVISÓRIA]` e adicionando o resultado confirmado abaixo da regra. PRs para milestones seguintes são bloqueados se regras provisórias relacionadas não foram revisadas.
 
 ---
 
-*Este documento é a fonte de verdade para padrões de desenvolvimento. Conflitos entre este documento e qualquer outro doc devem ser resolvidos atualizando este documento — não criando exceções ad-hoc no código.*
+_Este documento é a fonte de verdade para padrões de desenvolvimento. Conflitos entre este documento e qualquer outro doc devem ser resolvidos atualizando este documento — não criando exceções ad-hoc no código._

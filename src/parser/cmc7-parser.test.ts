@@ -4,32 +4,50 @@ import { BankRegistry } from '../validation/bank-registry.js';
 
 // CMC-7 symbols (Unicode)
 const SYM = {
-  START: '\u2446',  // ⑆
-  SEP1:  '\u2446',  // ⑆ (second occurrence)
-  SEP2:  '\u2447',  // ⑇
-  SEP3:  '\u2448',  // ⑈
-  SEP4:  '\u2449',  // ⑉
-  END:   '\u244A',  // ⑊
+  START: '\u2446', // ⑆
+  SEP1: '\u2446', // ⑆ (second occurrence)
+  SEP2: '\u2447', // ⑇
+  SEP3: '\u2448', // ⑈
+  SEP4: '\u2449', // ⑉
+  END: '\u244A', // ⑊
 };
 
 // Structurally valid synthetic CMC-7 string following the FEBRABAN grammar:
 // ⑆ Block1 ⑆ Block2 ⑇ N ⑈ Block3 ⑉ Block4 ⑊
 // BB (001): bankCode(3) + agency(4) + account(8) + checkNum(6) + DV(1) = 22 digits in Block1
-const BB_BLOCK1  = '0010002' + '00000001' + '000001' + '5'; // 3+4+8+6+1 = 22  (simplified, DV not validated here)
-const GENERIC_B2 = '0000001000' + '0';                       // 10 + DV
-const GENERIC_N  = '1';
+const BB_BLOCK1 = '0010002' + '00000001' + '000001' + '5'; // 3+4+8+6+1 = 22  (simplified, DV not validated here)
+const GENERIC_B2 = '0000001000' + '0'; // 10 + DV
+const GENERIC_N = '1';
 const GENERIC_B3 = '0010000000' + '0';
 const GENERIC_B4 = '0001023456' + '7';
 
 const VALID_BB_RAW =
-  SYM.START + BB_BLOCK1 + SYM.SEP1 + GENERIC_B2 + SYM.SEP2 + GENERIC_N +
-  SYM.SEP3 + GENERIC_B3 + SYM.SEP4 + GENERIC_B4 + SYM.END;
+  SYM.START +
+  BB_BLOCK1 +
+  SYM.SEP1 +
+  GENERIC_B2 +
+  SYM.SEP2 +
+  GENERIC_N +
+  SYM.SEP3 +
+  GENERIC_B3 +
+  SYM.SEP4 +
+  GENERIC_B4 +
+  SYM.END;
 
 // Bradesco (237): bankCode(3) + agency(4) + account(7) + checkNum(6) + DV(1) = 21 digits
 const BRAD_BLOCK1 = '2370001' + '0000001' + '000001' + '9'; // 3+4+7+6+1 = 21
 const VALID_BRAD_RAW =
-  SYM.START + BRAD_BLOCK1 + SYM.SEP1 + GENERIC_B2 + SYM.SEP2 + GENERIC_N +
-  SYM.SEP3 + GENERIC_B3 + SYM.SEP4 + GENERIC_B4 + SYM.END;
+  SYM.START +
+  BRAD_BLOCK1 +
+  SYM.SEP1 +
+  GENERIC_B2 +
+  SYM.SEP2 +
+  GENERIC_N +
+  SYM.SEP3 +
+  GENERIC_B3 +
+  SYM.SEP4 +
+  GENERIC_B4 +
+  SYM.END;
 
 describe('CMC7Parser', () => {
   const registry = new BankRegistry();
@@ -67,8 +85,17 @@ describe('CMC7Parser', () => {
     // Use an unknown bank code: 999
     const UNKNOWN_B1 = '9990001' + '00000001' + '000001' + '5';
     const unknownRaw =
-      SYM.START + UNKNOWN_B1 + SYM.SEP1 + GENERIC_B2 + SYM.SEP2 + GENERIC_N +
-      SYM.SEP3 + GENERIC_B3 + SYM.SEP4 + GENERIC_B4 + SYM.END;
+      SYM.START +
+      UNKNOWN_B1 +
+      SYM.SEP1 +
+      GENERIC_B2 +
+      SYM.SEP2 +
+      GENERIC_N +
+      SYM.SEP3 +
+      GENERIC_B3 +
+      SYM.SEP4 +
+      GENERIC_B4 +
+      SYM.END;
     const result = parser.parse(unknownRaw);
     expect(result.success).toBe(true); // still parses generically
     expect(result.warning).toBe('bank-spec-unknown');
@@ -79,17 +106,17 @@ describe('CMC7Parser', () => {
     const result = parser.parse(VALID_BB_RAW);
     expect(result.success).toBe(true);
     expect(result.fields?.bankCode).toBe('001');
-    expect(result.fields?.agency).toHaveLength(4);    // BB: agencyDigits = 4
-    expect(result.fields?.account).toHaveLength(8);   // BB: accountDigits = 8
-    expect(result.fields?.checkNum).toHaveLength(6);  // checkNumDigits = 6
+    expect(result.fields?.agency).toHaveLength(4); // BB: agencyDigits = 4
+    expect(result.fields?.account).toHaveLength(8); // BB: accountDigits = 8
+    expect(result.fields?.checkNum).toHaveLength(6); // checkNumDigits = 6
   });
 
   it('deve fazer parse do Block1 corretamente para Bradesco (237)', () => {
     const result = parser.parse(VALID_BRAD_RAW);
     expect(result.success).toBe(true);
     expect(result.fields?.bankCode).toBe('237');
-    expect(result.fields?.agency).toHaveLength(4);    // Bradesco: agencyDigits = 4
-    expect(result.fields?.account).toHaveLength(7);   // Bradesco: accountDigits = 7
+    expect(result.fields?.agency).toHaveLength(4); // Bradesco: agencyDigits = 4
+    expect(result.fields?.account).toHaveLength(7); // Bradesco: accountDigits = 7
     expect(result.fields?.checkNum).toHaveLength(6);
   });
 
@@ -105,10 +132,19 @@ describe('CMC7Parser', () => {
   it('deve retornar campos null (não undefined) quando banco desconhecido', () => {
     const UNKNOWN_B1 = '9990001' + '00000001' + '000001' + '5';
     const unknownRaw =
-      SYM.START + UNKNOWN_B1 + SYM.SEP1 + GENERIC_B2 + SYM.SEP2 + GENERIC_N +
-      SYM.SEP3 + GENERIC_B3 + SYM.SEP4 + GENERIC_B4 + SYM.END;
+      SYM.START +
+      UNKNOWN_B1 +
+      SYM.SEP1 +
+      GENERIC_B2 +
+      SYM.SEP2 +
+      GENERIC_N +
+      SYM.SEP3 +
+      GENERIC_B3 +
+      SYM.SEP4 +
+      GENERIC_B4 +
+      SYM.END;
     const result = parser.parse(unknownRaw);
-    
+
     expect(result.success).toBe(true);
     // For unknown banks, agency / account / checkNum are null (not undefined)
     expect(result.fields?.agency).toBeNull();

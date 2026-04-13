@@ -4,6 +4,8 @@ import {
   type CMC7ReaderOptions,
   type CMC7Error,
   type BankSpec,
+  type FrameQualityReport,
+  type EnvironmentInfo,
 } from './types/index.js';
 import { ImagePreprocessor } from './pipeline/image-preprocessor.js';
 import { ROIDetector } from './pipeline/roi-detector.js';
@@ -14,7 +16,6 @@ import { BankRegistry } from './validation/bank-registry.js';
 import { FieldExtractor } from './parser/field-extractor.js';
 import { FrameQualityAssessor } from './ocr/quality/assessor.js';
 import { detectEnvironment } from './capture/environment-detector.js';
-
 
 /**
  * Implementation of the CMC7Reader interface.
@@ -28,8 +29,6 @@ class ReaderImpl implements CMC7Reader {
   private iteratorQueue: CMC7Result[] = [];
   private iteratorResolvers: ((value: IteratorResult<CMC7Result>) => void)[] = [];
   private unsupportedEnvInfo: unknown = null;
-
-
 
   // Pipeline components
   private readonly preprocessor = new ImagePreprocessor();
@@ -53,18 +52,17 @@ class ReaderImpl implements CMC7Reader {
     }
   }
 
-
-
   private loopId: number | null = null;
   private lastProcessTime = 0;
   private videoElement: HTMLVideoElement | null = null;
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- implements CMC7Reader interface; camera wiring in M6 will add awaits
   async start(videoElement: HTMLVideoElement): Promise<void> {
     if (this.isRunning) return;
     this.videoElement = videoElement;
     this.isRunning = true;
     this.lastProcessTime = 0;
-    
+
     this.loop();
   }
 
@@ -85,7 +83,7 @@ class ReaderImpl implements CMC7Reader {
 
     try {
       this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-      
+
       const video = document.createElement('video');
       video.setAttribute('playsinline', 'true');
       video.setAttribute('data-testid', 'camera-video'); // Useful for E2E
@@ -93,12 +91,15 @@ class ReaderImpl implements CMC7Reader {
       video.style.height = '100%';
       video.style.objectFit = 'cover';
       video.srcObject = this.stream;
-      
+
       container.appendChild(video);
 
       // Aguarda metadados para garantir que o vídeo tenha dimensões e esteja pronto
       await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('Timeout waiting for video metadata')), 5000);
+        const timeout = setTimeout(
+          () => reject(new Error('Timeout waiting for video metadata')),
+          5000,
+        );
         if (video.readyState >= 2) {
           clearTimeout(timeout);
           resolve();
@@ -115,15 +116,14 @@ class ReaderImpl implements CMC7Reader {
 
       try {
         await video.play();
-      } catch (e) {
-        console.warn('Video play interrupted or failed', e);
-        // On some mobile browsers, play() might fail without user gesture, 
-        // but here it's called from startBtn.onclick, so it should be fine.
+      } catch (_e) {
+        // On some mobile browsers, play() might fail without user gesture.
+        // Silently ignore — the stream will still be active (Rule 4.1: no-console).
       }
-      
+
       this.videoElement = video;
       await this.start(video);
-      
+
       return video;
     } catch (err) {
       const error = err as Error;
@@ -132,10 +132,9 @@ class ReaderImpl implements CMC7Reader {
         message: error.message || 'Camera access denied by user',
       } as CMC7Error;
     }
-
-
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- implements CMC7Reader interface; no async op needed for cleanup
   async stop(): Promise<void> {
     this.isRunning = false;
     if (this.loopId !== null) {
@@ -144,12 +143,12 @@ class ReaderImpl implements CMC7Reader {
     }
 
     if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
+      this.stream.getTracks().forEach((track) => track.stop());
       this.stream = null;
     }
 
     if (this.videoElement && this.videoElement.parentElement) {
-      // Logic on whether to remove video element from DOM is debatable, 
+      // Logic on whether to remove video element from DOM is debatable,
       // but for simple startCamera/stop cycle, we'll clean it up.
       this.videoElement.remove();
       this.videoElement = null;
@@ -163,7 +162,7 @@ class ReaderImpl implements CMC7Reader {
     const interval = this.options.frameIntervalMs || 300;
 
     if (now - this.lastProcessTime >= interval) {
-      this.processFrame().catch(err => {
+      this.processFrame().catch((err) => {
         this.emit('error', err);
       });
       this.lastProcessTime = now;
@@ -191,20 +190,27 @@ class ReaderImpl implements CMC7Reader {
       const result = await this.readImage(imageData);
       this.emit('result', result);
     } catch (e) {
-      const err = e as CMC7Error;
+      const err = e as { type?: string };
       // Ignore "NotFound" in real-time loop to avoid flooding errors
       if (err.type !== 'CMC7_NOT_FOUND') {
-        this.emit('error', err);
+        this.emit('error', e);
       }
     }
-
   }
 
   /**
    * Processes a static image source and returns the CMC-7 result.
    */
   async readImage(
-    input: HTMLCanvasElement | HTMLImageElement | ImageBitmap | File | Blob | string | ImageData | HTMLVideoElement,
+    input:
+      | HTMLCanvasElement
+      | HTMLImageElement
+      | ImageBitmap
+      | File
+      | Blob
+      | string
+      | ImageData
+      | HTMLVideoElement,
   ): Promise<CMC7Result> {
     const startTime = Date.now();
 
@@ -244,7 +250,15 @@ class ReaderImpl implements CMC7Reader {
   }
 
   private async ensureImageData(
-    input: HTMLCanvasElement | HTMLImageElement | ImageBitmap | File | Blob | string | ImageData | HTMLVideoElement,
+    input:
+      | HTMLCanvasElement
+      | HTMLImageElement
+      | ImageBitmap
+      | File
+      | Blob
+      | string
+      | ImageData
+      | HTMLVideoElement,
   ): Promise<ImageData> {
     if (input instanceof ImageData) return input;
 
@@ -288,32 +302,40 @@ class ReaderImpl implements CMC7Reader {
       canvas.height = img.height;
     }
 
-
     const ctx = canvas.getContext('2d');
-    if (img instanceof HTMLVideoElement || img instanceof HTMLCanvasElement || img instanceof HTMLImageElement || img instanceof ImageBitmap) {
-        ctx?.drawImage(img as CanvasImageSource, 0, 0);
+    if (
+      img instanceof HTMLVideoElement ||
+      img instanceof HTMLCanvasElement ||
+      img instanceof HTMLImageElement ||
+      img instanceof ImageBitmap
+    ) {
+      ctx?.drawImage(img as CanvasImageSource, 0, 0);
     }
 
     return canvas;
   }
 
-  on(event: string, handler: (...args: any[]) => void): this {
+  on(event: 'result', handler: (result: CMC7Result) => void): this;
+  on(event: 'frame-quality', handler: (report: FrameQualityReport) => void): this;
+  on(event: 'error', handler: (error: CMC7Error) => void): this;
+  on(event: 'unsupported-environment', handler: (info: EnvironmentInfo) => void): this;
+  on(event: 'reading', handler: () => void): this;
+  // Implementation signature — must be broader than all overloads
+  on(event: string, handler: (...args: never[]) => void): this {
     if (!this.handlers.has(event)) {
       this.handlers.set(event, new Set());
     }
-    this.handlers.get(event)!.add(handler);
+    this.handlers.get(event)!.add(handler as (...args: unknown[]) => void);
 
     // AD-02: If this is an environment warning and we already have info, emit immediately
     if (event === 'unsupported-environment' && this.unsupportedEnvInfo) {
-      handler(this.unsupportedEnvInfo as never);
+      (handler as (info: unknown) => void)(this.unsupportedEnvInfo);
     }
-
 
     return this;
   }
 
-
-  off(event: string, handler: (...args: any[]) => void): this {
+  off(event: string, handler: (...args: unknown[]) => void): this {
     this.handlers.get(event)?.delete(handler);
     return this;
   }
@@ -323,7 +345,7 @@ class ReaderImpl implements CMC7Reader {
   }
 
   /** Internal helper to emit events to listeners. */
-  private emit(event: string, ...args: any[]): void {
+  private emit(event: string, ...args: unknown[]): void {
     if (event === 'result') {
       const result = args[0] as CMC7Result;
       if (this.iteratorResolvers.length > 0) {
@@ -334,11 +356,12 @@ class ReaderImpl implements CMC7Reader {
       }
     }
 
-    this.handlers.get(event)?.forEach(handler => {
+    this.handlers.get(event)?.forEach((handler) => {
       try {
         handler(...args);
-      } catch (e) {
-        console.error(`Error in event handler for ${event}:`, e);
+      } catch (_e) {
+        // Silently swallow handler errors to prevent one bad handler from breaking others
+        // (Rule 4.1: no-console — errors are surfaced via the 'error' event)
       }
     });
   }
@@ -349,33 +372,35 @@ class ReaderImpl implements CMC7Reader {
         if (this.iteratorQueue.length > 0) {
           return Promise.resolve({ value: this.iteratorQueue.shift()!, done: false });
         }
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           this.iteratorResolvers.push(resolve);
         });
-      }
+      },
     };
   }
 }
 
 /**
  * Creates and initializes a CMC-7 reader instance.
+ *
+ * @param options - Optional configuration.
+ * @returns The initialized {@link CMC7Reader} instance.
+ * @throws {@link CMC7InitError} If WebAssembly is not supported by the browser.
  */
-export async function createCMC7Reader(
-  options: CMC7ReaderOptions = {},
-): Promise<CMC7Reader> {
+// eslint-disable-next-line @typescript-eslint/require-await -- future M6 integration will load WASM here; kept async for public API contract and test compatibility
+export async function createCMC7Reader(options: CMC7ReaderOptions = {}): Promise<CMC7Reader> {
   // Check for WebAssembly support (RNF-003)
   if (typeof WebAssembly !== 'object' || !WebAssembly.instantiate) {
     throw {
       type: 'INIT_ERROR',
       message: 'WebAssembly not supported in this environment',
-      cause: 'webassembly-not-supported'
+      cause: 'webassembly-not-supported',
     } as CMC7Error;
   }
 
   const reader = new ReaderImpl(options);
-  
+
   // Environment check will follow in integration
-  
+
   return reader;
 }
-

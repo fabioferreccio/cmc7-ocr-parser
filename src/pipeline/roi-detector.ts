@@ -1,4 +1,4 @@
-/** 
+/**
  * Represents the detection region for the CMC-7 strip.
  */
 export interface ROI {
@@ -11,8 +11,8 @@ export interface ROI {
 export class ROIDetector {
   // Configuração baseada na anatomia do CMC-7 (docs/03-arquitetura.md)
   private readonly MIN_WIDTH_PERCENT = 0.3; // 30% da largura deve ter pixels pretos
-  private readonly MIN_STRIP_HEIGHT = 15;   // Altura mínima esperada (pixels)
-  private readonly MAX_STRIP_HEIGHT = 100;  // Altura máxima esperada (pixels)
+  private readonly MIN_STRIP_HEIGHT = 15; // Altura mínima esperada (pixels)
+  private readonly MAX_STRIP_HEIGHT = 100; // Altura máxima esperada (pixels)
 
   /**
    * Detects the y-position and height of the CMC-7 strip.
@@ -34,13 +34,13 @@ export class ROIDetector {
           blackPixels++;
         }
       }
-      projection[y]! = blackPixels;
+      projection[y] = blackPixels;
     }
 
     // 2. Identificação da maior sequência de linhas densas
     let bestY = -1;
     let bestHeight = 0;
-    
+
     let currentStart = -1;
     let currentHeight = 0;
 
@@ -71,11 +71,11 @@ export class ROIDetector {
 
     if (bestY === -1) return null;
 
-    return { 
-      x: 0, 
-      y: bestY, 
-      width: width, 
-      height: bestHeight 
+    return {
+      x: 0,
+      y: bestY,
+      width: width,
+      height: bestHeight,
     };
   }
 

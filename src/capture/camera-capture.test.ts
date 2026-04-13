@@ -35,8 +35,9 @@ describe('CameraCapture', () => {
     mockEnvironment({ isIOS: true, isHTTPS: true });
     // Simulando WKWebView bloqueando mediaDevices
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/117.0.5938.108 Mobile/15E148 Safari/604.1',
-      mediaDevices: undefined
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/117.0.5938.108 Mobile/15E148 Safari/604.1',
+      mediaDevices: undefined,
     });
 
     const capture = new CameraCapture();
@@ -59,7 +60,7 @@ describe('CameraCapture', () => {
   it('deve rejeitar com CMC7InitError se não HTTPS em ambiente não-localhost', async () => {
     mockEnvironment({ isHTTPS: false });
     vi.stubGlobal('location', { protocol: 'http:', hostname: 'example.com' });
-    
+
     const capture = new CameraCapture();
     await expect(capture.start(mockVideoElement())).rejects.toMatchObject({
       type: 'INIT_ERROR',
@@ -72,10 +73,10 @@ describe('CameraCapture', () => {
     const video = mockVideoElement();
     const capture = new CameraCapture();
     await capture.start(video);
-    
+
     const stream = video.srcObject as MediaStream;
     const track = stream.getTracks()[0]!;
-    
+
     await capture.stop();
     expect(track.stop).toHaveBeenCalled();
     expect(video.srcObject).toBeNull();

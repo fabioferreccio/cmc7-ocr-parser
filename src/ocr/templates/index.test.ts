@@ -7,8 +7,21 @@ import { TEMPLATES } from './index.js';
 import type { CMC7Char } from './index.js';
 
 const EXPECTED_CHARS: CMC7Char[] = [
-  '0','1','2','3','4','5','6','7','8','9',
-  '\u2446','\u2447','\u2448','\u2449','\u244A',
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '\u2446',
+  '\u2447',
+  '\u2448',
+  '\u2449',
+  '\u244A',
 ];
 
 describe('templates/index — structure [T-012 placeholder]', () => {
@@ -32,9 +45,7 @@ describe('templates/index — structure [T-012 placeholder]', () => {
   });
 
   it('[PROVISÓRIA] total size does not exceed 35 KB', () => {
-    const totalBytes = Object.values(TEMPLATES).reduce(
-      (sum, buf) => sum + buf.length, 0,
-    );
+    const totalBytes = Object.values(TEMPLATES).reduce((sum, buf) => sum + buf.length, 0);
     // NOTE: Placeholder arrays are zeros — real check after T-012
     expect(totalBytes).toBeLessThanOrEqual(35_000);
   });

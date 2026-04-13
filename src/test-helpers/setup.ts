@@ -28,7 +28,7 @@ if (typeof globalThis.ImageData === 'undefined') {
 if (typeof globalThis.ImageBitmap === 'undefined') {
   (globalThis as any).ImageBitmap = class ImageBitmap {
     constructor() {
-      throw new TypeError("Illegal constructor");
+      throw new TypeError('Illegal constructor');
     }
     width = 0;
     height = 0;
@@ -36,14 +36,13 @@ if (typeof globalThis.ImageBitmap === 'undefined') {
   };
 }
 
-globalThis.createImageBitmap = vi.fn().mockImplementation(
-  async (_source: unknown): Promise<ImageBitmap> => {
+globalThis.createImageBitmap = vi
+  .fn()
+  .mockImplementation(async (_source: unknown): Promise<ImageBitmap> => {
     const bitmap = Object.create(ImageBitmap.prototype);
     Object.assign(bitmap, { width: 960, height: 540, close: vi.fn() });
     return bitmap as ImageBitmap;
-  }
-);
-
+  });
 
 // ─── Worker mock (not in jsdom) ──────────────────────────────────────────────
 globalThis.Worker = vi.fn().mockImplementation(() => ({
@@ -82,11 +81,18 @@ HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation((contextId) 
 
 if (!globalThis.OffscreenCanvas) {
   globalThis.OffscreenCanvas = class {
-    constructor(public width: number, public height: number) {}
+    constructor(
+      public width: number,
+      public height: number,
+    ) {}
     getContext(id: string) {
       return (document.createElement('canvas') as any).getContext(id);
     }
-    convertToBlob() { return Promise.resolve(new Blob()); }
-    transferToImageBitmap() { return {} as ImageBitmap; }
+    convertToBlob() {
+      return Promise.resolve(new Blob());
+    }
+    transferToImageBitmap() {
+      return {} as ImageBitmap;
+    }
   } as any;
 }

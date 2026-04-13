@@ -22,7 +22,7 @@ export function detectEnvironment(): EnvironmentInfo & { userGuidance: string } 
   // WKWebView is generally any browser on iOS that is NOT the system Safari
   const isWKWebView = isIOS && !isSafari;
 
-  const hasCamera = !!(navigator.mediaDevices?.getUserMedia);
+  const hasCamera = !!navigator.mediaDevices?.getUserMedia;
 
   const isHTTPS =
     location.protocol === 'https:' ||

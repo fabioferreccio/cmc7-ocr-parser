@@ -18,7 +18,9 @@ export function mockGetUserMedia(
   } as unknown as MediaStream;
 
   const mock = config.reject
-    ? vi.fn().mockRejectedValue(new DOMException(config.error ?? 'Permission denied', 'NotAllowedError'))
+    ? vi
+        .fn()
+        .mockRejectedValue(new DOMException(config.error ?? 'Permission denied', 'NotAllowedError'))
     : vi.fn().mockResolvedValue(stream);
 
   Object.defineProperty(globalThis.navigator, 'mediaDevices', {
@@ -37,10 +39,10 @@ export function mockVideoElement(width = 1280, height = 720): HTMLVideoElement {
   Object.defineProperty(video, 'videoWidth', { value: width, configurable: true });
   Object.defineProperty(video, 'videoHeight', { value: height, configurable: true });
   Object.defineProperty(video, 'readyState', { value: 4, configurable: true });
-  
+
   video.play = vi.fn().mockResolvedValue(undefined);
   video.pause = vi.fn();
-  
+
   return video;
 }
 
@@ -77,7 +79,7 @@ export function mockEnvironment(overrides: Partial<EnvironmentInfo> = {}): void 
     vi.stubGlobal('location', {
       ...globalThis.location,
       protocol: overrides.isHTTPS === false ? 'http:' : 'https:',
-      hostname: globalThis.location.hostname
+      hostname: globalThis.location.hostname,
     });
   }
 }
@@ -94,14 +96,28 @@ export const mockCV = {
     rows = 10;
     cols = 10;
     delete() {}
-    static empty() { return true; }
-    empty() { return false; }
+    static empty() {
+      return true;
+    }
+    empty() {
+      return false;
+    }
   },
   matFromImageData: vi.fn().mockImplementation(() => new mockCV.Mat()),
-  Size: class { constructor(public width: number, public height: number) {} },
-  Point: class { constructor(public x: number, public y: number) {} },
+  Size: class {
+    constructor(
+      public width: number,
+      public height: number,
+    ) {}
+  },
+  Point: class {
+    constructor(
+      public x: number,
+      public y: number,
+    ) {}
+  },
   Scalar: vi.fn(),
-  
+
   cvtColor: vi.fn(),
   GaussianBlur: vi.fn(),
   adaptiveThreshold: vi.fn(),
@@ -113,7 +129,9 @@ export const mockCV = {
   morphologyEx: vi.fn(),
   getStructuringElement: vi.fn().mockImplementation(() => new mockCV.Mat()),
   matchTemplate: vi.fn(),
-  minMaxLoc: vi.fn().mockReturnValue({ minVal: 0, maxVal: 0.9, minLoc: { x: 0, y: 0 }, maxLoc: { x: 0, y: 0 } }),
+  minMaxLoc: vi
+    .fn()
+    .mockReturnValue({ minVal: 0, maxVal: 0.9, minLoc: { x: 0, y: 0 }, maxLoc: { x: 0, y: 0 } }),
 
   COLOR_RGBA2GRAY: 6,
   COLOR_GRAY2RGBA: 8,
@@ -130,4 +148,3 @@ export const mockCV = {
 
   delete: vi.fn(),
 };
-

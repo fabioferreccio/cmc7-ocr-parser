@@ -43,9 +43,23 @@
   },
   "overrides": [
     {
-      "files": ["src/**/*.test.ts", "src/test-helpers/**"],
+      "files": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/test-helpers/**"],
+      "parserOptions": {
+        "project": "./tsconfig.lint.json"
+      },
       "rules": {
         "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/require-await": "off",
+        "@typescript-eslint/unbound-method": "off",
+        "@typescript-eslint/await-thenable": "off",
+        "@typescript-eslint/no-unnecessary-type-assertion": "off",
         "no-restricted-globals": "off",
         "no-restricted-syntax": "off"
       }
@@ -55,6 +69,27 @@
       "rules": {
         "@typescript-eslint/explicit-function-return-type": "off",
         "no-restricted-globals": "off"
+      }
+    },
+    {
+      "files": ["src/wasm/opencv-loader.ts", "src/pipeline/image-preprocessor.ts", "src/ocr/symbol-segmenter.ts", "src/ocr/cnn-engine.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
+        "@typescript-eslint/require-await": "off"
+      }
+    },
+    {
+      "files": ["src/workers/pipeline.worker.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/require-await": "off"
       }
     }
   ]

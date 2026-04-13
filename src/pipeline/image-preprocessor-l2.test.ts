@@ -7,7 +7,7 @@ vi.mock('../wasm/opencv-loader.js', async (importOriginal) => {
   const { mockCV } = await import('../test-helpers/mocks.js');
   return {
     ...(await importOriginal<any>()),
-    loadOpenCV: vi.fn().mockResolvedValue(mockCV)
+    loadOpenCV: vi.fn().mockResolvedValue(mockCV),
   };
 });
 
@@ -21,9 +21,9 @@ describe('ImagePreprocessor L2 (OpenCV.js)', () => {
 
   it('deve binarizar a imagem usando adaptiveThreshold', async () => {
     const img = mockImageData();
-    
+
     await processor.binarize(img);
-    
+
     expect(mockCV.adaptiveThreshold).toHaveBeenCalled();
     // Verifica se limpou a memória (cv.Mat.delete)
     // O construtor Mat deve ter sido chamado pelo menos 2 vezes (src e dst)
@@ -34,7 +34,7 @@ describe('ImagePreprocessor L2 (OpenCV.js)', () => {
 
   it('deve realizar deskew (correção de inclinação)', async () => {
     const img = mockImageData();
-    
+
     await processor.deskew(img);
 
     expect(mockCV.getRotationMatrix2D).toHaveBeenCalled();

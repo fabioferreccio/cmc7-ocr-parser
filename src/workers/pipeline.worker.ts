@@ -24,10 +24,10 @@ ctx.onmessage = async (event: MessageEvent<WorkerMessage>) => {
         // Fluxo de processamento real virá nas tasks M3 e M4.
         // Por enquanto, apenas fechamos o bitmap para evitar leaks.
         payload.bitmap.close();
-        
-        ctx.postMessage({ 
-          type: 'quality', 
-          payload: { score: 100, issues: [], shouldProcess: true } 
+
+        ctx.postMessage({
+          type: 'quality',
+          payload: { score: 100, issues: [], shouldProcess: true },
         } as WorkerResponse);
       }
       break;

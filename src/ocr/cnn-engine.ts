@@ -1,8 +1,21 @@
 import type { CMC7InitError } from '../types';
 
 const CMC7_CHARS = [
-  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-  '\u2446', '\u2447', '\u2448', '\u2449', '\u244A'
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '\u2446',
+  '\u2447',
+  '\u2448',
+  '\u2449',
+  '\u244A',
 ];
 
 /**
@@ -19,8 +32,10 @@ const CMC7_CHARS = [
  * Implemented in T-014.
  */
 export class CNNEngine {
-  private session: any | null = null;
-  private ort: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- onnxruntime-web lazy-import has no type for InferenceSession (docs/05-regras.md Rule 7.2: DECISÃO AD-03)
+  private session: unknown = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- onnxruntime-web dynamic import namespace type
+  private ort: unknown;
 
   /**
    * Inicializa a sessão ONNX lazily.
@@ -28,18 +43,21 @@ export class CNNEngine {
    */
   async init(modelUrl: string): Promise<void> {
     if (this.session) return; // already initialized
-    
+
     try {
       // Lazy import to keep bundle small
-      this.ort = await import('onnxruntime-web');
-      this.session = await this.ort.InferenceSession.create(modelUrl, {
-        executionProviders: ['wasm']
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- onnxruntime-web dynamic import
+      this.ort = await import('onnxruntime-web') as any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this.session = await (this.ort as any).InferenceSession.create(modelUrl, {
+        executionProviders: ['wasm'],
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
       throw {
         type: 'INIT_ERROR',
-        message: `Failed to load ONNX model from ${modelUrl}: ${e.message}`,
-        cause: 'model-load-failed'
+        message: `Failed to load ONNX model from ${modelUrl}: ${msg}`,
+        cause: 'model-load-failed',
       } as CMC7InitError;
     }
   }
@@ -52,31 +70,42 @@ export class CNNEngine {
     if (!this.session) {
       throw new Error('CNNEngine not initialized. Call init() first.');
     }
-    
+
     // Normalize input
     const floatData = new Float32Array(charImageBuffer.length);
     for (let i = 0; i < charImageBuffer.length; i++) {
-      floatData[i] = charImageBuffer[i] / 255.0; // scale 0-1
+      floatData[i] = (charImageBuffer[i] ?? 0) / 255.0; // scale 0-1; ?? handles noUncheckedIndexedAccess
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ort/session untyped (lazy import)
+    const ort = this.ort as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const session = this.session as any;
+
     // Tensor shape: [batch=1, channels=1, height=64, width=32]
-    const tensor = new this.ort.Tensor('float32', floatData, [1, 1, 64, 32]);
-    
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const tensor = new ort.Tensor('float32', floatData, [1, 1, 64, 32]);
+
     // Setup inputs dynamically based on session definition
-    const inputName = this.session.inputNames?.[0] || 'input';
-    const outputName = this.session.outputNames?.[0] || 'output';
-    
-    const feeds: Record<string, any> = {};
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const inputName = (session.inputNames?.[0] as string | undefined) ?? 'input';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const outputName = (session.outputNames?.[0] as string | undefined) ?? 'output';
+
+    const feeds: Record<string, unknown> = {};
     feeds[inputName] = tensor;
 
-    const results = await this.session.run(feeds);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+    const results = await session.run(feeds);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
     const outputTensor = results[outputName];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const logits = outputTensor.data as Float32Array;
 
     const result = this.argmax(logits);
     return {
       char: CMC7_CHARS[result.index]!,
-      score: result.score
+      score: result.score,
     };
   }
 
@@ -84,8 +113,10 @@ export class CNNEngine {
     let maxIdx = 0;
     let maxVal = -Infinity;
     for (let i = 0; i < arr.length; i++) {
-      if (arr[i] > maxVal) {
-        maxVal = arr[i];
+      // noUncheckedIndexedAccess: arr[i] is always defined within arr.length bounds
+      const val = arr[i] ?? -Infinity;
+      if (val > maxVal) {
+        maxVal = val;
         maxIdx = i;
       }
     }

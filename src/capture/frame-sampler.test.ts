@@ -20,7 +20,7 @@ describe('FrameSampler', () => {
     sampler.on('frame', frameSpy);
 
     sampler.start();
-    
+
     await vi.advanceTimersByTimeAsync(300);
     expect(frameSpy).toHaveBeenCalledTimes(1);
 

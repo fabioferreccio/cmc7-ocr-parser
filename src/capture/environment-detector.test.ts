@@ -8,11 +8,11 @@ describe('EnvironmentDetector', () => {
   beforeEach(() => {
     vi.stubGlobal('navigator', {
       userAgent: '',
-      mediaDevices: { getUserMedia: vi.fn() }
+      mediaDevices: { getUserMedia: vi.fn() },
     });
     vi.stubGlobal('location', {
       protocol: 'https:',
-      hostname: 'example.com'
+      hostname: 'example.com',
     });
   });
 
@@ -23,8 +23,9 @@ describe('EnvironmentDetector', () => {
 
   it('deve detectar Safari iOS como ambiente compatível', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
-      mediaDevices: { getUserMedia: vi.fn() }
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+      mediaDevices: { getUserMedia: vi.fn() },
     });
     const info = detectEnvironment();
     expect(info.isIOS).toBe(true);
@@ -35,8 +36,9 @@ describe('EnvironmentDetector', () => {
 
   it('deve detectar Chrome iOS como WKWebView (incompatível)', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/117.0.5938.108 Mobile/15E148 Safari/604.1',
-      mediaDevices: { getUserMedia: undefined }
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/117.0.5938.108 Mobile/15E148 Safari/604.1',
+      mediaDevices: { getUserMedia: undefined },
     });
     const info = detectEnvironment();
     expect(info.isIOS).toBe(true);
@@ -49,8 +51,9 @@ describe('EnvironmentDetector', () => {
 
   it('deve detectar Chrome Android como compatível', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36',
-      mediaDevices: { getUserMedia: vi.fn() }
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36',
+      mediaDevices: { getUserMedia: vi.fn() },
     });
     const info = detectEnvironment();
     expect(info.isIOS).toBe(false);
@@ -59,8 +62,9 @@ describe('EnvironmentDetector', () => {
 
   it('deve detectar Safari desktop como compatível', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15',
-      mediaDevices: { getUserMedia: vi.fn() }
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15',
+      mediaDevices: { getUserMedia: vi.fn() },
     });
     const info = detectEnvironment();
     expect(info.isSafari).toBe(true);
@@ -87,8 +91,9 @@ describe('EnvironmentDetector', () => {
 
   it('deve gerar userGuidance em português quando WKWebView detectado', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/117.0 Mobile/15E148 Safari/604.1',
-      mediaDevices: undefined
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/117.0 Mobile/15E148 Safari/604.1',
+      mediaDevices: undefined,
     });
     const info = detectEnvironment();
     expect(info.isWKWebView).toBe(true);

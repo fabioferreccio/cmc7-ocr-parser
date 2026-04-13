@@ -8,15 +8,15 @@
 
 ## Visão Geral dos Milestones
 
-| Milestone | Nome | Entrega Principal | Go/No-Go |
-|-----------|------|------------------|----------|
-| **M1** | PoC de Risco | Validação das incertezas críticas | Segmentação ≥ 85% em 30 imagens |
-| **M2** | Fundação | Infraestrutura, captura, qualidade de frame | Pipeline de captura funcional |
-| **M3** | Image Pipeline | Pré-processamento + detecção ROI CMC-7 | Strip detectado em ≥ 90% das imagens |
-| **M4** | OCR Engine | Reconhecimento dos 15 caracteres CMC-7 | Taxa de acerto ≥ 95% por caractere |
-| **M5** | Validação e Parsing | Parser + DVs + BankRegistry | Parsing correto dos 5 maiores bancos |
-| **M6** | API Pública | `createCMC7Reader()` completo e tipado | Demo funcional câmera → resultado |
-| **M7** | Release | Build, wrappers, docs, npm publish | Package publicado e auditado |
+| Milestone | Nome                | Entrega Principal                           | Go/No-Go                             |
+| --------- | ------------------- | ------------------------------------------- | ------------------------------------ |
+| **M1**    | PoC de Risco        | Validação das incertezas críticas           | Segmentação ≥ 85% em 30 imagens      |
+| **M2**    | Fundação            | Infraestrutura, captura, qualidade de frame | Pipeline de captura funcional        |
+| **M3**    | Image Pipeline      | Pré-processamento + detecção ROI CMC-7      | Strip detectado em ≥ 90% das imagens |
+| **M4**    | OCR Engine          | Reconhecimento dos 15 caracteres CMC-7      | Taxa de acerto ≥ 95% por caractere   |
+| **M5**    | Validação e Parsing | Parser + DVs + BankRegistry                 | Parsing correto dos 5 maiores bancos |
+| **M6**    | API Pública         | `createCMC7Reader()` completo e tipado      | Demo funcional câmera → resultado    |
+| **M7**    | Release             | Build, wrappers, docs, npm publish          | Package publicado e auditado         |
 
 ---
 
@@ -40,16 +40,17 @@
 
 ### T-001 — Audit de Licença da Fonte CMC-7 TTF [DONE]
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-001 |
-| **Camada** | Camada 2 (OCR Engine) — pré-requisito para templates |
-| **PRD** | Risco R6, Premissa P-06, RNF-005 |
-| **Dependências** | Nenhuma |
-| **Complexidade** | S |
-| **Risco** | Se nenhuma fonte com licença redistribuível for encontrada, os templates precisam ser desenhados manualmente ou capturados de scans |
+| Campo            | Valor                                                                                                                               |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-001                                                                                                                               |
+| **Camada**       | Camada 2 (OCR Engine) — pré-requisito para templates                                                                                |
+| **PRD**          | Risco R6, Premissa P-06, RNF-005                                                                                                    |
+| **Dependências** | Nenhuma                                                                                                                             |
+| **Complexidade** | S                                                                                                                                   |
+| **Risco**        | Se nenhuma fonte com licença redistribuível for encontrada, os templates precisam ser desenhados manualmente ou capturados de scans |
 
 **Testes a escrever primeiro:**
+
 ```
 audit/font-license.test.ts
 - deve listar todas as fontes CMC-7 TTF candidatas encontradas
@@ -59,6 +60,7 @@ audit/font-license.test.ts
 ```
 
 **Critério de done:**
+
 - [x] Arquivo `audit/font-audit-report.md` com resultado de cada fonte avaliada
 - [x] Decisão registrada: fonte escolhida OU abordagem alternativa (captura manual de templates)
 - [x] Se nenhuma fonte redistribuível: task T-013 usa imagens escaneadas como templates
@@ -69,16 +71,17 @@ audit/font-license.test.ts
 
 > **Esta é a tarefa mais crítica do projeto.** Valida o Risco R1 do PRD e a Premissa P-01.
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-002 |
-| **Camada** | Camadas 1 + 2 (pipeline + OCR) |
-| **PRD** | Premissa P-01, Risco R1, RF-004, RF-005 |
-| **Dependências** | T-001 (para ter templates disponíveis) |
-| **Complexidade** | XL |
-| **Risco** | Se acurácia < 85%, o projeto precisa mudar para abordagem CRNN (end-to-end), o que impacta o scope e timeline do MVP |
+| Campo            | Valor                                                                                                                |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-002                                                                                                                |
+| **Camada**       | Camadas 1 + 2 (pipeline + OCR)                                                                                       |
+| **PRD**          | Premissa P-01, Risco R1, RF-004, RF-005                                                                              |
+| **Dependências** | T-001 (para ter templates disponíveis)                                                                               |
+| **Complexidade** | XL                                                                                                                   |
+| **Risco**        | Se acurácia < 85%, o projeto precisa mudar para abordagem CRNN (end-to-end), o que impacta o scope e timeline do MVP |
 
 **Testes a escrever primeiro:**
+
 ```
 poc/segmentation-benchmark.test.ts
 - deve detectar a faixa CMC-7 em ≥ 85% de 30 imagens de câmera reais
@@ -89,6 +92,7 @@ poc/segmentation-benchmark.test.ts
 ```
 
 **Critério de done:**
+
 - [x] Script `poc/run-segmentation-benchmark.ts` executável com dataset de 30+ imagens
 - [x] Taxa de detecção de faixa ≥ 85% — go para M3
 - [x] Taxa de detecção de faixa < 75% — registrar no `docs/03-arquitetura.md` a mudança para CRNN
@@ -98,18 +102,19 @@ poc/segmentation-benchmark.test.ts
 
 ### T-003 — Benchmark Build Customizada OpenCV.js [DONE]
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-003 |
-| **Camada** | Camada 1 (Image Pipeline) |
-| **PRD** | Premissa P-02, P-04, RNF-003, Risco R4, Risco R5 |
-| **Dependências** | Nenhuma (paralelo a T-001/T-002) |
-| **Complexidade** | M |
-| **Risco** | Build customizada pode não suportar `findContours` ou `HoughLines` se módulos forem excluídos agressivamente |
+| Campo            | Valor                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------ |
+| **ID**           | T-003                                                                                                        |
+| **Camada**       | Camada 1 (Image Pipeline)                                                                                    |
+| **PRD**          | Premissa P-02, P-04, RNF-003, Risco R4, Risco R5                                                             |
+| **Dependências** | Nenhuma (paralelo a T-001/T-002)                                                                             |
+| **Complexidade** | M                                                                                                            |
+| **Risco**        | Build customizada pode não suportar `findContours` ou `HoughLines` se módulos forem excluídos agressivamente |
 
 **Nota de Implementação:** Build TechStark v4.9.0 homologada. Atende RNF-003 (3.45 MB total JS+WASM) e RP-02 (single-thread). Integrada via wrapper ESM em `src/wasm/opencv-loader.ts` para garantir escalabilidade e desacoplamento (permitindo futura troca por Rust/WASM se necessário).
 
 **Testes a escrever primeiro:**
+
 ```
 poc/opencv-build.test.ts
 - deve confirmar que build tem tamanho ≤ 4 MB (WASM + JS) [PASSED: 3.45MB]
@@ -118,11 +123,11 @@ poc/opencv-build.test.ts
 ```
 
 **Critério de done:**
+
 - [x] Build homologada e medida: 3.45 MB total
 - [x] Todas as operações necessárias presentes no binário
 - [x] Wrapper ESM/TypeScript (`opencv-loader.ts`) implementado
 - [x] Confirmação sobre não obrigatoriedade de headers CORP/COOP
-
 
 ---
 
@@ -136,16 +141,17 @@ poc/opencv-build.test.ts
 
 ### T-004 — Setup do Projeto
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-004 |
-| **Camada** | Transversal |
-| **PRD** | RNF-006, R-05 (ESM + CJS) |
-| **Dependências** | M1 concluído |
-| **Complexidade** | M |
-| **Risco** | Configuração de tsup com Workers e WASM pode exigir plugins customizados |
+| Campo            | Valor                                                                    |
+| ---------------- | ------------------------------------------------------------------------ |
+| **ID**           | T-004                                                                    |
+| **Camada**       | Transversal                                                              |
+| **PRD**          | RNF-006, R-05 (ESM + CJS)                                                |
+| **Dependências** | M1 concluído                                                             |
+| **Complexidade** | M                                                                        |
+| **Risco**        | Configuração de tsup com Workers e WASM pode exigir plugins customizados |
 
 **Testes a escrever primeiro:**
+
 ```
 build/build-output.test.ts
 - deve gerar dist/esm/index.js com exports ESM corretos
@@ -156,6 +162,7 @@ build/build-output.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `package.json` com `exports`, `types`, `engines` configurados
 - [x] `tsconfig.json` com `strict: true`
 - [x] `tsup.config.ts` gerando ESM + CJS + `.d.ts`
@@ -166,16 +173,17 @@ build/build-output.test.ts
 
 ### T-005 — EnvironmentDetector
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-005 |
-| **Camada** | Camada 1 (CameraCapture) |
-| **PRD** | RF-002 (detecção WKWebView), RNF-002 |
-| **Dependências** | T-004 |
-| **Complexidade** | S |
-| **Risco** | User-agent spoofing pode causar falsos positivos na detecção de WKWebView |
+| Campo            | Valor                                                                     |
+| ---------------- | ------------------------------------------------------------------------- |
+| **ID**           | T-005                                                                     |
+| **Camada**       | Camada 1 (CameraCapture)                                                  |
+| **PRD**          | RF-002 (detecção WKWebView), RNF-002                                      |
+| **Dependências** | T-004                                                                     |
+| **Complexidade** | S                                                                         |
+| **Risco**        | User-agent spoofing pode causar falsos positivos na detecção de WKWebView |
 
 **Testes a escrever primeiro:**
+
 ```
 src/capture/environment-detector.test.ts
 - deve detectar Safari iOS como ambiente compatível (getUserMedia disponível)
@@ -189,6 +197,7 @@ src/capture/environment-detector.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/capture/environment-detector.ts` implementado
 - [x] Todos os 8 testes passando com mocks de `navigator.userAgent`
 - [x] Cobertura de linha ≥ 95% no módulo
@@ -197,16 +206,17 @@ src/capture/environment-detector.test.ts
 
 ### T-006 — CameraCapture e FrameSampler [DONE]
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-006 |
-| **Camada** | Camada 1 |
-| **PRD** | RF-002, RF-009 |
-| **Dependências** | T-005 |
-| **Complexidade** | M |
-| **Risco** | Testes de `getUserMedia` requerem mocks de MediaStream; vazamento de recursos de câmera é difícil de detectar em teste |
+| Campo            | Valor                                                                                                                  |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-006                                                                                                                  |
+| **Camada**       | Camada 1                                                                                                               |
+| **PRD**          | RF-002, RF-009                                                                                                         |
+| **Dependências** | T-005                                                                                                                  |
+| **Complexidade** | M                                                                                                                      |
+| **Risco**        | Testes de `getUserMedia` requerem mocks de MediaStream; vazamento de recursos de câmera é difícil de detectar em teste |
 
 **Testes a escrever primeiro:**
+
 ```
 src/capture/camera-capture.test.ts
 - deve chamar getUserMedia com facingMode: 'environment' por padrão
@@ -224,6 +234,7 @@ src/capture/frame-sampler.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/capture/camera-capture.ts` e `frame-sampler.ts` implementados
 - [x] Todos os testes passando com mocks de `MediaStream` e `HTMLVideoElement`
 - [x] `stop()` confirma `track.stop()` chamado em todos os tracks
@@ -232,16 +243,17 @@ src/capture/frame-sampler.test.ts
 
 ### T-007 — Web Worker Infrastructure
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-007 |
-| **Camada** | Camada 1 (transversal) |
-| **PRD** | RF-002 ("processamento não bloqueia main thread") |
-| **Dependências** | T-006 |
-| **Complexidade** | M |
-| **Risco** | Serialização de mensagens Worker pode introduzir latência inesperada; transferência de `ImageBitmap` pode falhar em browsers antigos |
+| Campo            | Valor                                                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **ID**           | T-007                                                                                                                                |
+| **Camada**       | Camada 1 (transversal)                                                                                                               |
+| **PRD**          | RF-002 ("processamento não bloqueia main thread")                                                                                    |
+| **Dependências** | T-006                                                                                                                                |
+| **Complexidade** | M                                                                                                                                    |
+| **Risco**        | Serialização de mensagens Worker pode introduzir latência inesperada; transferência de `ImageBitmap` pode falhar em browsers antigos |
 
 **Testes a escrever primeiro:**
+
 ```
 src/workers/pipeline-worker.test.ts
 - deve receber ImageBitmap via postMessage e não travar a main thread
@@ -252,6 +264,7 @@ src/workers/pipeline-worker.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/workers/pipeline.worker.ts` implementado (shell que aceita mensagens)
 - [x] Protocol de mensagens tipado (`WorkerMessage`, `WorkerResponse`)
 - [x] Testes passando com `jsdom` + mock de `Worker`
@@ -268,16 +281,17 @@ src/workers/pipeline-worker.test.ts
 
 ### T-008 — FrameQualityAssessor (Nível 1 — Canvas puro)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-008 |
-| **Camada** | Camada 2 (pré-OCR) |
-| **PRD** | RF-008, RNF-001 |
-| **Dependências** | T-007 |
-| **Complexidade** | M |
-| **Risco** | Cálculo de variância do Laplaciano em JS puro pode ser lento em frames grandes; thresholds precisam ser calibrados com imagens reais |
+| Campo            | Valor                                                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **ID**           | T-008                                                                                                                                |
+| **Camada**       | Camada 2 (pré-OCR)                                                                                                                   |
+| **PRD**          | RF-008, RNF-001                                                                                                                      |
+| **Dependências** | T-007                                                                                                                                |
+| **Complexidade** | M                                                                                                                                    |
+| **Risco**        | Cálculo de variância do Laplaciano em JS puro pode ser lento em frames grandes; thresholds precisam ser calibrados com imagens reais |
 
 **Testes a escrever primeiro:**
+
 ```
 src/ocr/quality/assessor.test.ts
 - deve retornar score 0 e issue 'blur' para imagem desfocada (variância < 80)
@@ -291,6 +305,7 @@ src/ocr/quality/assessor.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/ocr/quality/assessor.ts` implementado com Canvas API puro
 - [x] Todos os testes passando com imagens sintéticas de teste
 - [x] Benchmark de performance documentado (amostragem sub-15ms)
@@ -299,16 +314,17 @@ src/ocr/quality/assessor.test.ts
 
 ### T-009 — ImagePreprocessor L1 (Canvas API)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-009 |
-| **Camada** | Camada 1 (Image Pipeline) |
-| **PRD** | RF-004 |
-| **Dependências** | T-008 |
-| **Complexidade** | M |
-| **Risco** | Conversão de grayscale com pesos ITU-R 601 pode dar resultados diferentes de OpenCV — importante manter consistência |
+| Campo            | Valor                                                                                                                |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-009                                                                                                                |
+| **Camada**       | Camada 1 (Image Pipeline)                                                                                            |
+| **PRD**          | RF-004                                                                                                               |
+| **Dependências** | T-008                                                                                                                |
+| **Complexidade** | M                                                                                                                    |
+| **Risco**        | Conversão de grayscale com pesos ITU-R 601 pode dar resultados diferentes de OpenCV — importante manter consistência |
 
 **Testes a escrever primeiro:**
+
 ```
 src/pipeline/image-preprocessor-l1.test.ts
 - deve converter imagem colorida para grayscale com pesos corretos (R*0.299, G*0.587, B*0.114)
@@ -320,6 +336,7 @@ src/pipeline/image-preprocessor-l1.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/pipeline/image-preprocessor.ts` com métodos L1 implementados
 - [x] Todos os testes passando
 - [x] Output visual verificado via unit tests de dimensões
@@ -328,16 +345,17 @@ src/pipeline/image-preprocessor-l1.test.ts
 
 ### T-010 — ImagePreprocessor L2 (OpenCV.js)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-010 |
-| **Camada** | Camada 1 (Image Pipeline) |
-| **PRD** | RF-004 |
-| **Dependências** | T-009, T-003 (build OpenCV confirmada) |
-| **Complexidade** | L |
-| **Risco** | Carregamento do WASM em ambiente de teste (Node.js/Vitest) requer mock ou uso do build real; parâmetros de `adaptiveThreshold` precisam ser calibrados |
+| Campo            | Valor                                                                                                                                                  |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **ID**           | T-010                                                                                                                                                  |
+| **Camada**       | Camada 1 (Image Pipeline)                                                                                                                              |
+| **PRD**          | RF-004                                                                                                                                                 |
+| **Dependências** | T-009, T-003 (build OpenCV confirmada)                                                                                                                 |
+| **Complexidade** | L                                                                                                                                                      |
+| **Risco**        | Carregamento do WASM em ambiente de teste (Node.js/Vitest) requer mock ou uso do build real; parâmetros de `adaptiveThreshold` precisam ser calibrados |
 
 **Testes a escrever primeiro:**
+
 ```
 src/pipeline/image-preprocessor-l2.test.ts
 - deve aplicar GaussianBlur reduzindo ruído (comparar histograma antes/depois)
@@ -350,6 +368,7 @@ src/pipeline/image-preprocessor-l2.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/pipeline/image-preprocessor.ts` com métodos L2 implementados
 - [x] Testes passando com mock de OpenCV.js em Vitest
 - [x] Testes de integração com OpenCV real em ambiente de CI (via benchmark M1)
@@ -358,16 +377,17 @@ src/pipeline/image-preprocessor-l2.test.ts
 
 ### T-011 — ROIDetector (Detecção da Faixa CMC-7)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-011 |
-| **Camada** | Camada 1 (Image Pipeline) |
-| **PRD** | RF-004 (detecção da ROI) |
-| **Dependências** | T-010 |
-| **Complexidade** | L |
-| **Risco** | A projeção horizontal pode confundir assinatura ou carimbo do cheque com a faixa CMC-7; cheques com fundo colorido podem dificultar a detecção |
+| Campo            | Valor                                                                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-011                                                                                                                                          |
+| **Camada**       | Camada 1 (Image Pipeline)                                                                                                                      |
+| **PRD**          | RF-004 (detecção da ROI)                                                                                                                       |
+| **Dependências** | T-010                                                                                                                                          |
+| **Complexidade** | L                                                                                                                                              |
+| **Risco**        | A projeção horizontal pode confundir assinatura ou carimbo do cheque com a faixa CMC-7; cheques com fundo colorido podem dificultar a detecção |
 
 **Testes a escrever primeiro:**
+
 ```
 src/pipeline/roi-detector.test.ts
 - deve detectar faixa CMC-7 em imagem de cheque real binarizada
@@ -379,6 +399,7 @@ src/pipeline/roi-detector.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/pipeline/roi-detector.ts` implementado
 - [x] Taxa de detecção ≥ 90% no dataset de benchmark (validado contra T-002)
 - [x] Todos os testes unitários passando
@@ -395,16 +416,17 @@ src/pipeline/roi-detector.test.ts
 
 ### T-012 — Templates CMC-7 (Geração em Build Time) [DONE]
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-012 |
-| **Camada** | Camada 2 (OCR Engine) |
-| **PRD** | RF-005, RNF-003 (templates ≤ 30 KB) |
-| **Dependências** | T-001 (licença da fonte confirmada) |
-| **Complexidade** | M |
-| **Risco** | Se fonte não redistribuível, templates gerados de scans podem ter variações que afetam matching; script Python de geração precisa ser reproduzível |
+| Campo            | Valor                                                                                                                                              |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-012                                                                                                                                              |
+| **Camada**       | Camada 2 (OCR Engine)                                                                                                                              |
+| **PRD**          | RF-005, RNF-003 (templates ≤ 30 KB)                                                                                                                |
+| **Dependências** | T-001 (licença da fonte confirmada)                                                                                                                |
+| **Complexidade** | M                                                                                                                                                  |
+| **Risco**        | Se fonte não redistribuível, templates gerados de scans podem ter variações que afetam matching; script Python de geração precisa ser reproduzível |
 
 **Testes a escrever primeiro:**
+
 ```
 src/ocr/templates/templates.test.ts
 - deve ter exatamente 15 templates (10 dígitos + 5 símbolos)
@@ -416,6 +438,7 @@ src/ocr/templates/templates.test.ts
 ```
 
 **Critério de done:**
+
 - [x] Script `tools/generate-templates.py` gerando 15 templates em 32×64
 - [x] `src/ocr/templates/index.ts` gerado automaticamente em build time
 - [x] Todos os testes passando
@@ -425,16 +448,17 @@ src/ocr/templates/templates.test.ts
 
 ### T-013 — TemplateMatchingEngine
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-013 |
-| **Camada** | Camada 2 (OCR Engine) |
-| **PRD** | RF-005 |
-| **Dependências** | T-011 (ROI como input), T-012 (templates disponíveis) |
-| **Complexidade** | XL |
-| **Risco** | Segmentação de caracteres é o gargalo principal (Risco R1 do PRD); `findContours` pode fragmentar ou mesclar caracteres adjacentes |
+| Campo            | Valor                                                                                                                              |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-013                                                                                                                              |
+| **Camada**       | Camada 2 (OCR Engine)                                                                                                              |
+| **PRD**          | RF-005                                                                                                                             |
+| **Dependências** | T-011 (ROI como input), T-012 (templates disponíveis)                                                                              |
+| **Complexidade** | XL                                                                                                                                 |
+| **Risco**        | Segmentação de caracteres é o gargalo principal (Risco R1 do PRD); `findContours` pode fragmentar ou mesclar caracteres adjacentes |
 
 **Testes a escrever primeiro:**
+
 ```
 src/ocr/template-engine.test.ts
 
@@ -459,6 +483,7 @@ src/ocr/template-engine.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/ocr/template-engine.ts` implementado
 - [x] Taxa de acerto ≥ 95% no dataset de câmera real (benchmark T-002 aplicado ao engine)
 - [x] Se < 85%: acionar plano B (CNN engine prioritizado)
@@ -467,16 +492,17 @@ src/ocr/template-engine.test.ts
 
 ### T-014 — CNNEngine via onnxruntime-web [DONE]
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-014 |
-| **Camada** | Camada 2 (OCR Engine) |
-| **PRD** | RF-005 (modo alternativo `recognitionMode: 'cnn'`) |
-| **Dependências** | T-011, T-013, T-001 |
-| **Complexidade** | XL |
-| **Risco** | Pipeline de treinamento em Python é trabalho fora do repositório principal; performance onnxruntime-web em mobile precisa validar Premissa P-07 |
+| Campo            | Valor                                                                                                                                           |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-014                                                                                                                                           |
+| **Camada**       | Camada 2 (OCR Engine)                                                                                                                           |
+| **PRD**          | RF-005 (modo alternativo `recognitionMode: 'cnn'`)                                                                                              |
+| **Dependências** | T-011, T-013, T-001                                                                                                                             |
+| **Complexidade** | XL                                                                                                                                              |
+| **Risco**        | Pipeline de treinamento em Python é trabalho fora do repositório principal; performance onnxruntime-web em mobile precisa validar Premissa P-07 |
 
 **Testes a escrever primeiro:**
+
 ```
 src/ocr/cnn-engine.test.ts
 - deve carregar modelo ONNX lazily (não no import)
@@ -493,6 +519,7 @@ tools/train/
 ```
 
 **Critério de done:**
+
 - [x] Modelo `dist/models/cmc7-cnn.onnx` treinado e exportado (≤ 2 MB)
 - [x] `src/ocr/cnn-engine.ts` implementado
 - [x] Taxa de acerto ≥ 98% em dataset de câmera
@@ -510,16 +537,17 @@ tools/train/
 
 ### T-015 — DVValidator (Módulo 10 e Módulo 11)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-015 |
-| **Camada** | Camada 3 (Validação) |
-| **PRD** | RF-007 |
-| **Dependências** | T-004 (projeto configurado) |
-| **Complexidade** | S |
-| **Risco** | Variações do Módulo 11 ('X' vs 0 vs 1 para resto 1) precisam ser mapeadas por banco |
+| Campo            | Valor                                                                               |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| **ID**           | T-015                                                                               |
+| **Camada**       | Camada 3 (Validação)                                                                |
+| **PRD**          | RF-007                                                                              |
+| **Dependências** | T-004 (projeto configurado)                                                         |
+| **Complexidade** | S                                                                                   |
+| **Risco**        | Variações do Módulo 11 ('X' vs 0 vs 1 para resto 1) precisam ser mapeadas por banco |
 
 **Testes a escrever primeiro:**
+
 ```
 src/validation/dv-validator.test.ts
 - mod10('12345') deve retornar dígito verificador correto (valor conhecido)
@@ -533,6 +561,7 @@ src/validation/dv-validator.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/validation/dv-validator.ts` implementado
 - [x] Todos os testes passando com valores conhecidos de dvs reais
 - [x] Cobertura de linha ≥ 100% (lógica determinística)
@@ -541,16 +570,17 @@ src/validation/dv-validator.test.ts
 
 ### T-016 — BankRegistry (5 maiores bancos)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-016 |
-| **Camada** | Camada 3 (Validação) |
-| **PRD** | RF-007 (cobertura ≥ 80% do volume), Risco R3 |
-| **Dependências** | T-015 |
-| **Complexidade** | M |
-| **Risco** | Specs FEBRABAN por banco podem ser incompletas ou divergentes de documentação pública — Premissa P-05 |
+| Campo            | Valor                                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------------------------- |
+| **ID**           | T-016                                                                                                 |
+| **Camada**       | Camada 3 (Validação)                                                                                  |
+| **PRD**          | RF-007 (cobertura ≥ 80% do volume), Risco R3                                                          |
+| **Dependências** | T-015                                                                                                 |
+| **Complexidade** | M                                                                                                     |
+| **Risco**        | Specs FEBRABAN por banco podem ser incompletas ou divergentes de documentação pública — Premissa P-05 |
 
 **Testes a escrever primeiro:**
+
 ```
 src/validation/bank-registry.test.ts
 - deve retornar spec para código '001' (Banco do Brasil)
@@ -565,6 +595,7 @@ src/validation/bank-registry.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/validation/bank-registry.ts` com os 5 maiores bancos
 - [x] Specs validadas contra cheques reais de cada banco
 - [x] `registerBank()` funcional e documentado
@@ -574,16 +605,17 @@ src/validation/bank-registry.test.ts
 
 ### T-017 — CMC7Parser
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-017 |
-| **Camada** | Camada 3 (Parsing) |
-| **PRD** | RF-006 |
-| **Dependências** | T-015, T-016 |
-| **Complexidade** | L |
-| **Risco** | A estrutura dos blocos varia por banco; parser deve degradar gracefully para bancos desconhecidos |
+| Campo            | Valor                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------- |
+| **ID**           | T-017                                                                                             |
+| **Camada**       | Camada 3 (Parsing)                                                                                |
+| **PRD**          | RF-006                                                                                            |
+| **Dependências** | T-015, T-016                                                                                      |
+| **Complexidade** | L                                                                                                 |
+| **Risco**        | A estrutura dos blocos varia por banco; parser deve degradar gracefully para bancos desconhecidos |
 
 **Testes a escrever primeiro:**
+
 ```
 src/parser/cmc7-parser.test.ts
 - deve identificar os 5 símbolos delimitadores e suas posições
@@ -598,6 +630,7 @@ src/parser/cmc7-parser.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/parser/cmc7-parser.ts` implementado
 - [x] Testado com strings CMC-7 reais dos 5 bancos
 - [x] Todos os testes passando
@@ -606,16 +639,17 @@ src/parser/cmc7-parser.test.ts
 
 ### T-018 — FieldExtractor e Integração de Camada 3
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-018 |
-| **Camada** | Camada 3 (integração) |
-| **PRD** | RF-006, RF-007 |
-| **Dependências** | T-015, T-016, T-017 |
-| **Complexidade** | M |
-| **Risco** | Integração de múltiplos módulos pode expor edge cases não cobertos pelos testes individuais |
+| Campo            | Valor                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------- |
+| **ID**           | T-018                                                                                       |
+| **Camada**       | Camada 3 (integração)                                                                       |
+| **PRD**          | RF-006, RF-007                                                                              |
+| **Dependências** | T-015, T-016, T-017                                                                         |
+| **Complexidade** | M                                                                                           |
+| **Risco**        | Integração de múltiplos módulos pode expor edge cases não cobertos pelos testes individuais |
 
 **Testes a escrever primeiro:**
+
 ```
 src/parser/field-extractor.test.ts
 - deve compor CMC7Fields completo a partir de ParseResult válido
@@ -632,6 +666,7 @@ integration/layer3.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/parser/field-extractor.ts` implementado
 - [x] Testes de integração de Camada 3 passando com strings reais
 
@@ -647,16 +682,17 @@ integration/layer3.test.ts
 
 ### T-019 — Sistema de Eventos e CMC7Reader (shell)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-019 |
-| **Camada** | Camada 4 (API Pública) |
-| **PRD** | RF-001, RF-009 |
-| **Dependências** | T-007 |
-| **Complexidade** | M |
-| **Risco** | Memory leaks em listeners de eventos devem ser detectados nos testes |
+| Campo            | Valor                                                                |
+| ---------------- | -------------------------------------------------------------------- |
+| **ID**           | T-019                                                                |
+| **Camada**       | Camada 4 (API Pública)                                               |
+| **PRD**          | RF-001, RF-009                                                       |
+| **Dependências** | T-007                                                                |
+| **Complexidade** | M                                                                    |
+| **Risco**        | Memory leaks em listeners de eventos devem ser detectados nos testes |
 
 **Testes a escrever primeiro:**
+
 ```
 src/reader.test.ts
 - createCMC7Reader() deve retornar Promise<CMC7Reader>
@@ -670,6 +706,7 @@ src/reader.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/reader.ts` + `src/index.ts` implementados (shell com eventos)
 - [x] Todos os testes passando
 
@@ -677,16 +714,17 @@ src/reader.test.ts
 
 ### T-020 — readImage (Modo Imagem Estática)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-020 |
-| **Camada** | Camada 4 (API Pública) |
-| **PRD** | RF-003 |
-| **Dependências** | T-018, T-019 |
-| **Complexidade** | M |
-| **Risco** | Aceitar múltiplos tipos de input (File, Blob, string URL, HTMLImageElement) aumenta a superfície de edge cases |
+| Campo            | Valor                                                                                                          |
+| ---------------- | -------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-020                                                                                                          |
+| **Camada**       | Camada 4 (API Pública)                                                                                         |
+| **PRD**          | RF-003                                                                                                         |
+| **Dependências** | T-018, T-019                                                                                                   |
+| **Complexidade** | M                                                                                                              |
+| **Risco**        | Aceitar múltiplos tipos de input (File, Blob, string URL, HTMLImageElement) aumenta a superfície de edge cases |
 
 **Testes a escrever primeiro:**
+
 ```
 src/reader-read-image.test.ts
 - deve aceitar File JPEG e retornar Promise<CMC7Result>
@@ -700,6 +738,7 @@ src/reader-read-image.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `reader.readImage()` implementado e testado
 - [x] Testado manualmente com 5 fotos de cheques reais (via integração L3)
 
@@ -707,16 +746,17 @@ src/reader-read-image.test.ts
 
 ### T-021 — Modo Stream (start/stop)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-021 |
-| **Camada** | Camada 4 (API Pública) |
-| **PRD** | RF-002, RF-009 |
-| **Dependências** | T-019, T-020, T-006 |
-| **Complexidade** | L |
-| **Risco** | Vazamento de recursos de câmera após stop() é crítico; sequência start → stop → start pode ter race conditions |
+| Campo            | Valor                                                                                                          |
+| ---------------- | -------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-021                                                                                                          |
+| **Camada**       | Camada 4 (API Pública)                                                                                         |
+| **PRD**          | RF-002, RF-009                                                                                                 |
+| **Dependências** | T-019, T-020, T-006                                                                                            |
+| **Complexidade** | L                                                                                                              |
+| **Risco**        | Vazamento de recursos de câmera após stop() é crítico; sequência start → stop → start pode ter race conditions |
 
 **Testes a escrever primeiro:**
+
 ```
 src/reader-stream.test.ts
 - deve iniciar câmera e emitir primeiro 'result' em < 5s
@@ -730,6 +770,7 @@ src/reader-stream.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `reader.start()` e `reader.stop()` implementados
 - [x] Testado via mock de vídeo em ambiente de teste
 - [x] Gerenciamento de ciclo de vida (start/stop) validado
@@ -738,16 +779,17 @@ src/reader-stream.test.ts
 
 ### T-022 — Integração End-to-End (Demo)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-022 |
-| **Camada** | Transversal |
-| **PRD** | RF-001 a RF-009 |
-| **Dependências** | T-021 |
-| **Complexidade** | M |
-| **Risco** | Performance mobile pode ser pior que os targets individuais estimados |
+| Campo            | Valor                                                                 |
+| ---------------- | --------------------------------------------------------------------- |
+| **ID**           | T-022                                                                 |
+| **Camada**       | Transversal                                                           |
+| **PRD**          | RF-001 a RF-009                                                       |
+| **Dependências** | T-021                                                                 |
+| **Complexidade** | M                                                                     |
+| **Risco**        | Performance mobile pode ser pior que os targets individuais estimados |
 
 **Testes a escrever primeiro:**
+
 ```
 e2e/camera-to-result.test.ts (Playwright)
 - deve inicializar reader em < 3s (conexão 10 Mbps simulada)
@@ -762,6 +804,7 @@ performance/benchmark.test.ts
 ```
 
 **Critério de done:**
+
 - [x] Demo HTML funcional em `demo/`
 - [x] `startCamera()` integrado e funcional
 - [x] Pipeline ponta a ponta validado
@@ -777,16 +820,17 @@ performance/benchmark.test.ts
 
 ### T-023 — Testes E2E com Playwright
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-023 |
-| **Camada** | Transversal |
-| **PRD** | RF-001 a RF-009, RNF-002 |
-| **Dependências** | T-022 |
-| **Complexidade** | M |
-| **Risco** | Flakiness em testes de vídeo/câmera simulada; timeouts em ambiente de CI |
+| Campo            | Valor                                                                    |
+| ---------------- | ------------------------------------------------------------------------ |
+| **ID**           | T-023                                                                    |
+| **Camada**       | Transversal                                                              |
+| **PRD**          | RF-001 a RF-009, RNF-002                                                 |
+| **Dependências** | T-022                                                                    |
+| **Complexidade** | M                                                                        |
+| **Risco**        | Flakiness em testes de vídeo/câmera simulada; timeouts em ambiente de CI |
 
 **Testes a escrever primeiro:**
+
 ```
 e2e/camera-to-result.test.ts (Playwright)
 - deve inicializar reader em < 3s (conexão 10 Mbps simulada)
@@ -798,25 +842,26 @@ e2e/camera-to-result.test.ts (Playwright)
 ```
 
 **Critério de done:**
+
 - [x] Suite de testes Playwright passando em Chromium e WebKit (Chromium 100%, Webkit mock notes)
 - [x] Configuração de câmera simulada funcional
 - [x] Report de testes gerado no CI
-
 
 ---
 
 ### T-024 — Build e Bundle Otimização
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-024 |
-| **Camada** | Camada 5 (Integração/Build) |
-| **PRD** | RNF-003, R-05 |
-| **Dependências** | T-023 |
-| **Complexidade** | M |
-| **Risco** | tsup pode não lidar bem com WASM binary como asset estático |
+| Campo            | Valor                                                       |
+| ---------------- | ----------------------------------------------------------- |
+| **ID**           | T-024                                                       |
+| **Camada**       | Camada 5 (Integração/Build)                                 |
+| **PRD**          | RNF-003, R-05                                               |
+| **Dependências** | T-023                                                       |
+| **Complexidade** | M                                                           |
+| **Risco**        | tsup pode não lidar bem com WASM binary como asset estático |
 
 **Testes a escrever primeiro:**
+
 ```
 build/bundle-size.test.ts
 - dist/esm/index.js deve ter < 50 KB gzip
@@ -829,6 +874,7 @@ build/bundle-size.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `tsup.config.ts` final configurado
 - [x] Todos os checks de bundle passando
 - [x] `package.json` com `exports`, `sideEffects: false`, `files`
@@ -837,16 +883,17 @@ build/bundle-size.test.ts
 
 ### T-025 — React Hook e Vue Composable [DONE]
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-025 |
-| **Camada** | Camada 5 (Integração) |
-| **PRD** | RNF-006 (exemplos em React e Vue) |
-| **Dependências** | T-023 |
-| **Complexidade** | M |
-| **Risco** | StrictMode do React (double-mount) pode causar start() duplo e conflito de câmera |
+| Campo            | Valor                                                                             |
+| ---------------- | --------------------------------------------------------------------------------- |
+| **ID**           | T-025                                                                             |
+| **Camada**       | Camada 5 (Integração)                                                             |
+| **PRD**          | RNF-006 (exemplos em React e Vue)                                                 |
+| **Dependências** | T-023                                                                             |
+| **Complexidade** | M                                                                                 |
+| **Risco**        | StrictMode do React (double-mount) pode causar start() duplo e conflito de câmera |
 
 **Testes a escrever primeiro:**
+
 ```
 src/react.test.tsx
 - useCMC7Reader deve chamar createCMC7Reader na montagem [PASSED]
@@ -861,6 +908,7 @@ src/vue.test.ts
 ```
 
 **Critério de done:**
+
 - [x] `src/react.ts` e `src/vue.ts` implementados
 - [ ] Exemplos em `examples/react/` e `examples/vue/` funcionais (pendente T-026)
 - [x] Todos os testes passando
@@ -869,16 +917,17 @@ src/vue.test.ts
 
 ### T-026 — Documentação e Release [DONE]
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-026 |
-| **Camada** | Transversal |
-| **PRD** | RNF-005 (licença), RNF-006 (docs) |
-| **Dependências** | T-024, T-025 |
-| **Complexidade** | M |
-| **Risco** | SBOM incompleto pode bloquear adoção em ambientes corporativos com compliance rigoroso |
+| Campo            | Valor                                                                                  |
+| ---------------- | -------------------------------------------------------------------------------------- |
+| **ID**           | T-026                                                                                  |
+| **Camada**       | Transversal                                                                            |
+| **PRD**          | RNF-005 (licença), RNF-006 (docs)                                                      |
+| **Dependências** | T-024, T-025                                                                           |
+| **Complexidade** | M                                                                                      |
+| **Risco**        | SBOM incompleto pode bloquear adoção em ambientes corporativos com compliance rigoroso |
 
 **Testes a escrever primeiro:**
+
 ```
 docs/readme.test.ts (lint/verificação)
 - README.md deve conter seções: Installation, Quick Start, API Reference, Browser Support
@@ -893,6 +942,7 @@ audit/license-compliance.test.ts
 ```
 
 **Critério de done:**
+
 - [x] README.md completo (Installation, Quick Start, API Reference, Browser Support, Privacy, exemplos React/Vue/vanilla)
 - [x] SBOM: dependências documentadas em README.md e CHANGELOG.md (SBOM formal via cyclonedx: Milestone 8)
 - [x] `npm publish --dry-run` sem erros (v1.0.0)
@@ -903,7 +953,7 @@ audit/license-compliance.test.ts
 
 ## Milestone 8 — Auditoria de Dependências e Manutenção Segura
 
-> **Objetivo:** Estabelecer um processo contínuo e seguro para mitigar vulnerabilidades e atualizar pacotes legados (especificamente `jimp` e dependências atreladas a `vitest`) sem introduzir *breaking changes* silenciosas no projeto ou falhas para o consumidor final.  
+> **Objetivo:** Estabelecer um processo contínuo e seguro para mitigar vulnerabilidades e atualizar pacotes legados (especificamente `jimp` e dependências atreladas a `vitest`) sem introduzir _breaking changes_ silenciosas no projeto ou falhas para o consumidor final.  
 > **Demonstração ao final:** Relatório de auditoria limpo (`npm audit` identificando 0 vulnerabilidades moderadas/altas), build gerando pacotes otimizados sem inchaço, e suite total de testes aprovada.  
 > **Critério go/no-go:** Nenhuma degradação na taxa de reconhecimento (OCR) e compatibilidade total em execução de WebWorker/Canvas mantida.
 
@@ -911,22 +961,25 @@ audit/license-compliance.test.ts
 
 ### T-027 — Preparação e Criação de Ponto de Reversão
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-027 |
-| **Camada** | Transversal |
-| **Complexidade** | S |
-| **Risco** | Modificações aplicadas sem estado contínuo de estabilidade inicial podem mascarar quais *updates* causaram quebras. |
+| Campo            | Valor                                                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-027                                                                                                               |
+| **Camada**       | Transversal                                                                                                         |
+| **Complexidade** | S                                                                                                                   |
+| **Risco**        | Modificações aplicadas sem estado contínuo de estabilidade inicial podem mascarar quais _updates_ causaram quebras. |
 
 **Testes a executar primeiro:**
+
 ```bash
 npm run build && npm run test && npm run test:e2e
 ```
-*(Somente avançar se 100% da suite passar)*
+
+_(Somente avançar se 100% da suite passar)_
 
 **Critério de done:**
+
 - [ ] Confirmação documentada de estabilidade da suite atual.
-- [ ] Criação e mudança para *branch* específica da auditoria (ex: `security/dependency-updates`).
+- [ ] Criação e mudança para _branch_ específica da auditoria (ex: `security/dependency-updates`).
 - [ ] Backup local gerado: `package.json.bak` e `package-lock.json.bak` criado.
 - [ ] Auditoria estática original salva: `npm audit --json > audit-M8-before.json`.
 
@@ -934,20 +987,22 @@ npm run build && npm run test && npm run test:e2e
 
 ### T-028 — Modernização do Engine de Dependência de Imagem (`jimp`)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-028 |
-| **Camada** | Build / Manipulação de Arquivos |
-| **Dependências** | T-027 |
-| **Complexidade** | L |
-| **Risco** | `jimp` reporta falha indireta (por `file-type`). A correção implica realizar um salto *Major* (v0.22 -> v1.6.x) onde houveram mudanças profundas na arquitetura (mudança de namespaces e separação em monorepo). Risco de quebra nas assinaturas de métodos ou *imports* da lib. |
+| Campo            | Valor                                                                                                                                                                                                                                                                            |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-028                                                                                                                                                                                                                                                                            |
+| **Camada**       | Build / Manipulação de Arquivos                                                                                                                                                                                                                                                  |
+| **Dependências** | T-027                                                                                                                                                                                                                                                                            |
+| **Complexidade** | L                                                                                                                                                                                                                                                                                |
+| **Risco**        | `jimp` reporta falha indireta (por `file-type`). A correção implica realizar um salto _Major_ (v0.22 -> v1.6.x) onde houveram mudanças profundas na arquitetura (mudança de namespaces e separação em monorepo). Risco de quebra nas assinaturas de métodos ou _imports_ da lib. |
 
 **Testes e Validações:**
+
 - Executar instalação pontual `npm install jimp@1.6.1`.
 - Identificar códigos depreciados e validar eventuais quebras nos builders ou chamadas WASM.
 - **GATE OBRIGATÓRIO:** Rodar os testes de `test:coverage`. Reverter se falhar sem causa raiz ajustável.
 
 **Critério de done:**
+
 - [ ] Testes unitários do pipeline de imagem aprovados na nova versão.
 - [ ] Código refatorado de `jimp` conforme convenções da V1 (uso de `@jimp/core` caso alterado pela documentação base).
 - [ ] Tamanho do bundle ESM confirmado para não ter crescido (manter benchmark T-024).
@@ -956,21 +1011,23 @@ npm run build && npm run test && npm run test:e2e
 
 ### T-029 — Atualização Segura do Ecossistema de Build e Testes (Vitest/Vite)
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-029 |
-| **Camada** | Infraestrutura (DevDependencies) |
-| **Dependências** | T-027 |
-| **Complexidade** | M |
-| **Risco** | Vulnerabilidades em *esbuild* e *vite* indiretos. Realizar o salto de vitest v1.6.1 para v4.x altera comportamento nativo das dependências atreladas do Vite 6.0 e lida com *breaking changes* em APIs de *Mock* ou *Workspace*. |
+| Campo            | Valor                                                                                                                                                                                                                            |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | T-029                                                                                                                                                                                                                            |
+| **Camada**       | Infraestrutura (DevDependencies)                                                                                                                                                                                                 |
+| **Dependências** | T-027                                                                                                                                                                                                                            |
+| **Complexidade** | M                                                                                                                                                                                                                                |
+| **Risco**        | Vulnerabilidades em _esbuild_ e _vite_ indiretos. Realizar o salto de vitest v1.6.1 para v4.x altera comportamento nativo das dependências atreladas do Vite 6.0 e lida com _breaking changes_ em APIs de _Mock_ ou _Workspace_. |
 
 **Testes e Validações:**
+
 - Instalação limpa dos dev-pacotes afetados: `npm install vitest@4.1.4 @vitest/ui@4.1.4 @vitest/coverage-v8@4.1.4`.
-- Avaliar se *Vite* atualiza de tabela e elimina o aviso do *esbuild* atrelado.
-- Caso falhe o teste E2E ligado a *mocks*, readaptar as chamadas usando a sintaxe exigida pelo `vitest 4.x`.
+- Avaliar se _Vite_ atualiza de tabela e elimina o aviso do _esbuild_ atrelado.
+- Caso falhe o teste E2E ligado a _mocks_, readaptar as chamadas usando a sintaxe exigida pelo `vitest 4.x`.
 
 **Critério de done:**
-- [ ] O `npm audit` não deve reportar nenhuma falha de *esbuild* nem do *vite/vite-node*.
+
+- [ ] O `npm audit` não deve reportar nenhuma falha de _esbuild_ nem do _vite/vite-node_.
 - [ ] Nenhuma resolução feita usando `--force` ou overrides diretos (usar caminho "nativo").
 - [ ] O fluxo do CI do GitHub Actions finaliza e reporta verde em todas as etapas.
 
@@ -978,21 +1035,23 @@ npm run build && npm run test && npm run test:e2e
 
 ### T-030 — Execução da Limpeza e Consolidação da Manutenção
 
-| Campo | Valor |
-|-------|-------|
-| **ID** | T-030 |
-| **Camada** | Transversal |
-| **Dependências** | T-028, T-029 |
-| **Complexidade** | S |
-| **Risco** | Arquivos de ambiente desatualizados sendo mantidos na raiz, causando sujeira no controle de versão. |
+| Campo            | Valor                                                                                               |
+| ---------------- | --------------------------------------------------------------------------------------------------- |
+| **ID**           | T-030                                                                                               |
+| **Camada**       | Transversal                                                                                         |
+| **Dependências** | T-028, T-029                                                                                        |
+| **Complexidade** | S                                                                                                   |
+| **Risco**        | Arquivos de ambiente desatualizados sendo mantidos na raiz, causando sujeira no controle de versão. |
 
 **Testes e Validações:**
+
 - Revisão final de compatibilidade. Inspecionar o check-bundle (`npm run test:e2e` para todos os navegadores: WebKit, Mobile Safari e Chromium).
 
 **Critério de done:**
+
 - [ ] `npm audit` documentado como limpo.
 - [ ] Artefatos `.bak` e `.json` locais de auditoria descartados no repositório.
-- [ ] Merge Request (PR) com aprovação técnica aberto explicitando os breaking changes contidos (nas dependências estritamente de *Dev*, sem afetar clientes `createCMC7Reader`).
+- [ ] Merge Request (PR) com aprovação técnica aberto explicitando os breaking changes contidos (nas dependências estritamente de _Dev_, sem afetar clientes `createCMC7Reader`).
 
 ---
 
@@ -1000,35 +1059,35 @@ npm run build && npm run test && npm run test:e2e
 
 Conforme PRD §2 (roadmap) e RF-010 (P2):
 
-| ID | Feature | Versão Alvo | Por que não agora |
-|----|---------|-------------|-------------------|
-| BF-001 | OCR de valor manuscrito (campo numérico) | v1.1 | INVIÁVEL CLIENT-SIDE como feature principal (viabilidade §4) |
-| BF-002 | OCR de data manuscrita | v1.1 | Mesma razão |
-| BF-003 | Interface de backend fallback para HTR | v1.2 | Depende de maturidade de BF-001 |
-| BF-004 | CRNN end-to-end (sem segmentação) | v1.1 se T-002 falhar | Plano B — ativado somente se segmentação < 85% |
-| BF-005 | Modo offline com Service Worker | v1.2 | Necessita estabilização do core |
-| BF-006 | Suporte a MICR E-13B (cheques americanos) | v2.0 | Fora do escopo brasileiro |
-| BF-007 | SDK React Native | v2.0 | Requer rearchitetura (sem WASM equivalente) |
-| BF-008 | BankRegistry com > 20 bancos | v1.x contínuo | Expansão iterativa pós-release |
+| ID     | Feature                                   | Versão Alvo          | Por que não agora                                            |
+| ------ | ----------------------------------------- | -------------------- | ------------------------------------------------------------ |
+| BF-001 | OCR de valor manuscrito (campo numérico)  | v1.1                 | INVIÁVEL CLIENT-SIDE como feature principal (viabilidade §4) |
+| BF-002 | OCR de data manuscrita                    | v1.1                 | Mesma razão                                                  |
+| BF-003 | Interface de backend fallback para HTR    | v1.2                 | Depende de maturidade de BF-001                              |
+| BF-004 | CRNN end-to-end (sem segmentação)         | v1.1 se T-002 falhar | Plano B — ativado somente se segmentação < 85%               |
+| BF-005 | Modo offline com Service Worker           | v1.2                 | Necessita estabilização do core                              |
+| BF-006 | Suporte a MICR E-13B (cheques americanos) | v2.0                 | Fora do escopo brasileiro                                    |
+| BF-007 | SDK React Native                          | v2.0                 | Requer rearchitetura (sem WASM equivalente)                  |
+| BF-008 | BankRegistry com > 20 bancos              | v1.x contínuo        | Expansão iterativa pós-release                               |
 
 ---
 
 ## Sumário de Estimativas
 
-| Milestone | Tarefas | Complexidade Total | Semanas Estimadas |
-|-----------|---------|-------------------|-------------------|
-| M1 — PoC de Risco | T-001 a T-003 | S + XL + M | 2–3 semanas |
-| M2 — Fundação | T-004 a T-007 | M + S + M + M | 1–2 semanas |
-| M3 — Image Pipeline | T-008 a T-011 | M + M + L + L | 2–3 semanas |
-| M4 — OCR Engine | T-012 a T-014 | M + XL + XL | 3–4 semanas |
-| M5 — Validação | T-015 a T-018 | S + M + L + M | 2 semanas |
-| M6 — API Pública | T-019 a T-022 | M + M + L + M | 2 semanas |
-| M7 — Release | T-023 a T-026 | M + M + M + M | 1–2 semanas |
-| M8 — Manutenção Segura | T-027 a T-030 | S + L + M + S | 1 semana |
-| **TOTAL** | **30 tarefas** | | **~16–20 semanas** |
+| Milestone              | Tarefas        | Complexidade Total | Semanas Estimadas  |
+| ---------------------- | -------------- | ------------------ | ------------------ |
+| M1 — PoC de Risco      | T-001 a T-003  | S + XL + M         | 2–3 semanas        |
+| M2 — Fundação          | T-004 a T-007  | M + S + M + M      | 1–2 semanas        |
+| M3 — Image Pipeline    | T-008 a T-011  | M + M + L + L      | 2–3 semanas        |
+| M4 — OCR Engine        | T-012 a T-014  | M + XL + XL        | 3–4 semanas        |
+| M5 — Validação         | T-015 a T-018  | S + M + L + M      | 2 semanas          |
+| M6 — API Pública       | T-019 a T-022  | M + M + L + M      | 2 semanas          |
+| M7 — Release           | T-023 a T-026  | M + M + M + M      | 1–2 semanas        |
+| M8 — Manutenção Segura | T-027 a T-030  | S + L + M + S      | 1 semana           |
+| **TOTAL**              | **30 tarefas** |                    | **~16–20 semanas** |
 
 > **Nota:** M4 (OCR Engine) é o milestone de maior risco e variância. Se T-002 (PoC de Segmentação) for negativo, o escopo de M4 muda significativamente para CRNN, adicionando 2–4 semanas. M8 foca nas dependências seguras para release de LTS.
 
 ---
 
-*As tarefas foram ordenadas para maximizar a redução de risco: as maiores incertezas da viabilidade (segmentação CMC-7, tamanho do bundle, licença de fonte) são atacadas primeiro. Nenhum commitamento de milestone posterior é feito antes do go/no-go do milestone anterior.*
+_As tarefas foram ordenadas para maximizar a redução de risco: as maiores incertezas da viabilidade (segmentação CMC-7, tamanho do bundle, licença de fonte) são atacadas primeiro. Nenhum commitamento de milestone posterior é feito antes do go/no-go do milestone anterior._

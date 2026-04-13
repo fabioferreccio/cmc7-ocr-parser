@@ -6,7 +6,7 @@ import { loadOpenCV, type CV } from '../wasm/opencv-loader.js';
  * @remarks
  * Level 1 Pipeline: Uses Canvas API for low-latency resizing, grayscale conversion,
  * and ROI cropping (docs/03-arquitetura.md §1.2).
- * 
+ *
  * Level 2 Pipeline: Uses OpenCV.js (WASM) for binarization and deskewing.
  */
 export class ImagePreprocessor {
@@ -58,17 +58,23 @@ export class ImagePreprocessor {
     if (options.roiCrop) {
       const roiHeight = targetHeight * 0.4;
       const roiY = targetHeight * 0.6;
-      
+
       const roiCanvas = document.createElement('canvas');
       roiCanvas.width = targetWidth;
       roiCanvas.height = roiHeight;
       const roiCtx = roiCanvas.getContext('2d');
-      
+
       if (roiCtx) {
         roiCtx.drawImage(
           canvas,
-          0, roiY, targetWidth, roiHeight, // Source
-          0, 0, targetWidth, roiHeight,    // Dest
+          0,
+          roiY,
+          targetWidth,
+          roiHeight, // Source
+          0,
+          0,
+          targetWidth,
+          roiHeight, // Dest
         );
         return this.finalize(roiCanvas, options.grayscale);
       }
@@ -94,7 +100,7 @@ export class ImagePreprocessor {
     // Luminance formula: 0.299R + 0.587G + 0.114B
     for (let i = 0; i < data.length; i += 4) {
       const gray = 0.299 * data[i]! + 0.587 * data[i + 1]! + 0.114 * data[i + 2]!;
-      data[i] = gray;     // R
+      data[i] = gray; // R
       data[i + 1] = gray; // G
       data[i + 2] = gray; // B
       // alpha (i+3) is kept
@@ -120,7 +126,7 @@ export class ImagePreprocessor {
    */
   async binarize(imageData: ImageData): Promise<ImageData> {
     const cv = await this.ensureOpenCV();
-    
+
     // 1. Create Mats
     const src = (cv as any).matFromImageData(imageData);
     const gray = new cv.Mat();
@@ -144,7 +150,7 @@ export class ImagePreprocessor {
         cv.ADAPTIVE_THRESH_GAUSSIAN_C,
         cv.THRESH_BINARY,
         11,
-        2
+        2,
       );
 
       // 5. Convert back to RGBA for ImageData compatibility
@@ -169,7 +175,7 @@ export class ImagePreprocessor {
    */
   async deskew(imageData: ImageData): Promise<ImageData> {
     const cv = await this.ensureOpenCV();
-    
+
     const src = (cv as any).matFromImageData(imageData);
     const gray = new cv.Mat();
     const binary = new cv.Mat();
@@ -177,18 +183,26 @@ export class ImagePreprocessor {
 
     try {
       cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-      
+
       // Found non-zero points to compute angle
-      cv.adaptiveThreshold(gray, binary, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2);
+      cv.adaptiveThreshold(
+        gray,
+        binary,
+        255,
+        cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv.THRESH_BINARY_INV,
+        11,
+        2,
+      );
 
       const points = new cv.Mat();
       (cv as any).findNonZero(binary, points);
-      
+
       let angle = 0;
       if (!points.empty()) {
         const rect = (cv as any).minAreaRect(points);
         angle = rect.angle;
-        
+
         // OpenCV angle logic: normalize for CMC-7 strip
         if (rect.size.width < rect.size.height) {
           angle += 90;
@@ -205,7 +219,7 @@ export class ImagePreprocessor {
       const center = new cv.Point(src.cols / 2, src.rows / 2);
       const M = cv.getRotationMatrix2D(center, angle, 1.0);
       const dsize = new cv.Size(src.cols, src.rows);
-      
+
       cv.warpAffine(src, rotated, M, dsize, (cv as any).INTER_LINEAR, (cv as any).BORDER_REPLICATE);
       M.delete();
 

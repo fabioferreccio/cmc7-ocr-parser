@@ -26,7 +26,13 @@ describe('types/index — TypeScript contracts', () => {
       {
         type: 'UNSUPPORTED_ENVIRONMENT',
         message: 'x',
-        environment: { isIOS: true, isSafari: false, isWKWebView: true, hasCamera: false, isHTTPS: true },
+        environment: {
+          isIOS: true,
+          isSafari: false,
+          isWKWebView: true,
+          hasCamera: false,
+          isHTTPS: true,
+        },
         userGuidance: 'Abra no Safari',
       },
     ];
@@ -34,7 +40,14 @@ describe('types/index — TypeScript contracts', () => {
   });
 
   it('QualityIssue covers all expected values', () => {
-    const issues: QualityIssue[] = ['blur', 'low-contrast', 'glare', 'too-far', 'angled', 'no-strip-found'];
+    const issues: QualityIssue[] = [
+      'blur',
+      'low-contrast',
+      'glare',
+      'too-far',
+      'angled',
+      'no-strip-found',
+    ];
     expect(issues).toHaveLength(6);
   });
 });

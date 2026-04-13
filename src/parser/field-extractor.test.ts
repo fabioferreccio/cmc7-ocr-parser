@@ -20,7 +20,7 @@ describe('FieldExtractor', () => {
   // Let's use a valid mod10 DV for BB test.
   // 001000200000001000001 -> sum mod 10 -> DV
   // For BB, it's usually mod 10.
-  
+
   const BB_B1 = '0010002000000010000015'; // Valid-ish structure
   const B2 = '00000010000'; // 10 digits + 1 DV
   const N = '1';
@@ -31,7 +31,7 @@ describe('FieldExtractor', () => {
 
   it('deve extrair campos e validar DVs básicos', () => {
     const result = extractor.extract(RAW);
-    
+
     expect(result.raw).toBe(RAW);
     expect(result.fields.bankCode).toBe('001');
     expect(result.validation).toBeDefined();
@@ -42,22 +42,22 @@ describe('FieldExtractor', () => {
     // Modify DV of block 1
     const invalidRaw = RAW.replace('5' + S1, '9' + S1);
     const result = extractor.extract(invalidRaw);
-    
+
     expect(result.validation.isValid).toBe(false);
-    expect(result.validation.errors.some(e => e.field === 'block1')).toBe(true);
+    expect(result.validation.errors.some((e) => e.field === 'block1')).toBe(true);
   });
 
   it('deve lidar com bancos desconhecidos marcando validation.bankCodeValid como null', () => {
     const unknownRaw = RAW.replace('001', '999');
     const result = extractor.extract(unknownRaw);
-    
+
     expect(result.validation.bankCodeValid).toBeNull();
     expect(result.fields.agency).toBeNull();
   });
 
   it('deve processar tempos de execução e qualidade se fornecidos', () => {
     const result = extractor.extract(RAW, { frameQuality: 85, startTime: Date.now() - 50 });
-    
+
     expect(result.frameQuality).toBe(85);
     expect(result.processingTimeMs).toBeGreaterThanOrEqual(50);
   });

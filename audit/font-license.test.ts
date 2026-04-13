@@ -24,7 +24,7 @@ describe('T-001 — Audit de Licença da Fonte CMC-7 TTF', () => {
   it('a fonte escolhida deve ter uma licença compatível (MIT, Apache, Public Domain ou similar)', () => {
     const content = readFileSync(reportPath, 'utf8');
     // Verifica se a decisão não é de uma licença proibida (GPL no core sem exceção)
-    // Nota: O projeto permite redistribuição de DADOS DERIVADOS (templates), 
+    // Nota: O projeto permite redistribuição de DADOS DERIVADOS (templates),
     // mas precisamos ter certeza da permissão.
     expect(content).not.toContain('Licença: GPL'); // Simplificação para o teste falhar se for GPL pura sem análise
   });

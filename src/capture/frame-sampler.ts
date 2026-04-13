@@ -12,7 +12,7 @@ export class FrameSampler {
   private intervalId: ReturnType<typeof setInterval> | null = null;
   private isRunning = false;
   private readonly intervalMs: number;
-  private handlers: Map<string, Array<(...args: any[]) => void>> = new Map();
+  private handlers: Map<string, Array<(...args: unknown[]) => void>> = new Map();
 
   constructor(
     private readonly videoElement: HTMLVideoElement,
@@ -28,8 +28,8 @@ export class FrameSampler {
     if (this.isRunning) return;
     this.isRunning = true;
 
-    this.intervalId = setInterval(async () => {
-      await this.sample();
+    this.intervalId = setInterval(() => {
+      void this.sample();
     }, this.intervalMs);
   }
 
@@ -64,7 +64,7 @@ export class FrameSampler {
   /**
    * Simple event emitter implementation.
    */
-  on(event: FrameSamplerEvent, handler: (...args: any[]) => void): this {
+  on(event: FrameSamplerEvent, handler: (...args: unknown[]) => void): this {
     if (!this.handlers.has(event)) {
       this.handlers.set(event, []);
     }
@@ -72,7 +72,7 @@ export class FrameSampler {
     return this;
   }
 
-  private emit(event: FrameSamplerEvent, ...args: any[]): void {
+  private emit(event: FrameSamplerEvent, ...args: unknown[]): void {
     this.handlers.get(event)?.forEach((h) => h(...args));
   }
 }

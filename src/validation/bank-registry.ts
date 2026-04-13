@@ -15,40 +15,40 @@ export class BankRegistry {
 
   constructor() {
     // Populate with validated specs for BB, CEF, Bradesco, Itaú, Santander
-    
+
     this.register({
       compeCode: '001',
       name: 'Banco do Brasil',
       dvAlgorithm: 'mod10',
-      block1Layout: { agencyDigits: 4, accountDigits: 8, checkNumDigits: 6 }
+      block1Layout: { agencyDigits: 4, accountDigits: 8, checkNumDigits: 6 },
     });
 
     this.register({
       compeCode: '104',
       name: 'Caixa Econômica Federal',
       dvAlgorithm: 'mod10',
-      block1Layout: { agencyDigits: 4, accountDigits: 9, checkNumDigits: 6 }
+      block1Layout: { agencyDigits: 4, accountDigits: 9, checkNumDigits: 6 },
     });
 
     this.register({
       compeCode: '237',
       name: 'Bradesco',
       dvAlgorithm: 'mod10',
-      block1Layout: { agencyDigits: 4, accountDigits: 7, checkNumDigits: 6 }
+      block1Layout: { agencyDigits: 4, accountDigits: 7, checkNumDigits: 6 },
     });
 
     this.register({
       compeCode: '341',
       name: 'Itaú',
       dvAlgorithm: 'mod10',
-      block1Layout: { agencyDigits: 4, accountDigits: 5, checkNumDigits: 6 }
+      block1Layout: { agencyDigits: 4, accountDigits: 5, checkNumDigits: 6 },
     });
 
     this.register({
       compeCode: '033',
       name: 'Santander',
       dvAlgorithm: 'mod10',
-      block1Layout: { agencyDigits: 4, accountDigits: 8, checkNumDigits: 6 }
+      block1Layout: { agencyDigits: 4, accountDigits: 8, checkNumDigits: 6 },
     });
   }
 

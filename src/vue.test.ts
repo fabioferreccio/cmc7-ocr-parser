@@ -33,33 +33,33 @@ describe('useCMC7Reader Vue', () => {
   it('deve chamar createCMC7Reader em setup', async () => {
     const wrapper = mount(TestComponent);
     const vm = wrapper.vm as any;
-    
+
     expect(createCMC7Reader).toHaveBeenCalled();
     expect(vm.isReady).toBe(false);
-    
+
     // Aguarda a promessa do createCMC7Reader
-    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(vm.isReady).toBe(true);
   });
 
   it('deve expor estado reativo', async () => {
     const wrapper = mount(TestComponent);
     const vm = wrapper.vm as any;
-    
-    await new Promise(resolve => setTimeout(resolve, 0));
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(vm.isReady).toBe(true);
-    
+
     // Simula evento de resultado
-    const handler = mockReader.on.mock.calls.find(call => call[0] === 'result')[1];
+    const handler = mockReader.on.mock.calls.find((call) => call[0] === 'result')[1];
     handler({ raw: '456' });
-    
+
     expect(vm.result).toEqual({ raw: '456' });
   });
 
   it('deve limpar o reader na desmontagem', async () => {
     const wrapper = mount(TestComponent);
-    await new Promise(resolve => setTimeout(resolve, 0));
-    
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     wrapper.unmount();
     expect(mockReader.stop).toHaveBeenCalled();
   });

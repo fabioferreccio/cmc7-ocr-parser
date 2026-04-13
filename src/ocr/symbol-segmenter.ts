@@ -14,14 +14,14 @@ export class SymbolSegmenter {
 
   /**
    * Segments the CMC-7 strip into individual characters.
-   * 
+   *
    * @param image - The binarized image.
    * @param roi - Optional region of interest.
    * @returns Array of ordered, normalized segments (32x64px).
    */
   segment(image: ImageData, roi?: ROI): Segment[] {
     const { width, height, data } = image;
-    
+
     // Bounds to scan
     const startX = roi ? roi.x : 0;
     const endX = roi ? roi.x + roi.width : width;
@@ -36,7 +36,8 @@ export class SymbolSegmenter {
     for (let x = startX; x < endX; x++) {
       for (let y = startY; y < endY; y++) {
         const idx = (y * width + x) * 4;
-        if (data[idx]! < 128) { // Black pixel
+        if (data[idx]! < 128) {
+          // Black pixel
           colHasPixel[x] = true;
           if (y < colMinY[x]) colMinY[x] = y;
           if (y > colMaxY[x]) colMaxY[x] = y;
@@ -67,7 +68,7 @@ export class SymbolSegmenter {
               x: currentSeg.startX,
               width: currentSeg.endX - currentSeg.startX + 1,
               y: currentSeg.minY,
-              height: currentSeg.maxY - currentSeg.minY + 1
+              height: currentSeg.maxY - currentSeg.minY + 1,
             });
             currentSeg = null;
             gapCount = 0;
@@ -75,14 +76,14 @@ export class SymbolSegmenter {
         }
       }
     }
-    
+
     // Close the last segment if open
     if (currentSeg) {
       rawSegments.push({
         x: currentSeg.startX,
         width: currentSeg.endX - currentSeg.startX + 1,
         y: currentSeg.minY,
-        height: currentSeg.maxY - currentSeg.minY + 1
+        height: currentSeg.maxY - currentSeg.minY + 1,
       });
     }
 
@@ -94,7 +95,7 @@ export class SymbolSegmenter {
       if (seg.height >= minHeight) {
         finalSegments.push({
           ...seg,
-          imageData: this.normalizeSegment(image, seg)
+          imageData: this.normalizeSegment(image, seg),
         });
       }
     }
@@ -105,15 +106,18 @@ export class SymbolSegmenter {
     return finalSegments;
   }
 
-  private normalizeSegment(source: ImageData, box: { x: number; y: number; width: number; height: number }): ImageData {
+  private normalizeSegment(
+    source: ImageData,
+    box: { x: number; y: number; width: number; height: number },
+  ): ImageData {
     // We assume globalThis.ImageData exists (mocked in setup.ts for Node, native in browsers)
     const targetW = 32;
     const targetH = 64;
     const result = new ImageData(targetW, targetH);
-    
+
     // Fill with white
     for (let i = 0; i < result.data.length; i++) {
-        result.data[i] = 255;
+      result.data[i] = 255;
     }
 
     // Nearest neighbor interpolation to map 32x64 back into the bounding box
@@ -127,10 +131,10 @@ export class SymbolSegmenter {
           const sIdx = (sy * source.width + sx) * 4;
           const tIdx = (ty * targetW + tx) * 4;
 
-          result.data[tIdx]! = source.data[sIdx]!;
-          result.data[tIdx + 1]! = source.data[sIdx + 1]!;
-          result.data[tIdx + 2]! = source.data[sIdx + 2]!;
-          result.data[tIdx + 3]! = source.data[sIdx + 3]!;
+          result.data[tIdx] = source.data[sIdx]!;
+          result.data[tIdx + 1] = source.data[sIdx + 1]!;
+          result.data[tIdx + 2] = source.data[sIdx + 2]!;
+          result.data[tIdx + 3] = source.data[sIdx + 3]!;
         }
       }
     }

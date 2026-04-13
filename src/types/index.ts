@@ -106,7 +106,15 @@ export interface CMC7Validation {
 
 /** Per-field check-digit validation error. */
 export interface ValidationError {
-  field: 'bankCode' | 'agency' | 'account' | 'checkNumber' | 'block1' | 'block2' | 'block3' | 'block4';
+  field:
+    | 'bankCode'
+    | 'agency'
+    | 'account'
+    | 'checkNumber'
+    | 'block1'
+    | 'block2'
+    | 'block3'
+    | 'block4';
   expected: number;
   received: number;
   algorithm: 'mod10' | 'mod11' | 'unknown';
@@ -118,15 +126,14 @@ export interface FrameQualityReport {
   score: number;
   /** List of detected quality issues. */
   issues: QualityIssue[];
-  /** 
-   * Whether the frame meets requirements for OCR. 
+  /**
+   * Whether the frame meets requirements for OCR.
    * Derived from score >= minFrameQualityScore.
    */
   shouldProcess: boolean;
   /** Actionable suggestion for the user. */
   suggestion?: 'move-closer' | 'reduce-glare' | 'stabilize' | 'improve-lighting';
 }
-
 
 export type QualityIssue =
   | 'blur'
@@ -237,9 +244,7 @@ export interface CMC7Reader {
   stop(): Promise<void>;
 
   // Static image mode
-  readImage(
-    input: HTMLImageElement | ImageBitmap | File | Blob | string,
-  ): Promise<CMC7Result>;
+  readImage(input: HTMLImageElement | ImageBitmap | File | Blob | string): Promise<CMC7Result>;
 
   // Event emitter pattern
   on(event: 'result', handler: (result: CMC7Result) => void): this;

@@ -1,8 +1,4 @@
-import type { 
-  WorkerMessage, 
-  WorkerResponse, 
-  CMC7ReaderOptions
-} from '../types/index.js';
+import type { WorkerMessage, WorkerResponse, CMC7ReaderOptions } from '../types/index.js';
 
 export type WorkerClientEvent = 'result' | 'quality' | 'error' | 'ready';
 
@@ -14,7 +10,6 @@ export class WorkerClient {
   private worker: Worker | null = null;
   private handlers: Map<string, Array<(...args: unknown[]) => void>> = new Map();
 
-
   /**
    * Initializes the worker.
    *
@@ -24,25 +19,22 @@ export class WorkerClient {
     if (this.worker) return;
 
     // DECISÃO (AD-01): Worker isolado para manter Main Thread responsiva.
-    // O caminho do worker em desenvolvimento aponta para o TS, 
+    // O caminho do worker em desenvolvimento aponta para o TS,
     // em produção o bundler resolverá para o JS compilado.
-    this.worker = new Worker(
-      new URL('./pipeline.worker.js', import.meta.url),
-      { type: 'module' }
-    );
+    this.worker = new Worker(new URL('./pipeline.worker.js', import.meta.url), { type: 'module' });
 
     this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
       const { type, payload } = event.data;
       this.emit(type, payload);
     };
 
-    this.worker.onerror = (error) => {
+    this.worker.onerror = (_error) => {
       this.emit('error', {
         type: 'INIT_ERROR',
         message: 'Falha crítica no Web Worker.',
-        cause: 'wasm-load-failed' // Proxying error
+        cause: 'wasm-load-failed', // Proxying error
       });
-      console.error('[WorkerClient] Erro:', error);
+      // Error details are surfaced via the emitted 'error' event above (Rule 4.1 — no console in src/)
     };
 
     this.postMessage({ action: 'init', payload: { options } });
@@ -55,10 +47,7 @@ export class WorkerClient {
    */
   process(bitmap: ImageBitmap): void {
     // REGRA (6.2): Transferência obrigatória para evitar cópia de memória.
-    this.postMessage(
-      { action: 'process', payload: { bitmap } },
-      [bitmap]
-    );
+    this.postMessage({ action: 'process', payload: { bitmap } }, [bitmap]);
   }
 
   /**
@@ -75,7 +64,6 @@ export class WorkerClient {
    * Simple event emitter implementation.
    */
   on(event: WorkerClientEvent, handler: (...args: unknown[]) => void): this {
-
     if (!this.handlers.has(event)) {
       this.handlers.set(event, []);
     }
@@ -86,7 +74,6 @@ export class WorkerClient {
   private emit(event: string, ...args: unknown[]): void {
     this.handlers.get(event)?.forEach((h) => h(...args));
   }
-
 
   private postMessage(message: WorkerMessage, transfer?: Transferable[]): void {
     if (!this.worker) {

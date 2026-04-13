@@ -52,12 +52,12 @@ export function useCMC7Reader(options?: CMC7ReaderOptions): {
   useEffect(() => {
     let active = true;
 
-    // Inicialização assíncrona
-    createCMC7Reader(options).then((newReader) => {
+    // Inicialização assíncrona — createCMC7Reader retorna Promise<CMC7Reader>
+    void createCMC7Reader(options).then((newReader) => {
       // Se o componente foi desmontado durante a inicialização (StrictMode),
       // paramos o reader imediatamente.
       if (!active) {
-        newReader.stop();
+        void newReader.stop();
         return;
       }
 
@@ -76,11 +76,11 @@ export function useCMC7Reader(options?: CMC7ReaderOptions): {
       if (readerRef.current) {
         // DECISÃO (AD-08): Stop automático na desmontagem.
         // Garante que a câmera seja liberada e recursos WASM limpos.
-        readerRef.current.stop();
+        void readerRef.current.stop();
         readerRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line -- options intentionally omitted from deps: initialized once per mount
   }, []); // Só inicializa uma vez por montagem
 
   const start = useCallback(async (videoElement: HTMLVideoElement) => {

@@ -107,12 +107,11 @@ export class CMC7Parser {
     // Check ordering: ⑆...⑆...⑇...⑈...⑉...⑊
     const idx1a = raw.indexOf(S1);
     const idx1b = raw.indexOf(S1, idx1a + 1);
-    const idx2  = raw.indexOf(S2);
-    const idx3  = raw.indexOf(S3);
-    const idx4  = raw.indexOf(S4);
-    const idx5  = raw.indexOf(S5);
+    const idx2 = raw.indexOf(S2);
+    const idx3 = raw.indexOf(S3);
+    const idx4 = raw.indexOf(S4);
+    const idx5 = raw.indexOf(S5);
 
     return idx1a < idx1b && idx1b < idx2 && idx2 < idx3 && idx3 < idx4 && idx4 < idx5;
   }
 }
-
