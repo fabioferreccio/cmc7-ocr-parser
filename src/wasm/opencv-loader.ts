@@ -72,8 +72,8 @@ export async function loadOpenCV(assetsBaseUrl: string = './'): Promise<CV> {
     // 2. Setup Module for Emscripten
     const Module: any = {
       locateFile: (path: string) => {
-        if (path === 'opencv_js.wasm') {
-          return `${assetsBaseUrl}wasm/opencv_js.wasm`;
+        if (path === 'opencv_js.wasm' || path === 'opencv.wasm') {
+          return `${assetsBaseUrl}wasm/opencv.wasm`;
         }
         return path;
       },

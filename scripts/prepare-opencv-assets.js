@@ -26,7 +26,8 @@ function copyAssetsFrom(sourceDir) {
   }
   for (const asset of assetNames) {
     const src = path.join(sourceDir, asset);
-    const dst = path.join(outDir, asset);
+    const dstName = asset === 'opencv_js.wasm' ? 'opencv.wasm' : asset;
+    const dst = path.join(outDir, dstName);
     fs.copyFileSync(src, dst);
   }
   return true;

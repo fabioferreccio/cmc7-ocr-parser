@@ -829,9 +829,9 @@ build/bundle-size.test.ts
 ```
 
 **Critério de done:**
-- [ ] `tsup.config.ts` final configurado
-- [ ] Todos os checks de bundle passando
-- [ ] `package.json` com `exports`, `sideEffects: false`, `files`
+- [x] `tsup.config.ts` final configurado
+- [x] Todos os checks de bundle passando
+- [x] `package.json` com `exports`, `sideEffects: false`, `files`
 
 ---
 

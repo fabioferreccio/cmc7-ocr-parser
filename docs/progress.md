@@ -9,8 +9,8 @@
 
 - **Última atualização:** 2026-04-11
 - **Milestone atual:** 7 — Release
-- **Tasks concluídas:** 22 / 26
-- **Tasks em progresso:** Nenhuma (Próxima: T-024)
+- **Tasks concluídas:** 23 / 26
+- **Tasks em progresso:** Nenhuma (Próxima: T-025)
 
 
 ---
@@ -42,6 +42,7 @@
 | 2026-04-10 | T-022 | startCamera (Câmera & Demo) | ✅ Sucesso | src/reader.ts, demo/index.html |
 | 2026-04-11 | bugfix | Correção de tipagem em readImage (Gate 2) | ✅ Resolvido | src/reader.ts |
 | 2026-04-13 | T-023 | Testes E2E com Playwright | ✅ Sucesso | e2e/camera-to-result.test.ts, reader.ts, demo/main.ts, types/index.ts |
+| 2026-04-13 | T-024 | Build e Bundle Otimização | ✅ Sucesso | tsup.config.ts, package.json, scripts/prepare-opencv-assets.js, src/wasm/opencv-loader.ts, build/bundle-size.test.ts |
 
 
 ---
@@ -69,14 +70,16 @@
 - [T-020] readImage (Modo Imagem Estática)
 - [T-021] start (Loop de Tempo Real)
 - [T-022] startCamera (Integração com Câmera)
+- [T-023] Testes E2E com Playwright
+- [T-024] Build e Bundle Otimização
 
 ---
 
 ## Próxima Task
 
-**T-023 — Testes E2E com Playwright**  
+**T-025 — React Hook e Vue Composable**  
 Milestone 7 (Release)  
-Validar o fluxo completo em múltiplos navegadores (Chromium, WebKit) simulando mobile e câmera.
+Implementar wrappers para facilitar integração com React e Vue.
 
 ---
 
@@ -103,6 +106,7 @@ Validar o fluxo completo em múltiplos navegadores (Chromium, WebKit) simulando 
 | 2026-04-08 | T-003 | Decisão de não utilizar a build padrão do OpenCV.js (~10MB) e buscar/gerar build customizada para conformidade com RNF-003. | Uso de build padrão vs customizada. |
 | 2026-04-08 | T-003 | Confirmado que a build single-thread não requer headers COOP/CORP, facilitando o deploy. | Requisito de headers SharedArrayBuffer. |
 | 2026-04-10 | T-004 | Configuração de subpath exports para React/Vue confirmada em package.json e tsup.config.ts para evitar bloating do bundle principal. | Export único vs subpath. |
+| 2026-04-13 | T-024 | Renomeado `opencv_js.wasm` para `opencv.wasm` para simplificar assets e match com documentação de release. | Nomenclatura de artefatos. |
 
 ---
 
