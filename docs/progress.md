@@ -7,10 +7,10 @@
 
 ## Status Geral
 
-- **Última atualização:** 2026-04-11
-- **Milestone atual:** 7 — Release
-- **Tasks concluídas:** 24 / 26
-- **Tasks em progresso:** Nenhuma (Próxima: T-026)
+- **Última atualização:** 2026-04-13
+- **Milestone atual:** 7 — Release (Iniciando planejamento M8 - Segurança)
+- **Tasks concluídas:** 24 / 30
+- **Tasks em progresso:** Nenhuma (Próximas: T-026, T-027)
 
 
 ---
@@ -77,11 +77,19 @@
 
 ---
 
-## Próxima Task
+## Próximas Tasks
 
 **T-026 — Documentação e Release**  
 Milestone 7 (Release)  
 README, SBOM, NPM Publish.
+
+**T-027 — Preparação e Criação de Ponto de Reversão**  
+Milestone 8 (Auditoria de Dependências)  
+Snapshot verde do repositório, branches seguras, locks de backup.
+
+---
+
+**Milestone 8 pendente:** [T-027, T-028 (Jimp v1), T-029 (Vitest v4), T-030 (Cleanup)]
 
 ---
 
@@ -121,6 +129,14 @@ README, SBOM, NPM Publish.
 | 2026-04-08 | T-003 | `run_command` falhando no Windows (sandbox). | ✅ Resolvido | Benchmark realizado com sucesso via terminal local. |
 | 2026-04-13 | T-023 | Webkit/Safari mock flakiness no ambiente de teste. | ⚠️ Nota | Testes E2E passam 100% no Chromium; Webkit apresenta erro de mock de câmera. |
 
+
+---
+
+## Pendências Menores
+
+- **T-028**: Marcada como `[ ]` (não iniciada) mas depende de T-027 (incompleta) no docs/04-tasks.md.
+- **T-029**: Marcada como `[ ]` (não iniciada) mas depende de T-027 (incompleta) no docs/04-tasks.md.
+- **T-030**: Marcada como `[ ]` (não iniciada) mas depende de T-028 e T-029 (incompletas) no docs/04-tasks.md.
 
 ---
 

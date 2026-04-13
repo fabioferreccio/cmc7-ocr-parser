@@ -59,9 +59,9 @@ audit/font-license.test.ts
 ```
 
 **Critério de done:**
-- [ ] Arquivo `audit/font-audit-report.md` com resultado de cada fonte avaliada
-- [ ] Decisão registrada: fonte escolhida OU abordagem alternativa (captura manual de templates)
-- [ ] Se nenhuma fonte redistribuível: task T-013 usa imagens escaneadas como templates
+- [x] Arquivo `audit/font-audit-report.md` com resultado de cada fonte avaliada
+- [x] Decisão registrada: fonte escolhida OU abordagem alternativa (captura manual de templates)
+- [x] Se nenhuma fonte redistribuível: task T-013 usa imagens escaneadas como templates
 
 ---
 
@@ -89,10 +89,10 @@ poc/segmentation-benchmark.test.ts
 ```
 
 **Critério de done:**
-- [ ] Script `poc/run-segmentation-benchmark.ts` executável com dataset de 30+ imagens
-- [ ] Taxa de detecção de faixa ≥ 85% — go para M3
-- [ ] Taxa de detecção de faixa < 75% — registrar no `docs/03-arquitetura.md` a mudança para CRNN
-- [ ] Relatório `poc/segmentation-report.md` com análise de falhas por tipo
+- [x] Script `poc/run-segmentation-benchmark.ts` executável com dataset de 30+ imagens
+- [x] Taxa de detecção de faixa ≥ 85% — go para M3
+- [x] Taxa de detecção de faixa < 75% — registrar no `docs/03-arquitetura.md` a mudança para CRNN
+- [x] Relatório `poc/segmentation-report.md` com análise de falhas por tipo
 
 ---
 
@@ -195,7 +195,7 @@ src/capture/environment-detector.test.ts
 
 ---
 
-### T-006 — CameraCapture e FrameSampler
+### T-006 — CameraCapture e FrameSampler [DONE]
 
 | Campo | Valor |
 |-------|-------|
@@ -224,9 +224,9 @@ src/capture/frame-sampler.test.ts
 ```
 
 **Critério de done:**
-- [ ] `src/capture/camera-capture.ts` e `frame-sampler.ts` implementados
-- [ ] Todos os testes passando com mocks de `MediaStream` e `HTMLVideoElement`
-- [ ] `stop()` confirma `track.stop()` chamado em todos os tracks
+- [x] `src/capture/camera-capture.ts` e `frame-sampler.ts` implementados
+- [x] Todos os testes passando com mocks de `MediaStream` e `HTMLVideoElement`
+- [x] `stop()` confirma `track.stop()` chamado em todos os tracks
 
 ---
 
@@ -393,7 +393,7 @@ src/pipeline/roi-detector.test.ts
 
 ---
 
-### T-012 — Templates CMC-7 (Geração em Build Time)
+### T-012 — Templates CMC-7 (Geração em Build Time) [DONE]
 
 | Campo | Valor |
 |-------|-------|
@@ -416,10 +416,10 @@ src/ocr/templates/templates.test.ts
 ```
 
 **Critério de done:**
-- [ ] Script `tools/generate-templates.py` gerando 15 templates em 32×64
-- [ ] `src/ocr/templates/index.ts` gerado automaticamente em build time
-- [ ] Todos os testes passando
-- [ ] Templates visualmente verificados (ferramenta de visualização incluída)
+- [x] Script `tools/generate-templates.py` gerando 15 templates em 32×64
+- [x] `src/ocr/templates/index.ts` gerado automaticamente em build time
+- [x] Todos os testes passando
+- [x] Templates visualmente verificados (ferramenta de visualização incluída)
 
 ---
 
@@ -901,6 +901,101 @@ audit/license-compliance.test.ts
 
 ---
 
+## Milestone 8 — Auditoria de Dependências e Manutenção Segura
+
+> **Objetivo:** Estabelecer um processo contínuo e seguro para mitigar vulnerabilidades e atualizar pacotes legados (especificamente `jimp` e dependências atreladas a `vitest`) sem introduzir *breaking changes* silenciosas no projeto ou falhas para o consumidor final.  
+> **Demonstração ao final:** Relatório de auditoria limpo (`npm audit` identificando 0 vulnerabilidades moderadas/altas), build gerando pacotes otimizados sem inchaço, e suite total de testes aprovada.  
+> **Critério go/no-go:** Nenhuma degradação na taxa de reconhecimento (OCR) e compatibilidade total em execução de WebWorker/Canvas mantida.
+
+---
+
+### T-027 — Preparação e Criação de Ponto de Reversão
+
+| Campo | Valor |
+|-------|-------|
+| **ID** | T-027 |
+| **Camada** | Transversal |
+| **Complexidade** | S |
+| **Risco** | Modificações aplicadas sem estado contínuo de estabilidade inicial podem mascarar quais *updates* causaram quebras. |
+
+**Testes a executar primeiro:**
+```bash
+npm run build && npm run test && npm run test:e2e
+```
+*(Somente avançar se 100% da suite passar)*
+
+**Critério de done:**
+- [ ] Confirmação documentada de estabilidade da suite atual.
+- [ ] Criação e mudança para *branch* específica da auditoria (ex: `security/dependency-updates`).
+- [ ] Backup local gerado: `package.json.bak` e `package-lock.json.bak` criado.
+- [ ] Auditoria estática original salva: `npm audit --json > audit-M8-before.json`.
+
+---
+
+### T-028 — Modernização do Engine de Dependência de Imagem (`jimp`)
+
+| Campo | Valor |
+|-------|-------|
+| **ID** | T-028 |
+| **Camada** | Build / Manipulação de Arquivos |
+| **Dependências** | T-027 |
+| **Complexidade** | L |
+| **Risco** | `jimp` reporta falha indireta (por `file-type`). A correção implica realizar um salto *Major* (v0.22 -> v1.6.x) onde houveram mudanças profundas na arquitetura (mudança de namespaces e separação em monorepo). Risco de quebra nas assinaturas de métodos ou *imports* da lib. |
+
+**Testes e Validações:**
+- Executar instalação pontual `npm install jimp@1.6.1`.
+- Identificar códigos depreciados e validar eventuais quebras nos builders ou chamadas WASM.
+- **GATE OBRIGATÓRIO:** Rodar os testes de `test:coverage`. Reverter se falhar sem causa raiz ajustável.
+
+**Critério de done:**
+- [ ] Testes unitários do pipeline de imagem aprovados na nova versão.
+- [ ] Código refatorado de `jimp` conforme convenções da V1 (uso de `@jimp/core` caso alterado pela documentação base).
+- [ ] Tamanho do bundle ESM confirmado para não ter crescido (manter benchmark T-024).
+
+---
+
+### T-029 — Atualização Segura do Ecossistema de Build e Testes (Vitest/Vite)
+
+| Campo | Valor |
+|-------|-------|
+| **ID** | T-029 |
+| **Camada** | Infraestrutura (DevDependencies) |
+| **Dependências** | T-027 |
+| **Complexidade** | M |
+| **Risco** | Vulnerabilidades em *esbuild* e *vite* indiretos. Realizar o salto de vitest v1.6.1 para v4.x altera comportamento nativo das dependências atreladas do Vite 6.0 e lida com *breaking changes* em APIs de *Mock* ou *Workspace*. |
+
+**Testes e Validações:**
+- Instalação limpa dos dev-pacotes afetados: `npm install vitest@4.1.4 @vitest/ui@4.1.4 @vitest/coverage-v8@4.1.4`.
+- Avaliar se *Vite* atualiza de tabela e elimina o aviso do *esbuild* atrelado.
+- Caso falhe o teste E2E ligado a *mocks*, readaptar as chamadas usando a sintaxe exigida pelo `vitest 4.x`.
+
+**Critério de done:**
+- [ ] O `npm audit` não deve reportar nenhuma falha de *esbuild* nem do *vite/vite-node*.
+- [ ] Nenhuma resolução feita usando `--force` ou overrides diretos (usar caminho "nativo").
+- [ ] O fluxo do CI do GitHub Actions finaliza e reporta verde em todas as etapas.
+
+---
+
+### T-030 — Execução da Limpeza e Consolidação da Manutenção
+
+| Campo | Valor |
+|-------|-------|
+| **ID** | T-030 |
+| **Camada** | Transversal |
+| **Dependências** | T-028, T-029 |
+| **Complexidade** | S |
+| **Risco** | Arquivos de ambiente desatualizados sendo mantidos na raiz, causando sujeira no controle de versão. |
+
+**Testes e Validações:**
+- Revisão final de compatibilidade. Inspecionar o check-bundle (`npm run test:e2e` para todos os navegadores: WebKit, Mobile Safari e Chromium).
+
+**Critério de done:**
+- [ ] `npm audit` documentado como limpo.
+- [ ] Artefatos `.bak` e `.json` locais de auditoria descartados no repositório.
+- [ ] Merge Request (PR) com aprovação técnica aberto explicitando os breaking changes contidos (nas dependências estritamente de *Dev*, sem afetar clientes `createCMC7Reader`).
+
+---
+
 ## Backlog Futuro (P2 — fora do escopo v1.0)
 
 Conforme PRD §2 (roadmap) e RF-010 (P2):
@@ -929,9 +1024,10 @@ Conforme PRD §2 (roadmap) e RF-010 (P2):
 | M5 — Validação | T-015 a T-018 | S + M + L + M | 2 semanas |
 | M6 — API Pública | T-019 a T-022 | M + M + L + M | 2 semanas |
 | M7 — Release | T-023 a T-026 | M + M + M + M | 1–2 semanas |
-| **TOTAL** | **26 tarefas** | | **~15–19 semanas** |
+| M8 — Manutenção Segura | T-027 a T-030 | S + L + M + S | 1 semana |
+| **TOTAL** | **30 tarefas** | | **~16–20 semanas** |
 
-> **Nota:** M4 (OCR Engine) é o milestone de maior risco e variância. Se T-002 (PoC de Segmentação) for negativo, o escopo de M4 muda significativamente para CRNN, adicionando 2–4 semanas.
+> **Nota:** M4 (OCR Engine) é o milestone de maior risco e variância. Se T-002 (PoC de Segmentação) for negativo, o escopo de M4 muda significativamente para CRNN, adicionando 2–4 semanas. M8 foca nas dependências seguras para release de LTS.
 
 ---
 
