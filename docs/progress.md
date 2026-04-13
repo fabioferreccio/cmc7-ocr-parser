@@ -9,8 +9,8 @@
 
 - **Última atualização:** 2026-04-11
 - **Milestone atual:** 7 — Release
-- **Tasks concluídas:** 23 / 26
-- **Tasks em progresso:** Nenhuma (Próxima: T-025)
+- **Tasks concluídas:** 24 / 26
+- **Tasks em progresso:** Nenhuma (Próxima: T-026)
 
 
 ---
@@ -43,6 +43,7 @@
 | 2026-04-11 | bugfix | Correção de tipagem em readImage (Gate 2) | ✅ Resolvido | src/reader.ts |
 | 2026-04-13 | T-023 | Testes E2E com Playwright | ✅ Sucesso | e2e/camera-to-result.test.ts, reader.ts, demo/main.ts, types/index.ts |
 | 2026-04-13 | T-024 | Build e Bundle Otimização | ✅ Sucesso | tsup.config.ts, package.json, scripts/prepare-opencv-assets.js, src/wasm/opencv-loader.ts, build/bundle-size.test.ts |
+| 2026-04-13 | T-025 | React Hook e Vue Composable | ✅ Sucesso | src/react.ts, src/vue.ts, src/react.test.tsx, src/vue.test.ts, package.json |
 
 
 ---
@@ -72,14 +73,15 @@
 - [T-022] startCamera (Integração com Câmera)
 - [T-023] Testes E2E com Playwright
 - [T-024] Build e Bundle Otimização
+- [T-025] React Hook e Vue Composable
 
 ---
 
 ## Próxima Task
 
-**T-025 — React Hook e Vue Composable**  
+**T-026 — Documentação e Release**  
 Milestone 7 (Release)  
-Implementar wrappers para facilitar integração com React e Vue.
+README, SBOM, NPM Publish.
 
 ---
 
@@ -107,6 +109,7 @@ Implementar wrappers para facilitar integração com React e Vue.
 | 2026-04-08 | T-003 | Confirmado que a build single-thread não requer headers COOP/CORP, facilitando o deploy. | Requisito de headers SharedArrayBuffer. |
 | 2026-04-10 | T-004 | Configuração de subpath exports para React/Vue confirmada em package.json e tsup.config.ts para evitar bloating do bundle principal. | Export único vs subpath. |
 | 2026-04-13 | T-024 | Renomeado `opencv_js.wasm` para `opencv.wasm` para simplificar assets e match com documentação de release. | Nomenclatura de artefatos. |
+| 2026-04-13 | T-025 | Decisão de manter React e Vue como peerDependencies e subpath exports para evitar bloating do core. | Arquitetura de wrappers. |
 
 ---
 

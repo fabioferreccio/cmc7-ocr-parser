@@ -835,7 +835,7 @@ build/bundle-size.test.ts
 
 ---
 
-### T-025 — React Hook e Vue Composable
+### T-025 — React Hook e Vue Composable [DONE]
 
 | Campo | Valor |
 |-------|-------|
@@ -849,21 +849,21 @@ build/bundle-size.test.ts
 **Testes a escrever primeiro:**
 ```
 src/react.test.tsx
-- useCMC7Reader deve chamar createCMC7Reader na montagem
-- deve limpar o reader (stop) na desmontagem do componente
-- deve expor isReady: true após inicialização
-- deve funcionar corretamente com React.StrictMode (double-mount)
-- deve resetar result quando stop() é chamado
+- useCMC7Reader deve chamar createCMC7Reader na montagem [PASSED]
+- deve limpar o reader (stop) na desmontagem do componente [PASSED]
+- deve expor isReady: true após inicialização [PASSED]
+- deve funcionar corretamente com React.StrictMode (double-mount) [PASSED]
+- deve resetar result quando stop() é chamado [PASSED]
 
 src/vue.test.ts
-- useCMC7Reader deve chamar createCMC7Reader em setup
-- deve chamar stop() em onUnmounted
+- useCMC7Reader deve chamar createCMC7Reader em setup [PASSED]
+- deve chamar stop() em onUnmounted [PASSED]
 ```
 
 **Critério de done:**
-- [ ] `src/react.ts` e `src/vue.ts` implementados
-- [ ] Exemplos em `examples/react/` e `examples/vue/` funcionais
-- [ ] Todos os testes passando
+- [x] `src/react.ts` e `src/vue.ts` implementados
+- [ ] Exemplos em `examples/react/` e `examples/vue/` funcionais (pendente T-026)
+- [x] Todos os testes passando
 
 ---
 
