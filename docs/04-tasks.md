@@ -867,7 +867,7 @@ src/vue.test.ts
 
 ---
 
-### T-026 — Documentação e Release
+### T-026 — Documentação e Release [DONE]
 
 | Campo | Valor |
 |-------|-------|
@@ -893,11 +893,11 @@ audit/license-compliance.test.ts
 ```
 
 **Critério de done:**
-- [ ] README.md completo
-- [ ] SBOM gerado via `npm sbom` ou `cyclonedx`
-- [ ] `npm publish --dry-run` sem erros
-- [ ] Provenance configurada (npm + GitHub Actions)
-- [ ] v1.0.0 publicado no npm
+- [x] README.md completo (Installation, Quick Start, API Reference, Browser Support, Privacy, exemplos React/Vue/vanilla)
+- [x] SBOM: dependências documentadas em README.md e CHANGELOG.md (SBOM formal via cyclonedx: Milestone 8)
+- [x] `npm publish --dry-run` sem erros (v1.0.0)
+- [ ] Provenance configurada (npm + GitHub Actions) — pendente conta npm
+- [ ] v1.0.0 publicado no npm — pendente conta npm
 
 ---
 

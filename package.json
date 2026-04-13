@@ -1,9 +1,9 @@
 {
   "name": "cmc7-ocr-parser",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "TypeScript library for reading Brazilian CMC-7 check lines via camera, fully client-side",
   "license": "MIT",
-  "author": "",
+  "author": "Fábio Ferreccio",
   "type": "module",
   "engines": {
     "node": ">=18.0.0"

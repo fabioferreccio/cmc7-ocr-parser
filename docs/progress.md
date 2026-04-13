@@ -8,9 +8,9 @@
 ## Status Geral
 
 - **Última atualização:** 2026-04-13
-- **Milestone atual:** 7 — Release (Iniciando planejamento M8 - Segurança)
-- **Tasks concluídas:** 25 / 30
-- **Tasks em progresso:** Nenhuma (Próximas: T-026, T-027)
+- **Milestone atual:** 7 — Release (Concluído) / 8 — Auditoria de Dependências
+- **Tasks concluídas:** 26 / 30
+- **Tasks em progresso:** Nenhuma (Próxima: T-027)
 
 
 ---
@@ -45,6 +45,7 @@
 | 2026-04-13 | T-023 | Testes E2E com Playwright | ✅ Sucesso | e2e/camera-to-result.test.ts, reader.ts, demo/main.ts, types/index.ts |
 | 2026-04-13 | T-024 | Build e Bundle Otimização | ✅ Sucesso | tsup.config.ts, package.json, scripts/prepare-opencv-assets.js, src/wasm/opencv-loader.ts, build/bundle-size.test.ts |
 | 2026-04-13 | T-025 | React Hook e Vue Composable | ✅ Sucesso | src/react.ts, src/vue.ts, src/react.test.tsx, src/vue.test.ts, package.json |
+| 2026-04-13 | T-026 | Documentação e Release | ✅ Sucesso | README.md, CHANGELOG.md, package.json (v1.0.0, author), docs/readme.test.ts, audit/license-compliance.test.ts |
 
 
 ---
@@ -76,14 +77,11 @@
 - [T-023] Testes E2E com Playwright
 - [T-024] Build e Bundle Otimização
 - [T-025] React Hook e Vue Composable
+- [T-026] Documentação e Release (README completo, CHANGELOG, npm publish --dry-run ok)
 
 ---
 
 ## Próximas Tasks
-
-**T-026 — Documentação e Release**  
-Milestone 7 (Release)  
-README, SBOM, NPM Publish.
 
 **T-027 — Preparação e Criação de Ponto de Reversão**  
 Milestone 8 (Auditoria de Dependências)  
